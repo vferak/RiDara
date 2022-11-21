@@ -1,0 +1,28 @@
+version: '3.4'
+services:
+  database:
+    container_name: database
+    image: mariadb:10.7.1
+    restart: always
+    volumes:
+      - type: bind
+        source: ./.database
+        target: /var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: dunno
+    ports:
+      - "33306:3306"
+  api:
+    container_name: api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/api
+    depends_on:
+      - database
+    ports:
+      - "3000:3000"
