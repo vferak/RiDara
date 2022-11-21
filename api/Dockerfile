@@ -1,17 +1,17 @@
 FROM node:18.12.1-alpine
 
-RUN apk add bash curl
-
-RUN curl -fsSL "https://github.com/pnpm/pnpm/releases/latest/download/pnpm-linuxstatic-x64" -o /bin/pnpm; chmod +x /bin/pnpm
+RUN apk add bash
 
 WORKDIR /app
 
 COPY . .
 
-RUN pnpm install
+RUN npm install -g typescript ts-node
+
+RUN npm install
 
 EXPOSE 3000
 
 USER node
 
-CMD pnpm start:dev
+CMD npm run start:dev

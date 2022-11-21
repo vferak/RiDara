@@ -12,7 +12,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: user
       MYSQL_PASSWORD: password
-      MYSQL_DATABASE: dunno
+      MYSQL_DATABASE: ridara
     ports:
       - "33306:3306"
   api:
@@ -21,7 +21,7 @@ services:
       context: ./api
       dockerfile: Dockerfile
     volumes:
-      - ./:/api
+      - ./api:/app
     depends_on:
       - database
     ports:
