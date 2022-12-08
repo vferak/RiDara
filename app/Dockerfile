@@ -6,12 +6,10 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install -g typescript ts-node
-
 RUN npm install
 
-EXPOSE 3000
+EXPOSE 3010
 
 USER node
 
-CMD npm run start:dev
+CMD npm run dev

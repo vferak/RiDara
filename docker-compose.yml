@@ -26,3 +26,14 @@ services:
       - database
     ports:
       - "3000:3000"
+  app:
+    container_name: app
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    volumes:
+      - ./app:/app
+    depends_on:
+      - api
+    ports:
+      - "3010:3010"
