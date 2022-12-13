@@ -8,7 +8,7 @@ COPY . .
 
 RUN npm install
 
-EXPOSE 3010
+EXPOSE 3010 24678
 
 USER node
 
