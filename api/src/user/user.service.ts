@@ -7,36 +7,39 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
-  public constructor(
-    @InjectRepository(User)
-    private readonly userRepository: EntityRepository<User>,
-  ) {}
+    public constructor(
+        @InjectRepository(User)
+        private readonly userRepository: EntityRepository<User>,
+    ) {}
 
-  public async findAll(): Promise<User[]> {
-    return this.userRepository.findAll();
-  }
+    public async findAll(): Promise<User[]> {
+        return this.userRepository.findAll();
+    }
 
-  public async getOneByUuid(uuid: string): Promise<User> {
-    return this.userRepository.findOneOrFail({ uuid: uuid });
-  }
+    public async getOneByUuid(uuid: string): Promise<User> {
+        return this.userRepository.findOneOrFail({ uuid: uuid });
+    }
 
-  public async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = User.create(createUserDto);
+    public async create(createUserDto: CreateUserDto): Promise<User> {
+        const user = User.create(createUserDto);
 
-    await this.userRepository.persistAndFlush(user);
+        await this.userRepository.persistAndFlush(user);
 
-    return user;
-  }
+        return user;
+    }
 
-  public async update(user: User, updateUserDto: UpdateUserDto): Promise<User> {
-    user.update(updateUserDto);
+    public async update(
+        user: User,
+        updateUserDto: UpdateUserDto,
+    ): Promise<User> {
+        user.update(updateUserDto);
 
-    await this.userRepository.flush();
+        await this.userRepository.flush();
 
-    return user;
-  }
+        return user;
+    }
 
-  public async remove(user: User): Promise<void> {
-    await this.userRepository.removeAndFlush(user);
-  }
+    public async remove(user: User): Promise<void> {
+        await this.userRepository.removeAndFlush(user);
+    }
 }

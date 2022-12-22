@@ -6,15 +6,15 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { UserModule } from './user/user.module';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      cache: true,
-    }),
-    MikroOrmModule.forRoot(),
-    UserModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+    imports: [
+        ConfigModule.forRoot({
+            isGlobal: true,
+            cache: true,
+        }),
+        MikroOrmModule.forRoot(),
+        UserModule,
+    ],
+    controllers: [AppController],
+    providers: [AppService],
 })
 export class AppModule {}
