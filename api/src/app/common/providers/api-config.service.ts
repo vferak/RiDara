@@ -8,4 +8,8 @@ export class ApiConfigService {
     public getDatabase(): Record<string, any> {
         return this.configService.get<Record<string, any>>('database');
     }
+
+    public getJwt(): Record<string, any> {
+        return this.configService.get<Record<string, any>>('jwt');
+    }
 }

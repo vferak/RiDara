@@ -4,3 +4,7 @@ database:
     user: 'user'
     password: 'password'
     name: 'ridara'
+
+jwt:
+    secret_key: 'secretKey'
+    expiration: '60m'

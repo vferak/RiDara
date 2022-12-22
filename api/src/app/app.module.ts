@@ -1,3 +1,5 @@
+import configuration from '../../config/configuration';
+
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -11,8 +13,7 @@ import {
 import { ApiConfigService } from './common/providers/api-config.service';
 import { ConfigModuleOptions } from '@nestjs/config/dist/interfaces';
 import { CommonModule } from './common/common.module';
-
-import configuration from '../../config/configuration';
+import { AuthModule } from './auth/auth.module';
 
 const configModuleOptions: ConfigModuleOptions = {
     load: [configuration],
@@ -39,8 +40,9 @@ const configMicroOrm: MikroOrmModuleAsyncOptions = {
 @Module({
     imports: [
         ConfigModule.forRoot(configModuleOptions),
-        CommonModule,
         MikroOrmModule.forRootAsync(configMicroOrm),
+        CommonModule,
+        AuthModule,
         UserModule,
     ],
     controllers: [AppController],
