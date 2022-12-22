@@ -6,7 +6,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install -g typescript ts-node
+RUN npm install -g typescript ts-node @nestjs/cli
 
 RUN npm install
 
