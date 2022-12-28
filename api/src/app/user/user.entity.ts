@@ -29,4 +29,16 @@ export class User {
         this.email = updateUserDto.email;
         this.password = updateUserDto.password;
     }
+
+    public validatePassword(password: string): boolean {
+        return this.password === password;
+    }
+
+    public getEmail(): string {
+        return this.email;
+    }
+
+    public getPassword(): string {
+        return this.email;
+    }
 }

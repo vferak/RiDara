@@ -20,6 +20,10 @@ export class UserService {
         return this.userRepository.findOneOrFail({ uuid: uuid });
     }
 
+    public async findOneByEmail(email: string): Promise<User | null> {
+        return this.userRepository.findOne({ email: email });
+    }
+
     public async create(createUserDto: CreateUserDto): Promise<User> {
         const user = User.create(createUserDto);
 
