@@ -19,10 +19,6 @@ const emlements = [
 
 const el1 = { id: 1, name: 'První element', description: 'První pospis element' };
 const el2 = { id: 2, name: 'Druhy element', description: 'Druhy pospis element' };
-
-definePageMeta({
-    layout: 'home-layout',
-});
 </script>
 
 <template>
