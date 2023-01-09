@@ -10,6 +10,9 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ApiConfigService } from '../common/providers/api-config.service';
 import { JwtModuleAsyncOptions } from '@nestjs/jwt/dist/interfaces/jwt-module-options.interface';
+import { BcryptService } from './providers/bcrypt.service';
+import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { User } from '../user/user.entity';
 
 const jwtConfig: JwtModuleAsyncOptions = {
     inject: [ApiConfigService],
@@ -26,11 +29,17 @@ const jwtConfig: JwtModuleAsyncOptions = {
 };
 
 @Module({
-    imports: [PassportModule, JwtModule.registerAsync(jwtConfig), UserModule],
+    imports: [
+        PassportModule,
+        JwtModule.registerAsync(jwtConfig),
+        UserModule,
+        MikroOrmModule.forFeature([User]),
+    ],
     providers: [
         AuthService,
         LocalStrategy,
         JwtStrategy,
+        BcryptService,
         { provide: APP_GUARD, useClass: JwtAuthGuard },
     ],
     controllers: [AuthController],

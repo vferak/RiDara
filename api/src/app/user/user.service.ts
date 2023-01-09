@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { EntityRepository } from '@mikro-orm/mariadb';
 import { User } from './user.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
@@ -22,14 +21,6 @@ export class UserService {
 
     public async findOneByEmail(email: string): Promise<User | null> {
         return this.userRepository.findOne({ email: email });
-    }
-
-    public async create(createUserDto: CreateUserDto): Promise<User> {
-        const user = User.create(createUserDto);
-
-        await this.userRepository.persistAndFlush(user);
-
-        return user;
     }
 
     public async update(

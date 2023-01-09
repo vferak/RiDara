@@ -1,6 +1,6 @@
 import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
 import { v4 } from 'uuid';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Entity()
@@ -29,16 +29,11 @@ export class User {
         this.email = updateUserDto.email;
         this.password = updateUserDto.password;
     }
-
-    public validatePassword(password: string): boolean {
-        return this.password === password;
-    }
-
     public getEmail(): string {
         return this.email;
     }
 
     public getPassword(): string {
-        return this.email;
+        return this.password;
     }
 }

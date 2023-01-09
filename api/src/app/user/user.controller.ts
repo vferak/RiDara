@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserByUuidPipe } from './pipes/user-by-uuid.pipe';
 
@@ -27,11 +26,6 @@ export class UserController {
         @Param('uuid', UserByUuidPipe) user: User,
     ): Promise<User> {
         return user;
-    }
-
-    @Post()
-    public async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-        return this.userService.create(createUserDto);
     }
 
     @Patch(':uuid')
