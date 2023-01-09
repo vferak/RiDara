@@ -20,7 +20,7 @@ export class WorkspaceService {
         createWorkspaceDto: CreateWorkspaceDto,
         user: User,
     ): Promise<Workspace> {
-        const workspace = Workspace.create(createWorkspaceDto);
+        const workspace = Workspace.create(createWorkspaceDto, user);
         this.workspaceRepository.persist(workspace);
         await this.workspaceRepository.flush();
 

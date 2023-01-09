@@ -13,10 +13,10 @@ import { EntityManager } from '@mikro-orm/mariadb';
 export class UserWorkspace {
     [EntityRepositoryType]?: UserWorkspaceRepository;
 
-    @ManyToOne({ primary: true, entity: () => Workspace })
+    @ManyToOne({ primary: true, entity: () => Workspace, eager: true })
     private workspace: Workspace;
 
-    @ManyToOne({ primary: true, entity: () => User })
+    @ManyToOne({ primary: true, entity: () => User, eager: true })
     private user: User;
 
     @Property()

@@ -2,6 +2,7 @@ import {
     Collection,
     Entity,
     EntityRepositoryType,
+    ManyToOne,
     OneToMany,
     PrimaryKey,
     Property,
@@ -24,17 +25,24 @@ export class Workspace {
     @Property()
     private name!: string;
 
+    @ManyToOne({ entity: () => User, eager: true })
+    private owner!: User;
+
     @OneToMany('UserWorkspace', 'workspace')
     private userWorkspaces = new Collection<UserWorkspace>(this);
 
-    private constructor(uuid: string, name: string) {
+    private constructor(uuid: string, name: string, owner: User) {
         this.uuid = uuid;
         this.name = name;
+        this.owner = owner;
     }
 
-    public static create(createWorkspaceDto: CreateWorkspaceDto): Workspace {
+    public static create(
+        createWorkspaceDto: CreateWorkspaceDto,
+        owner: User,
+    ): Workspace {
         const uuid = v4();
-        return new Workspace(uuid, createWorkspaceDto.name);
+        return new Workspace(uuid, createWorkspaceDto.name, owner);
     }
 
     public update(updateWorkspaceDto: UpdateWorkspaceDto): void {
@@ -43,6 +51,10 @@ export class Workspace {
 
     public getName(): string {
         return this.name;
+    }
+
+    public getOwner(): User {
+        return this.owner;
     }
 
     public getUuid(): string {

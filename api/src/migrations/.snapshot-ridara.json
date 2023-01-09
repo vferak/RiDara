@@ -65,10 +65,28 @@
           "primary": false,
           "nullable": false,
           "mappedType": "string"
+        },
+        "owner_uuid": {
+          "name": "owner_uuid",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
         }
       },
       "name": "workspace",
       "indexes": [
+        {
+          "columnNames": [
+            "owner_uuid"
+          ],
+          "composite": false,
+          "keyName": "workspace_owner_uuid_index",
+          "primary": false,
+          "unique": false
+        },
         {
           "keyName": "PRIMARY",
           "columnNames": [
@@ -80,7 +98,20 @@
         }
       ],
       "checks": [],
-      "foreignKeys": {}
+      "foreignKeys": {
+        "workspace_owner_uuid_foreign": {
+          "constraintName": "workspace_owner_uuid_foreign",
+          "columnNames": [
+            "owner_uuid"
+          ],
+          "localTableName": "workspace",
+          "referencedColumnNames": [
+            "uuid"
+          ],
+          "referencedTableName": "user",
+          "updateRule": "cascade"
+        }
+      }
     },
     {
       "columns": {

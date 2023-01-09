@@ -16,6 +16,8 @@ import { UserService } from '../user/user.service';
 import { AddUserToWorkspaceDto } from '../userWorkspace/dto/create-userWorkspace.dto';
 import { UserWorkspaceService } from '../userWorkspace/userWorkspace.service';
 import { DeleteUserWorkspaceDto } from '../userWorkspace/dto/delete-userWorkspace.dto';
+import { CurrentUser } from '../common/decorators/user.decorator';
+import { User } from '../user/user.entity';
 
 @Controller('workspace')
 export class WorkspaceController {
@@ -25,7 +27,7 @@ export class WorkspaceController {
         private readonly userWorkspaceService: UserWorkspaceService,
     ) {}
 
-    @Get()
+    @Get('all')
     public async getAll(): Promise<Workspace[]> {
         return this.workspaceService.findAll();
     }
@@ -33,10 +35,8 @@ export class WorkspaceController {
     @Post('')
     public async create(
         @Body() createWorkspaceDto: CreateWorkspaceDto,
+        @CurrentUser() user: User,
     ): Promise<Workspace> {
-        const user = await this.userService.getOneByUuid(
-            createWorkspaceDto.user,
-        );
         return this.workspaceService.create(createWorkspaceDto, user);
     }
 
@@ -45,6 +45,13 @@ export class WorkspaceController {
         @Param('uuid', WorkspaceByUuidPipe) workspace: Workspace,
     ): Promise<Workspace> {
         return workspace;
+    }
+
+    @Get()
+    public async getWorkspaces(
+        @CurrentUser() user: User,
+    ): Promise<Workspace[]> {
+        return await user.getWorkspaces();
     }
 
     @Patch(':uuid')
