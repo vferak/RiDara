@@ -1,15 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { EntityRepository } from '@mikro-orm/mariadb';
 import { User } from './user.entity';
-import { InjectRepository } from '@mikro-orm/nestjs';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
-    public constructor(
-        @InjectRepository(User)
-        private readonly userRepository: EntityRepository<User>,
-    ) {}
+    public constructor(private readonly userRepository: UserRepository) {}
 
     public async findAll(): Promise<User[]> {
         return this.userRepository.findAll();

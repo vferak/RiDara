@@ -9,6 +9,8 @@ import { UserModule } from './user/user.module';
 import { ConfigModuleOptions } from '@nestjs/config/dist/interfaces';
 import { CommonModule } from './common/common.module';
 import { AuthModule } from './auth/auth.module';
+import { WorkspaceModule } from './workspace/workspace.module';
+import { UserWorkspaceModule } from './userWorkspace/userWorkspace.module';
 
 const configModuleOptions: ConfigModuleOptions = {
     load: [configuration],
@@ -22,6 +24,8 @@ const configModuleOptions: ConfigModuleOptions = {
         CommonModule,
         AuthModule,
         UserModule,
+        WorkspaceModule,
+        UserWorkspaceModule,
     ],
     controllers: [AppController],
     providers: [AppService],

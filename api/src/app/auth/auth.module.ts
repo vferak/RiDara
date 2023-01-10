@@ -29,12 +29,7 @@ const jwtConfig: JwtModuleAsyncOptions = {
 };
 
 @Module({
-    imports: [
-        PassportModule,
-        JwtModule.registerAsync(jwtConfig),
-        UserModule,
-        MikroOrmModule.forFeature([User]),
-    ],
+    imports: [PassportModule, JwtModule.registerAsync(jwtConfig), UserModule],
     providers: [
         AuthService,
         LocalStrategy,

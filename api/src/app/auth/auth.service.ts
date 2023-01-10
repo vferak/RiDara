@@ -2,17 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { User } from '../user/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from './dto/create-user.dto';
-import { InjectRepository } from '@mikro-orm/nestjs';
-import { EntityRepository } from '@mikro-orm/mariadb';
 import { BcryptService } from './providers/bcrypt.service';
+import { UserRepository } from '../user/user.repository';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly jwtService: JwtService,
         private readonly bcryptService: BcryptService,
-        @InjectRepository(User)
-        private readonly userRepository: EntityRepository<User>,
+        private readonly userRepository: UserRepository,
     ) {}
 
     async login(user: User): Promise<string> {
