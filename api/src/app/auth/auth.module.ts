@@ -10,9 +10,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ApiConfigService } from '../common/providers/api-config.service';
 import { JwtModuleAsyncOptions } from '@nestjs/jwt/dist/interfaces/jwt-module-options.interface';
-import { BcryptService } from './providers/bcrypt.service';
-import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { User } from '../user/user.entity';
+import { BcryptService } from '../common/providers/bcrypt.service';
 
 const jwtConfig: JwtModuleAsyncOptions = {
     inject: [ApiConfigService],
