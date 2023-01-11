@@ -48,14 +48,17 @@ export class User {
         return this.email;
     }
 
-    public getWorkspaces(): Workspace[] {
-        const workspaces = [];
+    public getUuid(): string {
+        return this.uuid;
+    }
 
-        for (const userWorkspace of this.userWorkspaces) {
-            workspaces.push(userWorkspace.getWorkspace());
-        }
-
-        return workspaces;
+    public async getWorkspaces(): Promise<Workspace[]> {
+        await this.userWorkspaces.init();
+        return this.userWorkspaces
+            .getItems()
+            .map((userWorkspace: UserWorkspace) =>
+                userWorkspace.getWorkspace(),
+            );
     }
 
     public getPassword(): string {

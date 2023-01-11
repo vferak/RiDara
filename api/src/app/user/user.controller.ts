@@ -13,6 +13,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserByUuidPipe } from './pipes/user-by-uuid.pipe';
 import { Public } from '../auth/decorators/public.decorator';
 import { CreateUserDto } from '../auth/dto/create-user.dto';
+import { Workspace } from '../workspace/workspace.entity';
 
 @Controller('user')
 export class UserController {
@@ -48,5 +49,12 @@ export class UserController {
         @Param('uuid', UserByUuidPipe) user: User,
     ): Promise<void> {
         await this.userService.remove(user);
+    }
+
+    @Get('dashboard/:uuid')
+    public async getWorkspaces(
+        @Param('uuid', UserByUuidPipe) user: User,
+    ): Promise<Workspace[]> {
+        return user.getWorkspaces();
     }
 }

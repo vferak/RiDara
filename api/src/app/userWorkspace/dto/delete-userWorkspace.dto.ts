@@ -1,7 +1,6 @@
-export class AddUserToWorkspaceDto {
+export class DeleteUserWorkspaceDto {
     public constructor(
         public workspaceUuid: string,
         public userUuid: string,
-        public role: string,
     ) {}
 }

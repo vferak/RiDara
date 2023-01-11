@@ -6,12 +6,14 @@ import { UserWorkspace } from '../userWorkspace/userWorkspace.entity';
 import { User } from '../user/user.entity';
 import { WorkspaceRepository } from './workspace.repository';
 import { UserWorkspaceRepository } from '../userWorkspace/userWorkspace.repository';
+import { EntityManager } from '@mikro-orm/mariadb';
 
 @Injectable()
 export class WorkspaceService {
     public constructor(
         private readonly workspaceRepository: WorkspaceRepository,
         private readonly userWorkspaceRepository: UserWorkspaceRepository,
+        private readonly entityManager: EntityManager,
     ) {}
 
     public async create(
@@ -20,8 +22,14 @@ export class WorkspaceService {
     ): Promise<Workspace> {
         const workspace = Workspace.create(createWorkspaceDto);
         this.workspaceRepository.persist(workspace);
+        await this.workspaceRepository.flush();
 
-        const userWorkspace = UserWorkspace.create(workspace, user, 'admin');
+        const userWorkspace = await UserWorkspace.create(
+            workspace,
+            user,
+            'admin',
+        );
+
         this.userWorkspaceRepository.persist(userWorkspace);
         await this.workspaceRepository.flush();
 
@@ -56,7 +64,7 @@ export class WorkspaceService {
         user: User,
         role: string,
     ): Promise<void> {
-        const userWorkspace = UserWorkspace.create(workspace, user, role);
+        const userWorkspace = await UserWorkspace.create(workspace, user, role);
         await this.userWorkspaceRepository.persistAndFlush(userWorkspace);
     }
 }

@@ -6,6 +6,8 @@ import {
 import { User } from '../user/user.entity';
 import { Workspace } from '../workspace/workspace.entity';
 import { UserWorkspaceRepository } from './userWorkspace.repository';
+import { BadRequestException } from '@nestjs/common';
+import { EntityManager } from '@mikro-orm/mariadb';
 
 @Entity({ customRepository: () => UserWorkspaceRepository })
 export class UserWorkspace {
@@ -28,11 +30,19 @@ export class UserWorkspace {
         user.addUserWorkspace(this);
     }
 
-    public static create(
+    public static async create(
         workspace: Workspace,
         user: User,
         role: string,
-    ): UserWorkspace {
+    ): Promise<UserWorkspace> {
+
+        const users = await workspace.getUsers();
+        for (const us of users) {
+            if (us.getUuid() === user.getUuid()) {
+                throw new BadRequestException('User already in workspace');
+            }
+        }
+
         return new UserWorkspace(workspace, user, role);
     }
 
@@ -46,5 +56,15 @@ export class UserWorkspace {
 
     public getRole(): string {
         return this.role;
+    }
+
+    public async remove(entityManager: EntityManager): Promise<void> {
+        const workspace = this.workspace;
+        entityManager.remove(this);
+
+        const users = await workspace.getUsers();
+        if (users.length === 0) {
+            workspace.remove(entityManager);
+        }
     }
 }

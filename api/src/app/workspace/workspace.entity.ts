@@ -12,6 +12,7 @@ import { CreateWorkspaceDto } from './dto/create-workspace.dto';
 import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
 import { UserWorkspace } from '../userWorkspace/userWorkspace.entity';
 import { WorkspaceRepository } from './workspace.repository';
+import { EntityManager } from '@mikro-orm/mariadb';
 
 @Entity({ customRepository: () => WorkspaceRepository })
 export class Workspace {
@@ -44,17 +45,22 @@ export class Workspace {
         return this.name;
     }
 
-    public getUsers(): User[] {
-        const users = [];
+    public getUuid(): string {
+        return this.uuid;
+    }
 
-        for (const userWorkspace of this.userWorkspaces) {
-            users.push(userWorkspace.getUser());
-        }
-
-        return users;
+    public async getUsers(): Promise<User[]> {
+        await this.userWorkspaces.init();
+        return this.userWorkspaces
+            .getItems()
+            .map((userWorkspace: UserWorkspace) => userWorkspace.getUser());
     }
 
     public addUserWorkspace(userWorkspace: UserWorkspace): void {
         this.userWorkspaces.add(userWorkspace);
+    }
+
+    public remove(entityManager: EntityManager): void {
+        entityManager.remove(this);
     }
 }

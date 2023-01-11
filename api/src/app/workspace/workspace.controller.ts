@@ -14,12 +14,15 @@ import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
 import { CreateWorkspaceDto } from './dto/create-workspace.dto';
 import { UserService } from '../user/user.service';
 import { AddUserToWorkspaceDto } from '../userWorkspace/dto/create-userWorkspace.dto';
+import { UserWorkspaceService } from '../userWorkspace/userWorkspace.service';
+import { DeleteUserWorkspaceDto } from '../userWorkspace/dto/delete-userWorkspace.dto';
 
 @Controller('workspace')
 export class WorkspaceController {
     constructor(
         private readonly workspaceService: WorkspaceService,
         private readonly userService: UserService,
+        private readonly userWorkspaceService: UserWorkspaceService,
     ) {}
 
     @Get()
@@ -64,7 +67,7 @@ export class WorkspaceController {
         @Body() addUserToWorkspaceDto: AddUserToWorkspaceDto,
     ): Promise<void> {
         const user = await this.userService.getOneByUuid(
-            addUserToWorkspaceDto.usersUuid,
+            addUserToWorkspaceDto.userUuid,
         );
         const workspace = await this.workspaceService.getOneByUuid(
             addUserToWorkspaceDto.workspaceUuid,
@@ -74,5 +77,26 @@ export class WorkspaceController {
             user,
             addUserToWorkspaceDto.role,
         );
+    }
+
+    @Post('remove_user')
+    public async removeUser(
+        @Body() deleteUserWorkspaceDto: DeleteUserWorkspaceDto,
+    ): Promise<void> {
+        const user = await this.userService.getOneByUuid(
+            deleteUserWorkspaceDto.userUuid,
+        );
+
+        const workspace = await this.workspaceService.getOneByUuid(
+            deleteUserWorkspaceDto.workspaceUuid,
+        );
+
+        const userWorkspace =
+            await this.userWorkspaceService.getOneByUserAndWorkspace(
+                user,
+                workspace,
+            );
+
+        return await this.userWorkspaceService.remove(userWorkspace);
     }
 }
