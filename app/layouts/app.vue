@@ -9,7 +9,7 @@ const logOut = (): void => {
 }
 </script>
 <template>
-    <div>
+    <div class="flex flex-col h-screen">
         <div class="drawer">
             <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
             <div class="drawer-content flex flex-col">
@@ -43,7 +43,7 @@ const logOut = (): void => {
                     </div>
                 </div>
 
-                <div class="bg-base-100">
+                <div class="bg-base-100 h-full">
                     <slot />
                 </div>
 
