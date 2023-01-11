@@ -50,4 +50,13 @@ export class WorkspaceService {
     public async remove(workspace: Workspace): Promise<void> {
         await this.workspaceRepository.removeAndFlush(workspace);
     }
+
+    public async addUserToWorkspace(
+        workspace: Workspace,
+        user: User,
+        role: string,
+    ): Promise<void> {
+        const userWorkspace = UserWorkspace.create(workspace, user, role);
+        await this.userWorkspaceRepository.persistAndFlush(userWorkspace);
+    }
 }
