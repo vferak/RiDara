@@ -6,12 +6,6 @@ const templates = [
     {id: 3, name: 'Treti template', description: 'Treti pospis template'},
     {id: 4, name: 'Ctvrty template', description: 'Ctvrty pospis template'}
 ]
-
-definePageMeta({
-    layout: "home-layout",
-});
-
-
 </script>
 
 <template>

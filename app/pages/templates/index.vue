@@ -15,10 +15,6 @@ const redirectToCreate = () => {
 const createFile = () => {
     router.push('templates/savefile');
 };
-
-definePageMeta({
-    layout: 'home-layout',
-});
 </script>
 
 <template>

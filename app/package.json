@@ -12,6 +12,9 @@
     "nuxt": "3.0.0"
   },
   "dependencies": {
-    "daisyui": "^2.41.0"
+    "@vee-validate/zod": "^4.7.3",
+    "daisyui": "^2.41.0",
+    "vee-validate": "^4.7.3",
+    "zod": "^3.20.2"
   }
 }
