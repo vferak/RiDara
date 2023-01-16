@@ -15,10 +15,4 @@ export class AuthController {
     async login(@Request() req) {
         return this.authService.login(req.user);
     }
-
-    @Public()
-    @Post('register')
-    public async register(@Body() createUserDto: CreateUserDto): Promise<User> {
-        return this.authService.register(createUserDto);
-    }
 }

@@ -1,15 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { EntityRepository } from '@mikro-orm/mariadb';
 import { User } from './user.entity';
-import { InjectRepository } from '@mikro-orm/nestjs';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserRepository } from './user.repository';
+import { CreateUserDto } from '../auth/dto/create-user.dto';
+import { BcryptService } from '../common/providers/bcrypt.service';
 
 @Injectable()
 export class UserService {
     public constructor(
-        @InjectRepository(User)
-        private readonly userRepository: EntityRepository<User>,
+        private readonly userRepository: UserRepository,
+        private readonly bcryptService: BcryptService,
     ) {}
+
+    public async register(createUserDto: CreateUserDto): Promise<User> {
+        createUserDto.password = await this.bcryptService.hash(
+            createUserDto.password,
+        );
+        const user = User.create(createUserDto);
+        await this.userRepository.persistAndFlush(user);
+
+        return user;
+    }
 
     public async findAll(): Promise<User[]> {
         return this.userRepository.findAll();
@@ -27,6 +38,9 @@ export class UserService {
         user: User,
         updateUserDto: UpdateUserDto,
     ): Promise<User> {
+        updateUserDto.password = await this.bcryptService.hash(
+            updateUserDto.password,
+        );
         user.update(updateUserDto);
 
         await this.userRepository.flush();
