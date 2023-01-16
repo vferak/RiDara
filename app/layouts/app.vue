@@ -16,7 +16,7 @@ const logOut = (): void => {
                 <!-- Navbar -->
                 <div class="navbar bg-base-200">
                     <div class="flex-1">
-                        <NuxtLink to="/" class="btn btn-ghost normal-case text-xl">RiDara</NuxtLink>
+                        <NuxtLink to="/diagrams" class="btn btn-ghost normal-case text-xl">RiDara</NuxtLink>
 
                     </div>
                     <div class="flex-none gap-3">
@@ -30,13 +30,7 @@ const logOut = (): void => {
                                 </div>
                             </label>
                             <ul tabindex="0" class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52">
-                                <li>
-                                    <a class="justify-between">
-                                        Profile
-                                        <span class="badge">New</span>
-                                    </a>
-                                </li>
-                                <li><a>Settings</a></li>
+                                <li><NuxtLink to="/user/profile">Profile</NuxtLink></li>
                                 <li><a @click='logOut'>Logout</a></li>
                             </ul>
                         </div>

@@ -48,10 +48,6 @@ export class User {
         return this.email;
     }
 
-    public getUuid(): string {
-        return this.uuid;
-    }
-
     public async getWorkspaces(): Promise<Workspace[]> {
         await this.userWorkspaces.init();
         return this.userWorkspaces
@@ -59,6 +55,10 @@ export class User {
             .map((userWorkspace: UserWorkspace) =>
                 userWorkspace.getWorkspace(),
             );
+    }
+
+    public getUuid(): string {
+        return this.uuid;
     }
 
     public getPassword(): string {

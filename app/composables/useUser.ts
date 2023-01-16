@@ -1,3 +1,10 @@
+export type User = {
+    uuid: string,
+    email: string,
+    password: string,
+    userWorkspaces: string[],
+}
+
 export const useUser = () => {
 
     const register = async (email: string, password: string): Promise<void> => {
@@ -11,5 +18,25 @@ export const useUser = () => {
             }
         );
     }
-    return { register: register }
+
+    const update = async (email: string, password: string): Promise<void> => {
+        const body = {email: email, password: password};
+
+        return await useApiFetch(
+            'http://localhost:3000/user',
+            {
+                method: 'PATCH',
+                body: body,
+            }
+        );
+    }
+
+    const getProfile = async (): Promise<User> => {
+
+        return await useApiFetch(
+            `/user/profile`
+        );
+    }
+
+    return { update: update, getProfile: getProfile, register: register }
 }

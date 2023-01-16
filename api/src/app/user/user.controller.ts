@@ -25,7 +25,7 @@ export class UserController {
     public async register(@Body() createUserDto: CreateUserDto): Promise<User> {
         return this.userService.register(createUserDto);
     }
-    @Get()
+    @Get('/all')
     public async getAll(): Promise<User[]> {
         return this.userService.findAll();
     }
@@ -35,16 +35,20 @@ export class UserController {
         return user.getWorkspaces();
     }
 
-    @Get(':uuid')
-    public async getByUuid(
-        @Param('uuid', UserByUuidPipe) user: User,
-    ): Promise<User> {
+    @Get('profile')
+    public async getProfile(@CurrentUser() user: User): Promise<object> {
+        await user.getWorkspaces();
         return user;
     }
 
-    @Patch(':uuid')
+    @Get()
+    public async getByUuid(@CurrentUser() user: User): Promise<User> {
+        return user;
+    }
+
+    @Patch('')
     public async update(
-        @Param('uuid', UserByUuidPipe) user: User,
+        @CurrentUser() user: User,
         @Body() updateUserDto: UpdateUserDto,
     ): Promise<User> {
         return this.userService.update(user, updateUserDto);

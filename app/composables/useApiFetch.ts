@@ -1,7 +1,7 @@
 import { NitroFetchRequest } from 'nitropack';
 import { FetchOptions } from 'ofetch';
 
-export const useApiFetch = async <T = unknown, R extends NitroFetchRequest = NitroFetchRequest>(request: R, opts?: FetchOptions | undefined) => {
+export const useApiFetch = async <T = unknown, R extends NitroFetchRequest = NitroFetchRequest>(request: R, opts?: FetchOptions | undefined): any => {
     const runtimeConfig = useRuntimeConfig();
     const auth = useAuth();
 
