@@ -15,6 +15,9 @@ const configMicroOrm: MikroOrmModuleOptions = {
     user: databaseConfig.user,
     password: databaseConfig.password,
     dbName: databaseConfig.name,
+    migrations: {
+        path: 'src/migrations',
+    },
 };
 
 export default configMicroOrm;
