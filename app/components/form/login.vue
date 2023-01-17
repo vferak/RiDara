@@ -18,10 +18,11 @@ const password = $veeValidate.useField<string>('password');
 const loginFailed = useState<boolean>(() => false);
 
 const onSubmit = handleSubmit(async (): Promise<void> => {
-    loginFailed.value = !(await auth.logIn(email.value.value, password.value.value));
-
-    if (!loginFailed.value) {
+    try {
+        await auth.logIn(email.value.value, password.value.value);
         router.push('/templates');
+    } catch {
+        loginFailed.value = true;
     }
 });
 </script>

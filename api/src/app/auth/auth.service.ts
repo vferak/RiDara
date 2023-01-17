@@ -7,7 +7,7 @@ export class AuthService {
     constructor(private readonly jwtService: JwtService) {}
 
     async login(user: User): Promise<string> {
-        const payload = { username: user.getEmail(), sub: user.getPassword() };
+        const payload = { uuid: user.getUuid(), username: user.getEmail() };
 
         return this.jwtService.sign(payload);
     }
