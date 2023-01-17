@@ -18,12 +18,16 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "database:fresh": "npx mikro-orm migration:fresh",
+    "database:diff": "npx mikro-orm migration:create",
+    "database:migrate": "npx mikro-orm migration:up"
   },
   "dependencies": {
-    "@mikro-orm/cli": "^5.5.3",
-    "@mikro-orm/core": "^5.5.3",
-    "@mikro-orm/mariadb": "^5.5.3",
+    "@mikro-orm/cli": "^5.6.7",
+    "@mikro-orm/core": "^5.6.7",
+    "@mikro-orm/mariadb": "^5.6.7",
+    "@mikro-orm/migrations": "^5.6.7",
     "@mikro-orm/nestjs": "^5.1.2",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.2.0",
@@ -83,5 +87,8 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "mikro-orm": {
+    "useTsNode": true
   }
 }
