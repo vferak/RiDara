@@ -14,6 +14,7 @@ import { UserByUuidPipe } from './pipes/user-by-uuid.pipe';
 import { Public } from '../auth/decorators/public.decorator';
 import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { Workspace } from '../workspace/workspace.entity';
+import { CurrentUser } from '../common/decorators/user.decorator';
 
 @Controller('user')
 export class UserController {
@@ -27,6 +28,11 @@ export class UserController {
     @Get()
     public async getAll(): Promise<User[]> {
         return this.userService.findAll();
+    }
+
+    @Get('dashboard')
+    public async getDashboard(@CurrentUser() user: User): Promise<Workspace[]> {
+        return user.getWorkspaces();
     }
 
     @Get(':uuid')
@@ -49,12 +55,5 @@ export class UserController {
         @Param('uuid', UserByUuidPipe) user: User,
     ): Promise<void> {
         await this.userService.remove(user);
-    }
-
-    @Get('dashboard/:uuid')
-    public async getWorkspaces(
-        @Param('uuid', UserByUuidPipe) user: User,
-    ): Promise<Workspace[]> {
-        return user.getWorkspaces();
     }
 }
