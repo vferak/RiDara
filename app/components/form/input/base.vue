@@ -3,7 +3,8 @@ import { FieldContext } from 'vee-validate';
 
 const props = defineProps<{
     name: string,
-    field: FieldContext
+    field: FieldContext,
+    type: string
 }>();
 
 const value = props.field.value;
@@ -27,7 +28,7 @@ const isError = computed<boolean>(
                 <BadgeSuccess v-if='isValid'/>
             </span>
         </label>
-        <input @focusout='field.setTouched' v-model='value' name='email' type='text' :placeholder='props.name'
+        <input @focusout='field.setTouched' v-model='value' :name='field.label' :type='props.type' :placeholder='props.name'
                class='input input-bordered input-sm' :class='[isError ? "input-error" : "", isValid ? "input-success" : ""]' />
     </div>
 </template>

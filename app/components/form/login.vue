@@ -29,8 +29,8 @@ const onSubmit = handleSubmit(async (): Promise<void> => {
 <template>
     <form @submit='onSubmit' class='flex flex-col'>
         <AlertError v-if='loginFailed' class='mb-6 mt-4'>Invalid credentials!</AlertError>
-        <FormInputBase :name='"E-mail"' :field='email'/>
-        <FormInputBase :name='"Password"' :field='password'/>
+        <FormInputBase :name='"E-mail"' :type='"email"' :field='email'/>
+        <FormInputBase :name='"Password"' :type='"password"' :field='password'/>
         <input type='submit' value='Submit' class='btn btn-sm mt-4' />
     </form>
 </template>
