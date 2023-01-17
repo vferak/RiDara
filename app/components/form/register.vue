@@ -29,7 +29,7 @@ const password_again = $veeValidate.useField<string>('password_again');
 
 const onSubmit = handleSubmit(async (): Promise<void> => {
     await user.register(email.value.value, password.value.value);
-    router.push({ path: '/', query: {'registration_succesfull': 1} });
+    router.push({ path: '/', query: {'registration_successful': 1} });
 });
 </script>
 <template>

@@ -1,20 +1,16 @@
 <script setup lang='ts'>
 const route = useRoute();
-const success = useState(() => !!(route.query.registration_succesfull));
+const success = useState<boolean>();
+
 watchEffect(() => {
-    success.value = !!(route.query.registration_succesfull);
-})
-
-if (success.value) {
-    setTimeout(() => {
-        success.value = false;
-    }, 5000);
-}
-
+   success.value = !!(route.query.registration_successful);
+});
 </script>
 <template>
     <div class='container mx-auto h-full'>
-        <ToastSuccess v-show='success'>Registration successfull</ToastSuccess>
+        <Toast v-model='success'>
+            <AlertSuccess>Registration successful</AlertSuccess>
+        </Toast>
         <div class='flex h-full justify-center items-center'>
             <div class='card bg-base-100 shadow-xl w-1/3 mb-48'>
                 <div class='card-body w-full'>
