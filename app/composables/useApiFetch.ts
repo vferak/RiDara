@@ -2,6 +2,7 @@ import { NitroFetchRequest } from 'nitropack';
 import { FetchOptions } from 'ofetch';
 
 export const useApiFetch = async <T = unknown, R extends NitroFetchRequest = NitroFetchRequest>(request: R, opts?: FetchOptions | undefined) => {
+    const runtimeConfig = useRuntimeConfig();
     const auth = useAuth();
 
     const getHeaders = () => {
@@ -16,7 +17,7 @@ export const useApiFetch = async <T = unknown, R extends NitroFetchRequest = Nit
 
 
     const customFetch = $fetch.create({
-        baseURL: 'http://localhost:3000',
+        baseURL: runtimeConfig.public.API_URL,
         headers: getHeaders()
     })
 

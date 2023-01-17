@@ -2,5 +2,10 @@
 export default defineNuxtConfig({
     modules: [
         '@nuxtjs/tailwindcss'
-    ]
+    ],
+    runtimeConfig: {
+        public: {
+            API_URL: 'Missing .env config file!'
+        }
+    }
 })
