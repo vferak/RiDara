@@ -1,51 +1,64 @@
 <script setup lang='ts'>
-const router = useRouter();
-const auth = useAuth();
-
-const logOut = (): void => {
-    auth.logOut();
-
-    router.push('/');
-}
+const navs = [
+    {
+        name: 'Overview',
+        links: [
+            {name: 'Dashboard', route: '/projects', icon: 'gg-collage'},
+            {name: 'Workspaces', route: '/projects', icon: 'gg-work-alt'},
+        ],
+    },
+    {
+        name: 'Current workspace',
+        links: [
+            {name: 'New project', route: '/projects', icon: 'gg-add-r'},
+            {name: 'Projects', route: '/projects', icon: 'gg-album'},
+            {name: 'Workspace settings', route: '/diagrams', icon: 'gg-options'},
+        ],
+    },
+    {
+        name: 'Admin',
+        links: [
+            {name: 'Templates', route: '/projects', icon: 'gg-template'},
+        ],
+    },
+];
 </script>
 <template>
     <div class="flex flex-col h-screen">
-        <div class="drawer">
-            <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
-            <div class="drawer-content flex flex-col">
-                <!-- Navbar -->
-                <div class="navbar bg-base-200">
-                    <div class="flex-1">
-                        <NuxtLink to="/diagrams" class="btn btn-ghost normal-case text-xl">RiDara</NuxtLink>
-                        <ThemeToggle/>
-                    </div>
-                    <div class="flex-none gap-3">
-                        <ul class="menu menu-horizontal p-0">
-                            <li><NuxtLink to="/diagrams">Diagrams</NuxtLink></li>
-                        </ul>
-                        <div class="dropdown dropdown-end">
-                            <label tabindex="0" class="btn btn-ghost btn-circle avatar">
-                                <div class="w-10 rounded-full">
-                                    <img src="https://placeimg.com/80/80/people" />
-                                </div>
-                            </label>
-                            <ul tabindex="0" class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52">
-                                <li><NuxtLink to="/user/profile">Profile</NuxtLink></li>
-                                <li><a @click='logOut'>Logout</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+        <div class="drawer drawer-mobile">
+            <input id="site-drawer" type="checkbox" class="drawer-toggle" />
+            <div class="drawer-content flex flex-col items-center justify-center">
+                <LayoutNavbar/>
 
-                <div class="bg-base-100 h-full">
+                <div class="bg-base-100 h-full w-full">
                     <slot />
                 </div>
 
-
+                <LayoutFooter/>
+            </div>
+            <div class="drawer-side">
+                <label for="site-drawer" class="drawer-overlay"></label>
+                <aside class='w-80 bg-base-300 h-full'>
+                    <div class='hidden lg:flex px-4 py-2'>
+                        <NuxtLink class='btn btn-ghost justify-start normal-case text-3xl font-bold w-full' to="/diagrams">RiDara</NuxtLink>
+                    </div>
+                    <div class='flex flex-col'>
+                        <div v-for='nav in navs' :key='nav.name'>
+                            <div class="divider">{{ nav.name }}</div>
+                            <ul class="menu p-4 text-base-content">
+                                <li v-for='navLink in nav.links' :key='navLink.route'>
+                                    <NuxtLink :to="navLink.route" class='flex gap-4 items-stretch'>
+                                    <span class='flex-none w-6 flex justify-center items-center'>
+                                        <i :class="navLink.icon"></i>
+                                    </span>
+                                        <span class='flex-1 font-medium'>{{ navLink.name }}</span>
+                                    </NuxtLink>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </aside>
             </div>
         </div>
-
-        <LayoutFooter/>
-
     </div>
 </template>

@@ -7,4 +7,11 @@ export default <Partial<Config>>{
     daisyui: {
         themes: ['light', 'dark'],
     },
+    theme: {
+        container: {
+            padding: {
+                lg: '5rem',
+            }
+        }
+    }
 }
