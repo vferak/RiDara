@@ -3,7 +3,7 @@ const navs = [
     {
         name: 'Overview',
         links: [
-            {name: 'Dashboard', route: '/projects', icon: 'gg-collage'},
+            {name: 'Dashboard', route: '/dashboard', icon: 'gg-collage'},
             {name: 'Workspaces', route: '/projects', icon: 'gg-work-alt'},
         ],
     },
@@ -30,7 +30,7 @@ const navs = [
             <div class="drawer-content flex flex-col items-center justify-center">
                 <LayoutNavbar/>
 
-                <div class="bg-base-100 h-full w-full">
+                <div class="bg-base-100 h-full w-full overflow-auto">
                     <slot />
                 </div>
 

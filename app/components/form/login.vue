@@ -20,7 +20,7 @@ const loginFailed = useState<boolean>(() => false);
 const onSubmit = handleSubmit(async (): Promise<void> => {
     try {
         await auth.logIn(email.value.value, password.value.value);
-        router.push('/templates');
+        router.push('/dashboard');
     } catch {
         loginFailed.value = true;
     }

@@ -6,7 +6,7 @@ const { workspace } = defineProps<{ workspace: Workspace }>()
 
 <template>
   <div>
-    <div class="card w-50 bg-base-100 shadow-xl">
+    <div class="card w-50 bg-base-200 shadow-xl">
       <div class="card-body">
         <h2 class="card-title">{{ workspace.name }}</h2>
         <p>{{ workspace.owner.email }}</p>
