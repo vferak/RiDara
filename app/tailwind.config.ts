@@ -5,6 +5,6 @@ export default <Partial<Config>>{
         require("daisyui")
     ],
     daisyui: {
-        themes: ['light'],
+        themes: ['light', 'dark'],
     },
 }

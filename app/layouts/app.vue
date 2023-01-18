@@ -17,7 +17,7 @@ const logOut = (): void => {
                 <div class="navbar bg-base-200">
                     <div class="flex-1">
                         <NuxtLink to="/diagrams" class="btn btn-ghost normal-case text-xl">RiDara</NuxtLink>
-
+                        <ThemeToggle/>
                     </div>
                     <div class="flex-none gap-3">
                         <ul class="menu menu-horizontal p-0">
