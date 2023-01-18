@@ -37,7 +37,7 @@ onBeforeMount(async () => {
             </div>
         </div>
         <div class="card w-1/2 min-w-min bg-base-200 shadow-xl mx-auto mt-8 px-10 pt-8">
-           <FormUserEdit :user-email='userData.email'/>
+           <FormUserEdit :user-email='userData.email' :first-name='userData.firstName' :last-name='userData.lastName'/>
         </div>
     </div>
 </template>

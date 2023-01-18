@@ -21,6 +21,24 @@
           "nullable": false,
           "mappedType": "string"
         },
+        "first_name": {
+          "name": "first_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
         "password": {
           "name": "password",
           "type": "varchar(255)",
@@ -29,6 +47,16 @@
           "primary": false,
           "nullable": false,
           "mappedType": "string"
+        },
+        "create_date": {
+          "name": "create_date",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
         }
       },
       "name": "user",

@@ -7,8 +7,8 @@ export type User = {
 
 export const useUser = () => {
 
-    const register = async (email: string, password: string): Promise<void> => {
-        const body = {email: email, password: password};
+    const register = async (email: string, firstName: string, lastName: string, password: string): Promise<void> => {
+        const body = {email: email, firstName: firstName, lastName: lastName, password: password};
 
         await useApiFetch(
             'http://localhost:3000/user/register',
@@ -19,8 +19,8 @@ export const useUser = () => {
         );
     }
 
-    const update = async (email: string, password: string): Promise<void> => {
-        const body = {email: email, password: password};
+    const update = async (email: string, firstName: string, lastName: string, password: string): Promise<void> => {
+        const body = {email: email, firstName: firstName, lastName: lastName, password: password};
 
         return await useApiFetch(
             'http://localhost:3000/user',

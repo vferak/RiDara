@@ -24,28 +24,65 @@ export class User {
     private email!: string;
 
     @Property()
+    private firstName!: string;
+
+    @Property()
+    private lastName!: string;
+
+    @Property()
     private password!: string;
+
+    @Property()
+    private createDate!: Date;
 
     @OneToMany('UserWorkspace', 'user')
     private userWorkspaces = new Collection<UserWorkspace>(this);
 
-    private constructor(uuid: string, email: string, password: string) {
+    private constructor(
+        uuid: string,
+        email: string,
+        firstName: string,
+        lastName: string,
+        password: string,
+        createDate: Date,
+    ) {
         this.uuid = uuid;
         this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.password = password;
+        this.createDate = createDate;
     }
 
     public static create(createUserDto: CreateUserDto): User {
         const uuid = v4();
-        return new User(uuid, createUserDto.email, createUserDto.password);
+        const date = new Date();
+        return new User(
+            uuid,
+            createUserDto.email,
+            createUserDto.firstName,
+            createUserDto.lastName,
+            createUserDto.password,
+            date,
+        );
     }
 
     public update(updateUserDto: UpdateUserDto): void {
         this.email = updateUserDto.email;
+        this.firstName = updateUserDto.firstName;
+        this.lastName = updateUserDto.lastName;
         this.password = updateUserDto.password;
     }
     public getEmail(): string {
         return this.email;
+    }
+
+    public getFirstName(): string {
+        return this.firstName;
+    }
+
+    public getLastName(): string {
+        return this.lastName;
     }
 
     public async getWorkspaces(): Promise<Workspace[]> {

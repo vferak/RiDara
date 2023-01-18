@@ -9,6 +9,8 @@ const { handleSubmit } = $veeValidate.useForm({
     validationSchema: $veeValidate.toFormValidator(
         $z.object({
             email: $z.string().email({ message: 'Must be a valid email' }),
+            firstName: $z.string(),
+            lastName: $z.string(),
             password: $z.string().min(3, { message: 'Too short' }),
             password_again: $z.string().min(3, { message: 'Too short' }),
         }).superRefine(({ password_again, password }, ctx) => {
@@ -24,16 +26,20 @@ const { handleSubmit } = $veeValidate.useForm({
 });
 
 const email = $veeValidate.useField<string>('email');
+const firstName = $veeValidate.useField<string>('firstName');
+const lastName = $veeValidate.useField<string>('lastName');
 const password = $veeValidate.useField<string>('password');
 const password_again = $veeValidate.useField<string>('password_again');
 
 const onSubmit = handleSubmit(async (): Promise<void> => {
-    await user.register(email.value.value, password.value.value);
+    await user.register(email.value.value, firstName.value.value, lastName.value.value, password.value.value);
     router.push({ path: '/', query: {'registration_successful': 1} });
 });
 </script>
 <template>
     <form @submit='onSubmit' class='flex flex-col'>
+        <FormInputBase :name='"First name"' :type='"text"' :field='firstName' />
+        <FormInputBase :name='"Last name"' :type='"text"' :field='lastName' />
         <FormInputBase :name='"E-mail"' :type='"email"' :field='email' />
         <FormInputBase :name='"Password"' :type='"password"' :field='password' />
         <FormInputBase :name='"Password again"' :type='"password"' :field='password_again' />
