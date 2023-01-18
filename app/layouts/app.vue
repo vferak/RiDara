@@ -4,7 +4,7 @@ const navs = [
         name: 'Overview',
         links: [
             {name: 'Dashboard', route: '/dashboard', icon: 'gg-collage'},
-            {name: 'Workspaces', route: '/projects', icon: 'gg-work-alt'},
+            {name: 'Workspaces', route: '/workspaces', icon: 'gg-work-alt'},
         ],
     },
     {

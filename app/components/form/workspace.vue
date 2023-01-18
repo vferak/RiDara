@@ -4,8 +4,12 @@ const router = useRouter();
 const workspace = useWorkspace();
 const { $z, $veeValidate } = useNuxtApp();
 
+const props = defineProps<{
+    name?: string
+}>();
+
 const emit = defineEmits<{
-    (event: 'formSent', value: boolean): void
+    (event: 'formSent', name: string): void
 }>();
 
 const { handleSubmit } = $veeValidate.useForm({
@@ -17,17 +21,21 @@ const { handleSubmit } = $veeValidate.useForm({
 });
 
 const name = $veeValidate.useField<string>('name');
+if(props.name !== undefined) {
+    name.setValue(props.name);
+}
 
 const onSubmit = handleSubmit(async (): Promise<void> => {
-    await workspace.create(name.value.value);
-    emit('formSent', true);
+    emit('formSent', name.value.value);
+    name.setValue('');
+    name.meta.touched = false;
 });
 
 </script>
 
 <template>
     <form @submit='onSubmit' class='flex flex-col mb-4'>
-        <FormInputBase :name='"Name"' :type='"text"' :field='name'  />
-        <input type='submit' value='Submit' class='btn btn-sm mt-4' />
+        <FormInputBase :name='"Name"' :type='"text"' :field='name'/>
+        <input type='submit' value='Submit' class='btn btn-sm mt-4'/>
     </form>
 </template>

@@ -9,7 +9,7 @@ watch(() => props.modelValue, () => {});
 </script>
 <template>
     <input v-model='props.modelValue' type='checkbox' id='new-template' class='modal-toggle' />
-    <label for='new-template' class='modal cursor-pointer'>
+    <label for='new-template' class='modal cursor-pointer left-80'>
         <label class='modal-box relative' for=''>
             <slot/>
         </label>

@@ -27,5 +27,32 @@ export const useWorkspace = () => {
         );
     }
 
-    return { getWorkspaces:getWorkspaces, create:create }
+    const getWorkspace = async (uuid: string): Promise<Workspace> => {
+
+        return await useApiFetch(
+            `/workspace/${uuid}/settings`,
+        );
+    }
+
+    const getUsersFromWorkspace = async (uuid: string): Promise<User[]> => {
+
+        return await useApiFetch(
+            `/workspace/${uuid}/users`,
+        );
+    }
+
+    const update = async (uuid: string, name: string): Promise<void> => {
+        const body = {name: name};
+
+        return await useApiFetch(
+            `http://localhost:3000/workspace/${uuid}`,
+            {
+                method: 'PATCH',
+                body: body,
+            }
+        );
+    }
+
+
+    return { getWorkspaces:getWorkspaces, create:create, getWorkspace:getWorkspace, getUsersFromWorkspace:getUsersFromWorkspace, update: update }
 }

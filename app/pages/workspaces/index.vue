@@ -2,7 +2,6 @@
 
 import { Workspace } from '~/composables/useWorkspace';
 
-const router = useRouter();
 const workspace = useWorkspace();
 
 const workspaces = useState<Workspace[]>();
@@ -12,7 +11,11 @@ const exist = computed(() => workspaces.value !== undefined && workspaces.value.
 
 const closeModal = async () => {
     modalState.value = false;
+};
+const createWorkspace = async (name: string) => {
+    await workspace.create(name);
     workspaces.value = await workspace.getWorkspaces();
+    await closeModal();
 };
 
 const openModal = () => {
@@ -33,16 +36,17 @@ onBeforeMount(async () => {
                     Workspaces</p>
                 <div>
                     <button @click='openModal' class='btn mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>New
-                        workspace</button>
+                        workspace
+                    </button>
                     <Modal v-model='modalState'>
                         <h3 class='text-lg font-bold'>Create new workspace</h3>
-                        <FormWorkspaceCreate @form-sent='closeModal' />
+                        <FormWorkspace @form-sent='createWorkspace'/>
                     </Modal>
                 </div>
             </div>
             <AlertInform v-if='exist' class='mb-6 mt-4'>Please create workspace!</AlertInform>
             <div class='grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5'>
-                <CardsWorkspaceCard v-for='workspace in workspaces' :key='workspace.id' :workspace='workspace' />
+                <CardsWorkspaceCard v-for='workspace in workspaces' :key='workspace.uuid' :workspace='workspace' />
             </div>
         </div>
 

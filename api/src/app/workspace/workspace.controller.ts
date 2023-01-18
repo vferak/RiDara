@@ -40,11 +40,18 @@ export class WorkspaceController {
         return this.workspaceService.create(createWorkspaceDto, user);
     }
 
-    @Get(':uuid')
+    @Get(':uuid/settings')
     public async getByUuid(
         @Param('uuid', WorkspaceByUuidPipe) workspace: Workspace,
     ): Promise<Workspace> {
         return workspace;
+    }
+
+    @Get(':uuid/users')
+    public async getUsersByWorkspace(
+        @Param('uuid', WorkspaceByUuidPipe) workspace: Workspace,
+    ): Promise<User[]> {
+        return workspace.getUsers();
     }
 
     @Get()
