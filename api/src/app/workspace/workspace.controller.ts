@@ -18,6 +18,7 @@ import { UserWorkspaceService } from '../userWorkspace/userWorkspace.service';
 import { DeleteUserWorkspaceDto } from '../userWorkspace/dto/delete-userWorkspace.dto';
 import { CurrentUser } from '../common/decorators/user.decorator';
 import { User } from '../user/user.entity';
+import { EntityManager } from '@mikro-orm/mariadb';
 
 @Controller('workspace')
 export class WorkspaceController {
@@ -25,6 +26,8 @@ export class WorkspaceController {
         private readonly workspaceService: WorkspaceService,
         private readonly userService: UserService,
         private readonly userWorkspaceService: UserWorkspaceService,
+
+        private readonly entityManager: EntityManager,
     ) {}
 
     @Get('all')
@@ -54,6 +57,18 @@ export class WorkspaceController {
         return workspace.getUsers();
     }
 
+    @Get(':uuid/usersNotInWorkspace')
+    public async getUsersNotInWorkspace(
+        @Param('uuid', WorkspaceByUuidPipe) workspace: Workspace,
+    ): Promise<User[]> {
+        const usersInWorkspace = await workspace.getUsers();
+        const allUsers = await this.userService.findAll();
+
+        return allUsers.filter(
+            (a) => !usersInWorkspace.find((u) => u.getUuid() === a.getUuid()),
+        );
+    }
+
     @Get()
     public async getWorkspaces(
         @CurrentUser() user: User,
@@ -73,7 +88,10 @@ export class WorkspaceController {
     public async remove(
         @Param('uuid', WorkspaceByUuidPipe) workspace: Workspace,
     ): Promise<void> {
-        await this.workspaceService.remove(workspace);
+        const usersInWorkspace =
+            await this.userWorkspaceService.getAllByWorkspace(workspace);
+        await this.userWorkspaceService.removeAllUsers(usersInWorkspace);
+        await workspace.remove(this.entityManager);
     }
 
     @Post('add_user')

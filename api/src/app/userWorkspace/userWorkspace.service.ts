@@ -20,6 +20,21 @@ export class UserWorkspaceService {
         });
 
     }
+
+    public async getAllByWorkspace(workspace: Workspace):Promise<UserWorkspace[]>{
+        return await this.userWorkspaceRepository.find({
+            workspace: workspace,
+        });
+    }
+
+    public async removeAllUsers(userWorkspaces: UserWorkspace[]): Promise<void> {
+        for(const userWorkspace of userWorkspaces)
+        {
+            await userWorkspace.remove(this.entityManager);
+        }
+        await this.userWorkspaceRepository.flush();
+    }
+
     public async remove(userWorkspace: UserWorkspace): Promise<void> {
         await userWorkspace.remove(this.entityManager);
         await this.userWorkspaceRepository.flush();
