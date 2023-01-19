@@ -3,10 +3,15 @@ export class BpmnElementData {
     private readonly id: string;
     private readonly upmmUuid: string;
 
-    public constructor(type: string, id: string, upmmUuid: string) {
+    private readonly outgoing?: string[];
+    private readonly incoming?: string[];
+
+    public constructor(type: string, id: string, upmmUuid: string, outgoing?: string[], incoming?: string[]) {
         this.type = type;
         this.id = id;
         this.upmmUuid = upmmUuid;
+        this.incoming = incoming;
+        this.outgoing = outgoing;
     }
 
     public getId() {
@@ -19,5 +24,13 @@ export class BpmnElementData {
 
     public getUpmmUuid() {
         return this.upmmUuid;
+    }
+
+    public getIncoming() {
+        return this.incoming;
+    }
+
+    public getOutgoing() {
+        return this.outgoing;
     }
 }

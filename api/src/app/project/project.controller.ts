@@ -27,6 +27,7 @@ import * as path from 'path';
 import { OntologyNode } from '../ontology/ontologyNode/ontologyNode.entity';
 import { WorkspaceService } from '../workspace/workspace.service';
 import { AnalyzedJsonData } from '../shared/analyze/analyzedJson.data';
+import { AnalyzeData } from '../shared/analyze/analyze.data';
 
 @Controller('project')
 export class ProjectController {
@@ -145,21 +146,18 @@ export class ProjectController {
         return project;
     }
 
-    @Get(':uuid/analyze1')
-    public async firstLevelAnalyze(
+    @Get(':uuid/analyze')
+    public async analyze(
         @Param('uuid', ProjectByUuidPipe) project: Project,
     ): Promise<AnalyzedJsonData> {
+        let analyzedData: AnalyzeData;
         const bpmnData = await this.bpmnService.parseBpmnFile(
             project.getPath(),
         );
-
-        //LEVEL 2 analyze data
         const templateBpmnData = await this.bpmnService.parseBpmnFile(
             project.getTemplate().getFileName(),
         );
-
-        const copyBpmnData = bpmnData.getElements();
-        //////////////////////////////////////////////////////
+        const secondLevelBpmnData = bpmnData.getElements();
 
         const ontologyFile = project.getTemplate().getOntologyFile();
         const templateNodes = await ontologyFile.getNodes();
@@ -171,24 +169,45 @@ export class ProjectController {
             bpmnData,
         );
 
-        const analyzeData = await this.analyzeService.firstLevelAnalyze(
+        analyzedData = await this.analyzeService.firstLevelAnalyze(
             projectNodesMap,
             templateNodesMap,
-            copyBpmnData,
-            templateBpmnData.getElements(),
         );
 
-        const percentArray = analyzeData.getPercentArray();
-        const missingToJson = analyzeData.mapToJson(
-            analyzeData.getMissingMap(),
+        const firstLevelPercent = analyzedData.getPercentArray()[0];
+        if (firstLevelPercent === 100) {
+            analyzedData = await this.analyzeService.secondLevelAnalyze(
+                secondLevelBpmnData,
+                templateBpmnData.getElements(),
+                analyzedData,
+            );
+
+            const secondLevelPercent = analyzedData.getPercentArray()[0];
+
+            if (secondLevelPercent === 100) {
+                analyzedData = await this.analyzeService.thirdLevelAnalyze(
+                    secondLevelBpmnData,
+                    templateBpmnData.getElements(),
+                    analyzedData,
+                );
+            }
+        }
+
+        const percentArray = analyzedData.getPercentArray();
+        const missingToJson = analyzedData.mapToJson(
+            analyzedData.getMissingMap(),
         );
-        const notRecognizedToJson = analyzeData.mapToJson(
-            analyzeData.getNotRecognizedMap(),
+        const notRecognizedToJson = analyzedData.mapToJson(
+            analyzedData.getNotRecognizedMap(),
         );
-        const overExtendsToJson = analyzeData.mapToJson(
-            analyzeData.getOverExtendsMap(),
+        const overExtendsToJson = analyzedData.mapToJson(
+            analyzedData.getOverExtendsMap(),
         );
-        const shapeToJson = analyzeData.mapToJson(analyzeData.getShapeMap());
+        const shapeToJson = analyzedData.mapToJson(analyzedData.getShapeMap());
+
+        const relationErrorData = analyzedData.relationErrorDataValuesToJson(
+            analyzedData.getRelationErrorData(),
+        );
 
         const analyzeJsonData = new AnalyzedJsonData(
             percentArray,
@@ -196,28 +215,9 @@ export class ProjectController {
             notRecognizedToJson,
             overExtendsToJson,
             shapeToJson,
+            relationErrorData,
         );
 
         return analyzeJsonData;
-    }
-
-    @Get(':uuid/analyze2')
-    public async secondLevelAnalyze(
-        @Param('uuid', ProjectByUuidPipe) project: Project,
-    ): Promise<any> {
-        const projectBpmnData = await this.bpmnService.parseBpmnFile(
-            project.getPath(),
-        );
-
-        const templateBpmnData = await this.bpmnService.parseBpmnFile(
-            project.getTemplate().getFileName(),
-        );
-
-        const errorMap = await this.analyzeService.secondLevelAnalyze(
-            projectBpmnData.getElements(),
-            templateBpmnData.getElements(),
-        );
-
-        return errorMap;
     }
 }

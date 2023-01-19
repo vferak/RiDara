@@ -60,6 +60,14 @@ export const useProject = () => {
         });
     }
 
+    const analyze = async (uuid: string): Promise<AsyncData<AnalyzedJsonData, any>> => {
+        return useApiFetch<AnalyzedJsonData>(
+            `${projectUrlPrefix}/${uuid}/analyze`, {
+                method: 'GET',
+            }
+        );
+    }
+
     const analyzeFirstLevel = async (uuid: string): Promise<AsyncData<AnalyzedJsonData, any>> => {
         return useApiFetch<AnalyzedJsonData>(
             `${projectUrlPrefix}/${uuid}/analyze1`, {
@@ -71,6 +79,14 @@ export const useProject = () => {
     const analyzeSecondLevel = async (uuid: string) => {
         return useApiFetch(
             `${projectUrlPrefix}/${uuid}/analyze2`, {
+                method: 'GET',
+            }
+        );
+    }
+
+    const analyzeThirdLevel = async (uuid: string) => {
+        return useApiFetch(
+            `${projectUrlPrefix}/${uuid}/analyze3`, {
                 method: 'GET',
             }
         );
@@ -93,5 +109,7 @@ export const useProject = () => {
         getNodesByProject: getNodesByProject,
         importProject: importProject,
         analyzeSecondLevel: analyzeSecondLevel,
+        analyzeThirdLevel: analyzeThirdLevel,
+        analyze: analyze,
     };
 }

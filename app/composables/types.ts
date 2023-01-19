@@ -47,9 +47,26 @@ export type UserWorkspace = {
 }
 
 export type AnalyzedJsonData = {
-    percentArray: Array<number>;
+    percentArray: number[];
     missingMap?: string;
     notRecognizedMap?: string;
     overExtendsMap?: string;
     shapeMap?: string;
+    relationErrorJsonData?: RelationErrorJsonData[] | undefined;
+}
+
+export type RelationErrorJsonData = {
+    upmmId?: string | undefined;
+    elementId?: string | undefined;
+    errorsRelations?: string[] | undefined;
+    missingRelations?: string | undefined;
+    overExtendsRelations?: string | undefined;
+}
+
+export type RelationErrorDeserializedData = {
+    upmmId?: string | undefined;
+    elementId?: string | undefined;
+    errorsRelations?: string[] | undefined;
+    missingRelations?: Map<string, string> | undefined;
+    overExtendsRelations?: Map<string, string> | undefined;
 }

@@ -116,8 +116,8 @@ export class OntologyService {
         return ontologyNodes
             .filter((templateNode) =>
                 [
-                    /*'Entity',
-                    'Problem',*/
+                    'Goal',
+                    'Process_Step',
                     'Argument',
                     'Activity',
                     'Action',
