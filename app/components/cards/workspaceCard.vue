@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { Workspace } from '~/composables/useWorkspace';
+import { Workspace } from '~/server/types';
 
 const { workspace } = defineProps<{ workspace: Workspace }>();
 </script>

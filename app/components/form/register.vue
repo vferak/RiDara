@@ -1,8 +1,6 @@
 <script setup lang='ts'>
-import { useUser } from '~/composables/useUser';
-
 const router = useRouter();
-const user = useUser();
+const { registerUser } = useUser();
 const { $z, $veeValidate } = useNuxtApp();
 
 const { handleSubmit } = $veeValidate.useForm({
@@ -32,7 +30,7 @@ const password = $veeValidate.useField<string>('password');
 const password_again = $veeValidate.useField<string>('password_again');
 
 const onSubmit = handleSubmit(async (): Promise<void> => {
-    await user.register(email.value.value, firstName.value.value, lastName.value.value, password.value.value);
+    await registerUser(email.value.value, firstName.value.value, lastName.value.value, password.value.value);
     router.push({ path: '/', query: {'registration_successful': 1} });
 });
 </script>

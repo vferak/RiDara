@@ -2,20 +2,16 @@ export const useAuth = () => {
     const jwtCookie = useCookie<string|undefined>('jwt');
 
     const logIn = async (email: string, password: string): Promise<void> => {
-        const body = {username: email, password: password};
+        const body = { username: email, password: password };
 
-        try {
-            const response = await useApiFetch(
-                '/auth/login',
-                {
-                    method: 'POST',
-                    body: body,
-                }
-            );
+        const { error: error } = await useFetch('/api/auth', {
+            method: 'POST',
+            body: body
+        });
 
-            jwtCookie.value = JSON.stringify(response);
-        } catch (error) {
+        if (error.value) {
             logOut();
+
             throw error;
         }
     }

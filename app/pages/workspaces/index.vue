@@ -1,30 +1,25 @@
 <script setup lang='ts'>
 
-import { Workspace } from '~/composables/useWorkspace';
+const { getWorkspaces, createWorkspace } = useWorkspace();
 
-const workspace = useWorkspace();
+let { data: workspaces, refresh } = await getWorkspaces();
 
-const workspaces = useState<Workspace[]>();
 const modalState = useState<boolean>(() => false);
 
-const exist = computed(() => workspaces.value !== undefined && workspaces.value.length === 0);
-
-const closeModal = async () => {
-    modalState.value = false;
-};
-const createWorkspace = async (name: string) => {
-    await workspace.create(name);
-    workspaces.value = await workspace.getWorkspaces();
-    await closeModal();
-};
+const exist = computed(() => workspaces.value !== undefined && workspaces.value?.length === 0);
 
 const openModal = () => {
     modalState.value = true;
 };
+const closeModal = () => {
+    modalState.value = false;
+};
 
-onBeforeMount(async () => {
-    workspaces.value = await workspace.getWorkspaces();
-});
+const create = (name: string) => {
+    createWorkspace(name);
+    refresh();
+    closeModal();
+};
 
 </script>
 
@@ -40,7 +35,7 @@ onBeforeMount(async () => {
                     </button>
                     <Modal v-model='modalState'>
                         <h3 class='text-lg font-bold'>Create new workspace</h3>
-                        <FormWorkspace @form-sent='createWorkspace'/>
+                        <FormWorkspace @form-sent='create'/>
                     </Modal>
                 </div>
             </div>

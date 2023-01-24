@@ -1,21 +1,11 @@
 <script setup lang='ts'>
-import { Workspace } from '~/composables/useWorkspace';
-
-const workspace = useWorkspace();
+const { getWorkspaces } = useWorkspace();
 
 const date = useDateFormat(useNow(), 'dddd, MMMM DD, YYYY')
 const time = useDateFormat(useNow(), 'HH:mm:ss')
 
-const workspaces = useState<Workspace[]>();
-const showEmptyWorkspacesMessage = useState<boolean>(() => false);
-
-onBeforeMount(async () => {
-    showEmptyWorkspacesMessage.value = false;
-
-    workspaces.value = (await useWorkspace().getWorkspaces()).slice(0, 4);
-
-    showEmptyWorkspacesMessage.value = workspaces.value.length === 0;
-});
+const { data: workspaces } = await getWorkspaces();
+const showEmptyWorkspacesMessage = useState<boolean>(() => workspaces.value!.length === 0);
 </script>
 <template>
     <div class="container mx-auto my-6">

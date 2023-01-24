@@ -1,8 +1,7 @@
 <script setup lang='ts'>
-
-const router = useRouter();
-const auth = useAuth();
-const user = useUser();
+const { push } = useRouter();
+const { logOut } = useAuth();
+const { updateUser } = useUser();
 const { $z, $veeValidate } = useNuxtApp();
 
 const props = defineProps<{
@@ -40,15 +39,13 @@ firstName.setValue(props.firstName);
 lastName.setValue(props.lastName);
 email.setValue(props.userEmail);
 
-
 const password = $veeValidate.useField<string>('password');
 const password_again = $veeValidate.useField<string>('password_again');
 
 const onSubmit = handleSubmit(async (): Promise<void> => {
-    await user.update(email.value.value, firstName.value.value, lastName.value.value, password.value.value);
-    auth.logOut();
-    router.push("/");
-
+    await updateUser(email.value.value, firstName.value.value, lastName.value.value, password.value.value);
+    logOut();
+    push("/");
 });
 </script>
 

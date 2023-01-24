@@ -1,18 +1,11 @@
-import { User } from '~/composables/useUser';
-
-export type Workspace = {
-    uuid: string,
-    name: string,
-    owner: User,
-}
-
 export const useWorkspace = () => {
+    const workspaceUrl = '/api/workspace';
 
-    const create = async (name: string): Promise<void> => {
-        const body = {name: name};
+    const createWorkspace = (name: string) => {
+        const body = { name: name };
 
-        return await useApiFetch(
-            'http://localhost:3000/workspace',
+        return useApiFetch(
+            workspaceUrl,
             {
                 method: 'POST',
                 body: body,
@@ -20,39 +13,34 @@ export const useWorkspace = () => {
         );
     }
 
-    const getWorkspaces = async (): Promise<Workspace[]> => {
-
-        return await useApiFetch(
-            `/workspace`
-        );
+    const getWorkspaces = () => {
+        return useApiFetch(workspaceUrl);
     }
 
-    const getWorkspace = async (uuid: string): Promise<Workspace> => {
-
-        return await useApiFetch(
-            `/workspace/${uuid}/settings`,
-        );
+    const getWorkspace = (uuid: string) => {
+        return useApiFetch(`${workspaceUrl}/${uuid}`);
     }
 
-    const getUsersFromWorkspace = async (uuid: string): Promise<User[]> => {
-
-        return await useApiFetch(
-            `/workspace/${uuid}/users`,
-        );
+    const getUsersFromWorkspace = (uuid: string) => {
+        return useApiFetch(`${workspaceUrl}/${uuid}/users`);
     }
 
-    const update = async (uuid: string, name: string): Promise<void> => {
-        const body = {name: name};
+    const updateWorkspace = (uuid: string, name: string) => {
+        const body = { name: name };
 
-        return await useApiFetch(
-            `http://localhost:3000/workspace/${uuid}`,
-            {
+        return useApiFetch(
+            `${workspaceUrl}/${uuid}`, {
                 method: 'PATCH',
                 body: body,
             }
         );
     }
 
-
-    return { getWorkspaces:getWorkspaces, create:create, getWorkspace:getWorkspace, getUsersFromWorkspace:getUsersFromWorkspace, update: update }
+    return {
+        getWorkspaces: getWorkspaces,
+        createWorkspace: createWorkspace,
+        getWorkspace: getWorkspace,
+        getUsersFromWorkspace: getUsersFromWorkspace,
+        updateWorkspace: updateWorkspace
+    };
 }

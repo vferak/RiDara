@@ -1,7 +1,4 @@
 <script setup lang='ts'>
-
-const router = useRouter();
-const workspace = useWorkspace();
 const { $z, $veeValidate } = useNuxtApp();
 
 const props = defineProps<{

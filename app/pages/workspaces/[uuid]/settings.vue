@@ -1,50 +1,44 @@
 <script setup lang='ts'>
-import { Workspace } from '~/composables/useWorkspace';
-import { User } from '~/composables/useUser';
-
-const workspace = useWorkspace();
-const workspaceValue = useState<Workspace>();
-const usersInWorkspace = useState<User[]>();
 const route = useRoute();
+const { getWorkspace, getUsersFromWorkspace, updateWorkspace } = useWorkspace();
+
 const uuid = route.params.uuid.toString();
 
-onBeforeMount(async () => {
-    usersInWorkspace.value = await workspace.getUsersFromWorkspace(uuid);
-    workspaceValue.value = await workspace.getWorkspace(uuid);
-    console.log(usersInWorkspace.value);
-});
+const { data: workspace, refresh: refreshWorkspace } = getWorkspace(uuid);
+const { data: users } = getUsersFromWorkspace(uuid);
 
 const modalState = useState<boolean>(() => false);
-const closeModal = async () => {
-    modalState.value = false;
-};
 
 const openModal = () => {
     modalState.value = true;
 };
 
-const updateWorkspace = async (name: string) => {
-    await workspace.update(workspaceValue.value.uuid,name);
-    workspaceValue.value = await workspace.getWorkspace(uuid);
+const closeModal = async () => {
+    modalState.value = false;
+};
+
+const update = async (name: string) => {
+    await updateWorkspace(workspace.value!.uuid,name);
+    refreshWorkspace()
     await closeModal();
 };
 
 </script>
 
 <template>
-    <div v-if="workspaceValue" class="container mx-auto h-full mt-4">
+    <div v-if="workspace" class="container mx-auto h-full mt-4">
         <div class="card w-1/2 min-w-min bg-base-200 shadow-xl mx-auto">
             <div class="card-body items-center text-center">
-                <h2 class="card-title text-2xl">{{ workspaceValue.name }}</h2>
+                <h2 class="card-title text-2xl">{{ workspace.name }}</h2>
                 <button @click='openModal' class="btn mt-4 btn-xs">Edit</button>
                 <Modal v-model='modalState'>
                     <h3 class='text-lg font-bold'>Update workspace name</h3>
-                    <FormWorkspace @form-sent='updateWorkspace' :name='workspaceValue.name'/>
+                    <FormWorkspace @form-sent='update' :name='workspace.name'/>
                 </Modal>
             </div>
         </div>
         <div class="card w-1/2 min-w-min bg-base-200 shadow-xl mx-auto mt-8 px-10 pt-8">
-            <div v-if="usersInWorkspace" class="container mx-auto h-full mt-4">
+            <div v-if="users" class="container mx-auto h-full mt-4">
                 <div class="overflow-x-auto w-full">
                     <table class="table w-full mb-12 text-center items-center">
                         <thead>
@@ -55,7 +49,7 @@ const updateWorkspace = async (name: string) => {
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="user in usersInWorkspace" :key="user.uuid">
+                        <tr v-for="user in users" :key="user.uuid">
                             <td>
                                 <div class="flex items-center space-x-3">
                                     <div>

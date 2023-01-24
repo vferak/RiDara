@@ -8,7 +8,6 @@ const addToTemplate = () => {
 
 const selected = ref('');
 const selectedFile = ref('');
-console.log(selectedFile);
 
 const emlements = [
     { id: 1, name: 'První element', description: 'První pospis element' },

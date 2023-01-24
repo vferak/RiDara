@@ -1,25 +1,21 @@
 import { NitroFetchRequest } from 'nitropack';
 import { FetchOptions } from 'ofetch';
 
-export const useApiFetch = async <T = unknown, R extends NitroFetchRequest = NitroFetchRequest>(request: R, opts?: FetchOptions | undefined): Promise<any> => {
-    const runtimeConfig = useRuntimeConfig();
-    const auth = useAuth();
-
-    const getHeaders = () => {
-        const headers = new Headers();
-
-        if (auth.isLoggedIn()) {
-            headers.set('Authorization', `Bearer ${auth.getJWT()}`);
-        }
-
-        return headers;
+export const useApiFetch = <T = unknown, R extends NitroFetchRequest = NitroFetchRequest>(request: R, opts?: FetchOptions | undefined) => {
+    if (opts === undefined) {
+        opts = {
+            headers: new Headers()
+        };
     }
 
+    const headers = new Headers(opts.headers);
+    const cookie = useRequestHeaders(['cookie']);
 
-    const customFetch = $fetch.create({
-        baseURL: runtimeConfig.public.API_URL,
-        headers: getHeaders()
-    })
+    if (cookie['cookie']) {
+        headers.set('cookie', cookie['cookie']);
+    }
 
-    return await customFetch(request, opts)
+    opts.headers = headers;
+
+    return useFetch(request, opts);
 }
