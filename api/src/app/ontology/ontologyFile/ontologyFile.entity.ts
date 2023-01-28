@@ -8,7 +8,7 @@ import {
 } from '@mikro-orm/core';
 import { v4 } from 'uuid';
 import { OntologyFileRepository } from './ontologyFIle.repository';
-import { CreateFileOntologyDto } from './dto/create-file-ontology.dto';
+import { CreateFileOntologyDto } from '../dto/create-file-ontology.dto';
 
 @Entity({ customRepository: () => OntologyFileRepository })
 export class OntologyFile {

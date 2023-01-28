@@ -6,9 +6,9 @@ import {
     Property,
 } from '@mikro-orm/core';
 import { v4 } from 'uuid';
-import { CreateNodeOntologyDto } from './dto/create-node-ontology.dto';
 import { OntologyFile } from '../ontologyFile/ontologyFile.entity';
 import { OntologyNodeRepository } from './ontologyNode.repository';
+import { CreateFileOntologyDto } from '../dto/create-file-ontology.dto';
 
 @Entity({ customRepository: () => OntologyNodeRepository })
 export class OntologyNode {
@@ -22,17 +22,18 @@ export class OntologyNode {
 
 
     @ManyToOne({ entity: () => OntologyFile, eager: true })
-    private file!: OntologyFile;
+    private ontologyFile!: OntologyFile;
 
-    private constructor(uuid: string, name: string) {
+    private constructor(uuid: string, name: string, ontologyFile: OntologyFile) {
         this.uuid = uuid;
         this.name = name;
+        this.ontologyFile = ontologyFile;
     }
 
     public static create(
-        createNodeOntologyDto: CreateNodeOntologyDto,
+        createNodeOntologyDto: CreateFileOntologyDto
     ): OntologyNode {
         const uuid = v4();
-        return new OntologyNode(uuid, createNodeOntologyDto.name);
+        return new OntologyNode(uuid, createNodeOntologyDto.name, createNodeOntologyDto.ontologyFile);
     }
 }

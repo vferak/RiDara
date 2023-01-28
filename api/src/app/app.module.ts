@@ -11,6 +11,7 @@ import { CommonModule } from './common/common.module';
 import { AuthModule } from './auth/auth.module';
 import { WorkspaceModule } from './workspace/workspace.module';
 import { UserWorkspaceModule } from './userWorkspace/userWorkspace.module';
+import { OntologyModule } from './ontology/ontology.module';
 
 const configModuleOptions: ConfigModuleOptions = {
     load: [configuration],
@@ -26,6 +27,7 @@ const configModuleOptions: ConfigModuleOptions = {
         UserModule,
         WorkspaceModule,
         UserWorkspaceModule,
+        OntologyModule,
     ],
     controllers: [AppController],
     providers: [AppService],

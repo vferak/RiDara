@@ -67,8 +67,8 @@
           "nullable": false,
           "mappedType": "string"
         },
-        "file_uuid": {
-          "name": "file_uuid",
+        "ontology_file_uuid": {
+          "name": "ontology_file_uuid",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -81,10 +81,10 @@
       "indexes": [
         {
           "columnNames": [
-            "file_uuid"
+            "ontology_file_uuid"
           ],
           "composite": false,
-          "keyName": "ontology_node_file_uuid_index",
+          "keyName": "ontology_node_ontology_file_uuid_index",
           "primary": false,
           "unique": false
         },
@@ -100,10 +100,10 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "ontology_node_file_uuid_foreign": {
-          "constraintName": "ontology_node_file_uuid_foreign",
+        "ontology_node_ontology_file_uuid_foreign": {
+          "constraintName": "ontology_node_ontology_file_uuid_foreign",
           "columnNames": [
-            "file_uuid"
+            "ontology_file_uuid"
           ],
           "localTableName": "ontology_node",
           "referencedColumnNames": [
