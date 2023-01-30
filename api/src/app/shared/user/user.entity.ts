@@ -7,11 +7,11 @@ import {
     Property,
 } from '@mikro-orm/core';
 import { v4 } from 'uuid';
-import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Workspace } from '../workspace/workspace.entity';
-import { UserWorkspace } from '../userWorkspace/userWorkspace.entity';
 import { UserRepository } from './user.repository';
+import { UserWorkspace } from '../../workspace/userWorkspace/userWorkspace.entity';
+import { CreateUserDto } from './dto/create-user.dto';
+import { Workspace } from '../../workspace/workspace.entity';
 
 @Entity({ customRepository: () => UserRepository })
 export class User {

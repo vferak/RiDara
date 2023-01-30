@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
 import { LocalStrategy } from './strategies/local.strategy';
 import { APP_GUARD } from '@nestjs/core';
@@ -11,6 +10,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ApiConfigService } from '../common/providers/api-config.service';
 import { JwtModuleAsyncOptions } from '@nestjs/jwt/dist/interfaces/jwt-module-options.interface';
 import { BcryptService } from '../common/providers/bcrypt.service';
+import { UserModule } from '../shared/user/user.module';
 
 const jwtConfig: JwtModuleAsyncOptions = {
     inject: [ApiConfigService],

@@ -12,12 +12,12 @@ import { Workspace } from './workspace.entity';
 import { WorkspaceByUuidPipe } from './pipes/workspace-by-uuid.pipe';
 import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
 import { CreateWorkspaceDto } from './dto/create-workspace.dto';
-import { UserService } from '../user/user.service';
-import { AddUserToWorkspaceDto } from '../userWorkspace/dto/create-userWorkspace.dto';
-import { UserWorkspaceService } from '../userWorkspace/userWorkspace.service';
-import { DeleteUserWorkspaceDto } from '../userWorkspace/dto/delete-userWorkspace.dto';
 import { CurrentUser } from '../common/decorators/user.decorator';
-import { User } from '../user/user.entity';
+import { UserService } from '../shared/user/user.service';
+import { UserWorkspaceService } from './userWorkspace/userWorkspace.service';
+import { User } from '../shared/user/user.entity';
+import { DeleteUserWorkspaceDto } from './userWorkspace/dto/delete-userWorkspace.dto';
+import { AddUserToWorkspaceDto } from './userWorkspace/dto/create-userWorkspace.dto';
 
 @Controller('workspace')
 export class WorkspaceController {

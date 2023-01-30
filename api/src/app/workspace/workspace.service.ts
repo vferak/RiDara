@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
 import { Workspace } from './workspace.entity';
 import { CreateWorkspaceDto } from './dto/create-workspace.dto';
-import { UserWorkspace } from '../userWorkspace/userWorkspace.entity';
-import { User } from '../user/user.entity';
 import { WorkspaceRepository } from './workspace.repository';
-import { UserWorkspaceRepository } from '../userWorkspace/userWorkspace.repository';
 import { EntityManager } from '@mikro-orm/mariadb';
+import { User } from '../shared/user/user.entity';
+import { UserWorkspace } from './userWorkspace/userWorkspace.entity';
+import { UserWorkspaceRepository } from './userWorkspace/userWorkspace.repository';
 
 @Injectable()
 export class WorkspaceService {

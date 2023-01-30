@@ -1,13 +1,14 @@
 import {
-    Entity, EntityRepositoryType,
+    Entity,
+    EntityRepositoryType,
     ManyToOne,
     Property,
 } from '@mikro-orm/core';
-import { User } from '../user/user.entity';
-import { Workspace } from '../workspace/workspace.entity';
 import { UserWorkspaceRepository } from './userWorkspace.repository';
 import { BadRequestException } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/mariadb';
+import { Workspace } from '../workspace.entity';
+import { User } from '../../shared/user/user.entity';
 
 @Entity({ customRepository: () => UserWorkspaceRepository })
 export class UserWorkspace {
@@ -35,7 +36,6 @@ export class UserWorkspace {
         user: User,
         role: string,
     ): Promise<UserWorkspace> {
-
         const users = await workspace.getUsers();
         for (const us of users) {
             if (us.getUuid() === user.getUuid()) {

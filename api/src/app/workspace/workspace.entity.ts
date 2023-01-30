@@ -8,12 +8,12 @@ import {
     Property,
 } from '@mikro-orm/core';
 import { v4 } from 'uuid';
-import { User } from '../user/user.entity';
 import { CreateWorkspaceDto } from './dto/create-workspace.dto';
 import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
-import { UserWorkspace } from '../userWorkspace/userWorkspace.entity';
 import { WorkspaceRepository } from './workspace.repository';
 import { EntityManager } from '@mikro-orm/mariadb';
+import { User } from '../shared/user/user.entity';
+import { UserWorkspace } from './userWorkspace/userWorkspace.entity';
 
 @Entity({ customRepository: () => WorkspaceRepository })
 export class Workspace {

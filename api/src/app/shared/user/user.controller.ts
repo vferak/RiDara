@@ -11,10 +11,10 @@ import { UserService } from './user.service';
 import { User } from './user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserByUuidPipe } from './pipes/user-by-uuid.pipe';
-import { Public } from '../auth/decorators/public.decorator';
-import { CreateUserDto } from '../auth/dto/create-user.dto';
-import { Workspace } from '../workspace/workspace.entity';
-import { CurrentUser } from '../common/decorators/user.decorator';
+import { Public } from '../../auth/decorators/public.decorator';
+import { CreateUserDto } from './dto/create-user.dto';
+import { Workspace } from '../../workspace/workspace.entity';
+import { CurrentUser } from '../../common/decorators/user.decorator';
 
 @Controller('user')
 export class UserController {
