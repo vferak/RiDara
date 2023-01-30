@@ -12,6 +12,7 @@ import { UserRepository } from './user.repository';
 import { UserWorkspace } from '../../workspace/userWorkspace/userWorkspace.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Workspace } from '../../workspace/workspace.entity';
+import { Project } from '../../project/project.entity';
 
 @Entity({ customRepository: () => UserRepository })
 export class User {
@@ -37,6 +38,9 @@ export class User {
 
     @OneToMany('UserWorkspace', 'user')
     private userWorkspaces = new Collection<UserWorkspace>(this);
+
+    @OneToMany('Project', 'owner')
+    private projects = new Collection<Project>(this);
 
     private constructor(
         uuid: string,
@@ -103,5 +107,10 @@ export class User {
     }
     public addUserWorkspace(userWorkspace: UserWorkspace): void {
         this.userWorkspaces.add(userWorkspace);
+    }
+
+    public async getProjects(): Promise<Project[]> {
+        await this.projects.init();
+        return this.projects.getItems();
     }
 }
