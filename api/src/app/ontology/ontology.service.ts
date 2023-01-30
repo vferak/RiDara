@@ -14,6 +14,10 @@ export class OntologyService {
         private readonly ontologyNodeRepository: OntologyNodeRepository,
     ) {}
 
+    public async getOneFileByUuid(uuid: string): Promise<OntologyFile> {
+        return this.ontologyFileRepository.findOneOrFail({ uuid: uuid });
+    }
+
     public async findAll(): Promise<OntologyFile[]> {
         return this.ontologyFileRepository.findAll();
     }

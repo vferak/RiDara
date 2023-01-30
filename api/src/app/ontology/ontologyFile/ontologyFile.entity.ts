@@ -9,6 +9,7 @@ import {
 import { v4 } from 'uuid';
 import { OntologyFileRepository } from './ontologyFIle.repository';
 import { CreateFileOntologyDto } from '../dto/create-file-ontology.dto';
+import { OntologyNode } from '../ontologyNode/ontologyNode.entity';
 
 @Entity({ customRepository: () => OntologyFileRepository })
 export class OntologyFile {
@@ -23,6 +24,9 @@ export class OntologyFile {
     @Property()
     private createDate!: Date;
 
+    @OneToMany('OntologyNode', 'ontologyFile')
+    private ontologyNodes = new Collection<OntologyNode>(this);
+
     private constructor(uuid: string, name: string, createDate: Date) {
         this.uuid = uuid;
         this.name = name;
@@ -35,5 +39,10 @@ export class OntologyFile {
         const uuid = v4();
         const date = new Date();
         return new OntologyFile(uuid, createFileOntologyDto.name, date);
+    }
+
+    public async getNodes(): Promise<OntologyNode[]> {
+        await this.ontologyNodes.init();
+        return this.ontologyNodes.getItems();
     }
 }

@@ -21,7 +21,7 @@ export class OntologyNode {
     private name!: string;
 
 
-    @ManyToOne({ entity: () => OntologyFile, eager: true })
+    @ManyToOne({ entity: () => OntologyFile })
     private ontologyFile!: OntologyFile;
 
     private constructor(uuid: string, name: string, ontologyFile: OntologyFile) {

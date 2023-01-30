@@ -2,6 +2,7 @@ import {
     Body,
     Controller,
     Get,
+    Param,
     Post,
     UploadedFile,
     UseInterceptors,
@@ -12,6 +13,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateFileOntologyDto } from './dto/create-file-ontology.dto';
 import { OntologyService } from './ontology.service';
 import { OntologyFile } from './ontologyFile/ontologyFile.entity';
+import { OntologyNode } from './ontologyNode/ontologyNode.entity';
+import { OntlogyFileByUuidPipe } from './pipes/ontlogyFile-by-uuid.pipe';
 
 @Controller('ontology')
 export class OntologyController {
@@ -29,5 +32,12 @@ export class OntologyController {
     @Get('files')
     public async displayFiles(): Promise<OntologyFile[]> {
         return this.ontologyService.findAll();
+    }
+
+    @Get(':uuid/nodes')
+    public async displayNodes(
+        @Param('uuid', OntlogyFileByUuidPipe) ontologyFile: OntologyFile,
+    ): Promise<OntologyNode[]> {
+        return ontologyFile.getNodes();
     }
 }
