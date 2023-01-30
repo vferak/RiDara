@@ -14,6 +14,10 @@ export class OntologyService {
         private readonly ontologyNodeRepository: OntologyNodeRepository,
     ) {}
 
+    public async findAll(): Promise<OntologyFile[]> {
+        return this.ontologyFileRepository.findAll();
+    }
+
     public async loadFile(
         file: Express.Multer.File,
         createFileOntologyDto: CreateFileOntologyDto,
