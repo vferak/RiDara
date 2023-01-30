@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+    ssr: false,
     css: ['/node_modules/css.gg/icons/all.css'],
     modules: [
         '@nuxtjs/tailwindcss',

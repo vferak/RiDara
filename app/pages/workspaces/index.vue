@@ -1,26 +1,25 @@
 <script setup lang='ts'>
-
 const { getWorkspaces, createWorkspace } = useWorkspace();
 
-let { data: workspaces, refresh } = await getWorkspaces();
+const { data: workspaces, refresh: refreshWorkspaces } = await getWorkspaces();
 
 const modalState = useState<boolean>(() => false);
 
-const exist = computed(() => workspaces.value !== undefined && workspaces.value?.length === 0);
+const exist = computed(() => workspaces.value !== null && workspaces.value?.length === 0);
 
 const openModal = () => {
     modalState.value = true;
 };
+
 const closeModal = () => {
     modalState.value = false;
 };
 
-const create = (name: string) => {
-    createWorkspace(name);
-    refresh();
+const create = async (name: string): Promise<void> => {
+    await createWorkspace(name);
+    await refreshWorkspaces();
     closeModal();
 };
-
 </script>
 
 <template>

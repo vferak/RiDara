@@ -4,7 +4,7 @@ export const useAuth = () => {
     const logIn = async (email: string, password: string): Promise<void> => {
         const body = { username: email, password: password };
 
-        const { error: error } = await useFetch('/api/auth', {
+        const { data: data, error: error } = await useApiFetch('/auth/login', {
             method: 'POST',
             body: body
         });
@@ -14,6 +14,8 @@ export const useAuth = () => {
 
             throw error;
         }
+
+        jwtCookie.value = JSON.stringify(data.value);
     }
 
     const logOut = (): void => {

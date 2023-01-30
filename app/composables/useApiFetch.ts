@@ -1,21 +1,22 @@
-import { NitroFetchRequest } from 'nitropack';
-import { FetchOptions } from 'ofetch';
+import { UseFetchOptions } from '#app';
 
-export const useApiFetch = <T = unknown, R extends NitroFetchRequest = NitroFetchRequest>(request: R, opts?: FetchOptions | undefined) => {
+export const useApiFetch = <DataT = unknown>(request: string, opts?: UseFetchOptions<DataT>) => {
+    const runtimeConfig = useRuntimeConfig();
+    const jwtCookie = useCookie<string|undefined>('jwt');
+
     if (opts === undefined) {
-        opts = {
-            headers: new Headers()
-        };
+        opts = {};
     }
 
-    const headers = new Headers(opts.headers);
-    const cookie = useRequestHeaders(['cookie']);
+    const method = opts.method || 'GET';
+    const headers = new Headers();
 
-    if (cookie['cookie']) {
-        headers.set('cookie', cookie['cookie']);
+    if (jwtCookie.value) {
+        headers.set('Authorization', `Bearer ${jwtCookie.value}`);
     }
 
     opts.headers = headers;
+    opts.key = `${request}-${method}`
 
-    return useFetch(request, opts);
+    return useFetch(`${runtimeConfig.public.API_URL}${request}`, opts);
 }

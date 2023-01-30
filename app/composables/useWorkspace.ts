@@ -1,11 +1,14 @@
-export const useWorkspace = () => {
-    const workspaceUrl = '/api/workspace';
+import { AsyncData } from '#app';
+import { Workspace } from '~/composables/types';
 
-    const createWorkspace = (name: string) => {
+export const useWorkspace = () => {
+    const workspaceUrlPrefix = '/workspace';
+
+    const createWorkspace = async (name: string): Promise<AsyncData<Workspace, any>> => {
         const body = { name: name };
 
-        return useApiFetch(
-            workspaceUrl,
+        return useApiFetch<Workspace>(
+            workspaceUrlPrefix,
             {
                 method: 'POST',
                 body: body,
@@ -13,23 +16,23 @@ export const useWorkspace = () => {
         );
     }
 
-    const getWorkspaces = () => {
-        return useApiFetch(workspaceUrl);
+    const getWorkspaces = async (): Promise<AsyncData<Workspace[], any>> => {
+        return useApiFetch<Workspace[]>(workspaceUrlPrefix);
     }
 
     const getWorkspace = (uuid: string) => {
-        return useApiFetch(`${workspaceUrl}/${uuid}`);
+        return useApiFetch(`${workspaceUrlPrefix}/${uuid}/settings`);
     }
 
     const getUsersFromWorkspace = (uuid: string) => {
-        return useApiFetch(`${workspaceUrl}/${uuid}/users`);
+        return useApiFetch(`${workspaceUrlPrefix}/${uuid}/users`);
     }
 
     const updateWorkspace = (uuid: string, name: string) => {
         const body = { name: name };
 
         return useApiFetch(
-            `${workspaceUrl}/${uuid}`, {
+            `${workspaceUrlPrefix}/${uuid}`, {
                 method: 'PATCH',
                 body: body,
             }
