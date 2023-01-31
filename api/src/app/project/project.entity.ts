@@ -10,6 +10,7 @@ import { Workspace } from '../workspace/workspace.entity';
 import { ProjectRepository } from './project.repository';
 import { User } from '../shared/user/user.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
 
 @Entity({ customRepository: () => ProjectRepository })
 export class Project {
@@ -50,16 +51,23 @@ export class Project {
         this.createDate = createDate;
     }
 
-    public static create(createProjectDto: CreateProjectDto): Project {
+    public static create(
+        createProjectDto: CreateProjectDto,
+        user: User,
+    ): Project {
         const uuid = v4();
         const date = new Date();
         return new Project(
             uuid,
             createProjectDto.name,
             createProjectDto.path,
-            createProjectDto.user,
+            user,
             createProjectDto.workspace,
             date,
         );
+    }
+
+    public update(updateProjectDto: UpdateProjectDto): void {
+        this.name = updateProjectDto.name;
     }
 }

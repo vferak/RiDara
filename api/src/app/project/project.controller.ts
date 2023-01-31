@@ -2,7 +2,7 @@ import {
     Body,
     Controller,
     Get,
-    Param,
+    Param, Patch,
     Post,
     UploadedFile,
     UseInterceptors,
@@ -16,6 +16,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { Express } from 'express';
+import { UpdateProjectDto } from './dto/update-project.dto';
 
 @Controller('project')
 export class ProjectController {
@@ -27,6 +28,14 @@ export class ProjectController {
         @CurrentUser() user: User,
     ): Promise<Project> {
         return this.projectService.create(createProjectDto, user);
+    }
+
+    @Patch(':uuid')
+    public async update(
+        @Param('uuid', ProjectByUuidPipe) project: Project,
+        @Body() updateProjectDto: UpdateProjectDto,
+    ): Promise<Project> {
+        return this.projectService.update(project, updateProjectDto);
     }
 
     @Get('user/:uuid')
