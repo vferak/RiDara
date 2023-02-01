@@ -1,17 +1,16 @@
 <script setup lang='ts'>
-
 const props = defineProps<{
     modelValue: boolean
 }>();
 
-watch(() => props.modelValue, () => {});
-
+const emit = defineEmits<{
+    (event: 'update:modelValue', value: boolean): void
+}>();
 </script>
 <template>
-    <input v-model='props.modelValue' type='checkbox' id='new-template' class='modal-toggle' />
-    <label for='new-template' class='modal cursor-pointer left-80'>
-        <label class='modal-box relative' for=''>
+    <div v-show='props.modelValue' class='modal cursor-pointer left-80 visible opacity-100 pointer-events-auto' @click="emit('update:modelValue', false)">
+        <div class='modal-box relative' @click.stop>
             <slot/>
-        </label>
-    </label>
+        </div>
+    </div>
 </template>

@@ -1,19 +1,10 @@
 <script setup lang='ts'>
 const { getWorkspaces, createWorkspace } = useWorkspace();
+const { modalState, openModal, closeModal } = useModal('workspace-create');
 
 const { data: workspaces, refresh: refreshWorkspaces } = await getWorkspaces();
 
-const modalState = useState<boolean>(() => false);
-
 const exist = computed(() => workspaces.value !== null && workspaces.value?.length === 0);
-
-const openModal = () => {
-    modalState.value = true;
-};
-
-const closeModal = () => {
-    modalState.value = false;
-};
 
 const create = async (name: string): Promise<void> => {
     await createWorkspace(name);
@@ -29,13 +20,10 @@ const create = async (name: string): Promise<void> => {
                 <p class='mb-4 mt-4 text-4xl font-bold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white'>
                     Workspaces</p>
                 <div>
-                    <button @click='openModal' class='btn mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>New
-                        workspace
+                    <button @click='openModal' class='btn mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
+                        New workspace
                     </button>
-                    <Modal v-model='modalState'>
-                        <h3 class='text-lg font-bold'>Create new workspace</h3>
-                        <FormWorkspace @form-sent='create'/>
-                    </Modal>
+
                 </div>
             </div>
             <AlertInform v-if='exist' class='mb-6 mt-4'>Please create workspace!</AlertInform>
@@ -43,6 +31,9 @@ const create = async (name: string): Promise<void> => {
                 <CardsWorkspaceCard v-for='workspace in workspaces' :key='workspace.uuid' :workspace='workspace' />
             </div>
         </div>
-
+        <Modal v-model='modalState'>
+            <h3 class='text-lg font-bold'>Create new workspace</h3>
+            <FormWorkspace @form-sent='create'/>
+        </Modal>
     </div>
 </template>
