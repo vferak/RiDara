@@ -8,7 +8,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (event: 'formSent', name: string, templateUuid: string): void
+    (event: 'formSent', name: string, templateUuid: string, blankFile: boolean): void
 }>();
 
 const templates = props.templates.map((template) => {
@@ -28,6 +28,7 @@ const { handleSubmit, resetForm } = $veeValidate.useForm({
             templateUuid: $z.string().refine((value) => value !== '' && templates.some(
                 (templates) => templates.value === value
             ), {message: 'Selected invalid template'}),
+            blankFile: $z.string(),
         })
     ),
 });
@@ -36,8 +37,12 @@ const name = $veeValidate.useField<string>('name');
 const templateUuid = $veeValidate.useField<string>('templateUuid');
 templateUuid.setValue('');
 
+const blankFile = $veeValidate.useField<string>('blankFile');
+blankFile.setValue('no');
+
 const onSubmit = handleSubmit(async (): Promise<void> => {
-    emit('formSent', name.value.value, templateUuid.value.value);
+    const blankFileValue = blankFile.value.value === "yes";
+    emit('formSent', name.value.value, templateUuid.value.value, blankFileValue);
     resetForm();
     templateUuid.setValue('');
 });
@@ -47,6 +52,7 @@ const onSubmit = handleSubmit(async (): Promise<void> => {
     <form @submit='onSubmit' class='flex flex-col mb-4'>
         <FormInputBase :name='"Name"' :type='"text"' :field='name'/>
         <FormInputBase :name='"File"' :type='"select"' :field='templateUuid' :options='templates'/>
+        <FormInputBase :name='"Blank file"' :type='"radio"' :field='blankFile'/>
         <input type='submit' value='Submit' class='btn btn-sm mt-4'/>
     </form>
 </template>

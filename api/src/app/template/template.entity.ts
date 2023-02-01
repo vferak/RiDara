@@ -69,4 +69,8 @@ export class Template {
     public getFileName(): string {
         return this.fileName;
     }
+
+    public getOntologyFile(): OntologyFile {
+        return this.ontologyFile;
+    }
 }

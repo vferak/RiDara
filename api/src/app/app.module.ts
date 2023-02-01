@@ -13,6 +13,7 @@ import { OntologyModule } from './ontology/ontology.module';
 import { ProjectModule } from './project/project.module';
 import { UserModule } from './shared/user/user.module';
 import { TemplateModule } from './template/template.module';
+import { AnalyzeModule } from './shared/analyze/analyze.module';
 
 const configModuleOptions: ConfigModuleOptions = {
     load: [configuration],
@@ -30,6 +31,7 @@ const configModuleOptions: ConfigModuleOptions = {
         OntologyModule,
         ProjectModule,
         TemplateModule,
+        AnalyzeModule,
     ],
     controllers: [AppController],
     providers: [AppService],

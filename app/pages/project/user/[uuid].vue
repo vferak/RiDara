@@ -9,12 +9,10 @@ const uuid = route.params.uuid.toString();
 
 const { data: projects, refresh: refreshProject } = await getProjects(uuid);
 
+//TODO odjebat po workspaces
 const { getUserProfile } = useUser();
-
 const {data: user} = await getUserProfile();
-
 const {data: templates} = await getTemplates();
-
 const userData: User = {
     email: user.value?.email,
     password: user.value?.password,
@@ -26,8 +24,8 @@ let workspace: Workspace = {
 uuid:'316e1b5f-ca7d-4c6f-8145-82493b4ab3a5',name:'Kokot',owner: userData,
 }
 
-const create = async (name: string, templateUuid: string): Promise<void> => {
-    await createProject(name, workspace, templateUuid);
+const create = async (name: string, templateUuid: string, blankFile: boolean): Promise<void> => {
+    await createProject(name, workspace, templateUuid, blankFile);
     await refreshProject();
     closeModal();
 };
