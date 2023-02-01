@@ -5,17 +5,20 @@ export const useApiFetch = <DataT = unknown>(request: string, opts?: UseFetchOpt
     const jwtCookie = useCookie<string|undefined>('jwt');
 
     if (opts === undefined) {
-        opts = {};
+        opts = {
+            headers: {}
+        };
     }
 
     const method = opts.method || 'GET';
-    const headers = new Headers();
 
     if (jwtCookie.value) {
-        headers.set('Authorization', `Bearer ${jwtCookie.value}`);
+        opts.headers = {
+            ...opts.headers,
+            'Authorization': `Bearer ${jwtCookie.value}`
+        };
     }
 
-    opts.headers = headers;
     opts.key = `${request}-${method}`
 
     return useFetch(`${runtimeConfig.public.API_URL}${request}`, opts);

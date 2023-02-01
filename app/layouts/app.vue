@@ -19,6 +19,7 @@ const navs = [
         name: 'Admin',
         links: [
             {name: 'Templates', route: '/projects', icon: 'gg-template'},
+            {name: 'Ontology files', route: '/ontology/files', icon: 'gg-file-document'},
         ],
     },
 ];

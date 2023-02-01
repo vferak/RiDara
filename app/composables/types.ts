@@ -10,3 +10,8 @@ export type User = {
     password: string,
     userWorkspaces: string[],
 }
+
+export type OntologyFile = {
+    uuid: string,
+    name: string,
+}

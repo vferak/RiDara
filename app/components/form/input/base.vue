@@ -18,6 +18,9 @@ const isValid = computed<boolean>(
 const isError = computed<boolean>(
     () => !!(errorMessage.value && meta.touched)
 );
+
+const inputClasses = props.type === 'file' ?
+    'file-input file-input-bordered' : 'input input-bordered input-sm';
 </script>
 <template>
     <div class="form-control mb-1">
@@ -29,6 +32,6 @@ const isError = computed<boolean>(
             </span>
         </label>
         <input @focusout='field.setTouched' v-model='value' :name='field.label' :type='props.type' :placeholder='props.name'
-               class='input input-bordered input-sm' :class='[isError ? "input-error" : "", isValid ? "input-success" : ""]' />
+               :class='[inputClasses, {"input-error": isError, "input-success": isValid}]'/>
     </div>
 </template>
