@@ -28,7 +28,6 @@ export class Project {
     @Property()
     private createDate!: Date;
 
-
     @ManyToOne({ entity: () => User, eager: true })
     private owner!: User;
 

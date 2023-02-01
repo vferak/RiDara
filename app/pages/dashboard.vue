@@ -1,10 +1,16 @@
 <script setup lang='ts'>
 const { getWorkspaces } = useWorkspace();
+const { getUserProfile } = useUser();
 
 const date = useDateFormat(useNow(), 'dddd, MMMM DD, YYYY')
 const time = useDateFormat(useNow(), 'HH:mm:ss')
 
+const { data: user } = await getUserProfile();
+
 const { data: workspaces } = await getWorkspaces();
+const firstName = user.value?.firstName;
+const lastName = user.value?.lastName;
+
 const showEmptyWorkspacesMessage = useState<boolean>(() => workspaces.value!.length === 0);
 </script>
 <template>
@@ -13,7 +19,7 @@ const showEmptyWorkspacesMessage = useState<boolean>(() => workspaces.value!.len
             Dashboard
         </p>
         <Alert class='my-4'>
-            Welcome back Vojto, today is {{ date }} and it's {{ time }}.
+            Welcome back {{ firstName }} {{ lastName }}, today is {{ date }} and it's {{ time }}.
         </Alert>
         <AlertInform v-if='showEmptyWorkspacesMessage'>
             <div class="flex-1">

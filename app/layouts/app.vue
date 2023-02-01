@@ -1,4 +1,8 @@
 <script setup lang='ts'>
+const { getUserProfile } = useUser();
+
+const { data: user } = await getUserProfile();
+
 const navs = [
     {
         name: 'Overview',
@@ -10,8 +14,8 @@ const navs = [
     {
         name: 'Current workspace',
         links: [
-            {name: 'New project', route: '/projects', icon: 'gg-add-r'},
-            {name: 'Projects', route: '/projects', icon: 'gg-album'},
+            {name: 'New project', route: '/project', icon: 'gg-add-r'},
+            {name: 'Projects', route: `/project/user/${user.value.uuid}`, icon: 'gg-album'},
             {name: 'Workspace settings', route: '/diagrams', icon: 'gg-options'},
         ],
     },

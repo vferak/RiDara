@@ -2,7 +2,8 @@ import {
     Body,
     Controller,
     Get,
-    Param, Patch,
+    Param,
+    Patch,
     Post,
     UploadedFile,
     UseInterceptors,
@@ -17,6 +18,7 @@ import { diskStorage } from 'multer';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { Express } from 'express';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import * as fs from 'fs';
 
 @Controller('project')
 export class ProjectController {
@@ -27,6 +29,19 @@ export class ProjectController {
         @Body() createProjectDto: CreateProjectDto,
         @CurrentUser() user: User,
     ): Promise<Project> {
+        const pathToFile = './resources/bpmn/';
+        const fullPath =
+            pathToFile +
+            user.getFirstName() +
+            user.getLastName() +
+            Date.now() +
+            '.bpmn';
+        fs.writeFile(`${fullPath}`, '', function (err) {
+            if (err) {
+                return console.error(err);
+            }
+        });
+        createProjectDto.path = fullPath;
         return this.projectService.create(createProjectDto, user);
     }
 
@@ -56,7 +71,7 @@ export class ProjectController {
         FileInterceptor('file', {
             storage: diskStorage({
                 destination: function (req, file, cb) {
-                    cb(null, './public/data/uploads/');
+                    cb(null, './resources/bpmn/');
                 },
                 filename: function (req, file, cb) {
                     cb(null, file.originalname);
@@ -69,7 +84,7 @@ export class ProjectController {
         @CurrentUser() user: User,
         @UploadedFile() file: Express.Multer.File,
     ) {
-        createProjectDto.path = file.path;
+        createProjectDto.path = './' + file.path;
         const project = await this.projectService.create(
             createProjectDto,
             user,

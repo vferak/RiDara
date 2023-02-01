@@ -1,3 +1,6 @@
+import { AsyncData } from '#app';
+import { Project, User } from '~/composables/types';
+
 export const useUser = () => {
     const userUrlPrefix = '/user';
 
@@ -19,8 +22,8 @@ export const useUser = () => {
         });
     }
 
-    const getUserProfile = () => {
-        return useApiFetch(`${userUrlPrefix}/profile`);
+    const getUserProfile = async (): Promise<AsyncData<User, any>> => {
+        return useApiFetch<User>(`${userUrlPrefix}/profile`);
     }
 
     return { updateUser: updateUser, getUserProfile: getUserProfile, registerUser: registerUser }

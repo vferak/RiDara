@@ -19,7 +19,7 @@ const closeModal = async () => {
 
 const update = async (name: string) => {
     await updateWorkspace(workspace.value!.uuid,name);
-    refreshWorkspace()
+    refreshWorkspace();
     await closeModal();
 };
 
