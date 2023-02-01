@@ -6,7 +6,6 @@ export default defineNuxtConfig({
         '/node_modules/bpmn-js/dist/assets/diagram-js.css',
         '/node_modules/bpmn-js/dist/assets/bpmn-font/css/bpmn.css',
         '/node_modules/bpmn-js-properties-panel/dist/assets/properties-panel.css',
-        '/node_modules/bpmn-js-properties-panel/dist/assets/element-templates.css'
     ],
     modules: [
         '@nuxtjs/tailwindcss',

@@ -1,0 +1,22 @@
+{
+    "name": "UPMM",
+    "prefix": "upmm",
+    "uri": "http://upmm",
+    "xml": {
+        "tagAlias": "lowerCase"
+    },
+    "associations": [],
+    "types": [
+        {
+            "name": "UpmmElement",
+            "extends": ["bpmn:BaseElement"],
+            "properties": [
+                {
+                    "name": "upmmId",
+                    "isAttr": true,
+                    "type": "String"
+                }
+            ]
+        }
+    ]
+}

@@ -1,36 +1,22 @@
 <script setup lang='ts'>
-// @ts-ignore
-import Modeler from 'bpmn-js/lib/Modeler';
-// @ts-ignore
-import { BpmnPropertiesPanelModule, BpmnPropertiesProviderModule } from 'bpmn-js-properties-panel';
+const { $bpmnModeler } = useNuxtApp();
 
 const props = defineProps<{
     xml: string
 }>();
 
-let modeler: Modeler;
-
 onMounted(async () => {
-    modeler = new Modeler({
-        container: '#canvas',
-        propertiesPanel: {
-            parent: '#properties'
-        },
-        additionalModules: [
-            BpmnPropertiesPanelModule,
-            BpmnPropertiesProviderModule
-        ],
-    });
+    $bpmnModeler.init('#canvas', '#properties')
 
     try {
-        await modeler.importXML(props.xml);
+        await $bpmnModeler.get().importXML(props.xml);
     } catch (err) {
         console.log('error rendering', err);
     }
 })
 
 const saveDiagram = async () => {
-    const xml = await modeler.saveXML();
+    const xml = await $bpmnModeler.get().saveXML();
     console.log(xml);
 }
 </script>
@@ -41,5 +27,6 @@ const saveDiagram = async () => {
             <div id="canvas" class='col-span-3'></div>
             <div id="properties" class='border-l-4'></div>
         </div>
+        <div @click='saveDiagram' class='fixed bottom-10'>Save</div>
     </div>
 </template>
