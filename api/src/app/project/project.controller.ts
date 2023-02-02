@@ -19,15 +19,20 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { Express } from 'express';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import * as fs from 'fs';
+import { TemplateService } from '../template/template.service';
 
 @Controller('project')
 export class ProjectController {
-    constructor(private readonly projectService: ProjectService) {}
+    constructor(
+        private readonly projectService: ProjectService,
+        private readonly templateService: TemplateService,
+    ) {}
 
     @Post('')
     public async create(
         @Body() createProjectDto: CreateProjectDto,
         @CurrentUser() user: User,
+        @Body('templateUuid') templateUuid: string,
     ): Promise<Project> {
         const pathToFile = './resources/bpmn/';
         const fullPath =
@@ -41,8 +46,10 @@ export class ProjectController {
                 return console.error(err);
             }
         });
+
+        const template = await this.templateService.getOneByUuid(templateUuid);
         createProjectDto.path = fullPath;
-        return this.projectService.create(createProjectDto, user);
+        return this.projectService.create(createProjectDto, user, template);
     }
 
     @Patch(':uuid')
@@ -66,7 +73,7 @@ export class ProjectController {
     ): Promise<Project> {
         return project;
     }
-    @Post('import')
+    /* @Post('import')
     @UseInterceptors(
         FileInterceptor('file', {
             storage: diskStorage({
@@ -90,5 +97,5 @@ export class ProjectController {
             user,
         );
         return project;
-    }
+    }*/
 }

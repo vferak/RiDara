@@ -11,6 +11,7 @@ import { ProjectRepository } from './project.repository';
 import { User } from '../shared/user/user.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { Template } from '../template/template.entity';
 
 @Entity({ customRepository: () => ProjectRepository })
 export class Project {
@@ -34,6 +35,9 @@ export class Project {
     @ManyToOne({ entity: () => Workspace, eager: true })
     private workspace!: Workspace;
 
+    @ManyToOne({ entity: () => Template, eager: true })
+    private template!: Template;
+
     private constructor(
         uuid: string,
         name: string,
@@ -41,6 +45,7 @@ export class Project {
         owner: User,
         workspace: Workspace,
         createDate: Date,
+        template: Template,
     ) {
         this.uuid = uuid;
         this.name = name;
@@ -48,11 +53,13 @@ export class Project {
         this.owner = owner;
         this.workspace = workspace;
         this.createDate = createDate;
+        this.template = template;
     }
 
     public static create(
         createProjectDto: CreateProjectDto,
         user: User,
+        template: Template,
     ): Project {
         const uuid = v4();
         const date = new Date();
@@ -63,6 +70,7 @@ export class Project {
             user,
             createProjectDto.workspace,
             date,
+            template,
         );
     }
 

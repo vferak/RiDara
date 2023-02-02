@@ -2,7 +2,7 @@
 import { User, Workspace } from '~/composables/types';
 
 const route = useRoute();
-
+const { getTemplates } = useTemplate();
 const { getProjects, createProject } = useProject();
 const { modalState, openModal, closeModal } = useModal('project-create');
 const uuid = route.params.uuid.toString();
@@ -12,6 +12,8 @@ const { data: projects, refresh: refreshProject } = await getProjects(uuid);
 const { getUserProfile } = useUser();
 
 const {data: user} = await getUserProfile();
+
+const {data: templates} = await getTemplates();
 
 const userData: User = {
     email: user.value?.email,
@@ -24,8 +26,8 @@ let workspace: Workspace = {
 uuid:'316e1b5f-ca7d-4c6f-8145-82493b4ab3a5',name:'Kokot',owner: userData,
 }
 
-const create = async (name: string): Promise<void> => {
-    await createProject(name, workspace);
+const create = async (name: string, templateUuid: string): Promise<void> => {
+    await createProject(name, workspace, templateUuid);
     await refreshProject();
     closeModal();
 };
@@ -51,7 +53,7 @@ const create = async (name: string): Promise<void> => {
         </div>
         <Modal v-model='modalState'>
             <h3 class='text-lg font-bold'>Create new project</h3>
-            <FormProject @form-sent='create'/>
+            <FormProject @form-sent='create' :templates='templates' />
         </Modal>
 
     </div>

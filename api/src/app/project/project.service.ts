@@ -4,6 +4,7 @@ import { Project } from './project.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { User } from '../shared/user/user.entity';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { Template } from '../template/template.entity';
 
 @Injectable()
 export class ProjectService {
@@ -16,8 +17,9 @@ export class ProjectService {
     public async create(
         createProjectDto: CreateProjectDto,
         user: User,
+        template: Template,
     ): Promise<Project> {
-        const project = Project.create(createProjectDto, user);
+        const project = Project.create(createProjectDto, user, template);
         this.projectRepository.persist(project);
         await this.projectRepository.flush();
 

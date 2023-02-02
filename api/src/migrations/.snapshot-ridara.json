@@ -515,6 +515,15 @@
           "primary": false,
           "nullable": false,
           "mappedType": "string"
+        },
+        "template_uuid": {
+          "name": "template_uuid",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
         }
       },
       "name": "project",
@@ -534,6 +543,15 @@
           ],
           "composite": false,
           "keyName": "project_workspace_uuid_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "template_uuid"
+          ],
+          "composite": false,
+          "keyName": "project_template_uuid_index",
           "primary": false,
           "unique": false
         },
@@ -571,6 +589,18 @@
             "uuid"
           ],
           "referencedTableName": "workspace",
+          "updateRule": "cascade"
+        },
+        "project_template_uuid_foreign": {
+          "constraintName": "project_template_uuid_foreign",
+          "columnNames": [
+            "template_uuid"
+          ],
+          "localTableName": "project",
+          "referencedColumnNames": [
+            "uuid"
+          ],
+          "referencedTableName": "template",
           "updateRule": "cascade"
         }
       }

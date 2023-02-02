@@ -1,11 +1,12 @@
 import { AsyncData } from '#app';
 import { Project, Workspace } from '~/composables/types';
+import template from '~/components/form/template.vue';
 
 export const useProject = () => {
     const projectUrlPrefix = '/project';
 
-    const createProject = async (name: string, workspace: Workspace): Promise<AsyncData<Project, any>> => {
-        const body = { name: name, workspace: workspace };
+    const createProject = async (name: string, workspace: Workspace, templateUuid: string): Promise<AsyncData<Project, any>> => {
+        const body = { name: name, workspace: workspace, templateUuid: templateUuid };
         return useApiFetch<Project>(
             projectUrlPrefix,
             {
