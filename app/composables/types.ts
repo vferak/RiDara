@@ -15,3 +15,9 @@ export type OntologyFile = {
     uuid: string,
     name: string,
 }
+
+export type Template = {
+    uuid: string,
+    name: string,
+    ontologyFile: OntologyFile
+}

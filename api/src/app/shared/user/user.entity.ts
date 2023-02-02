@@ -13,6 +13,7 @@ import { UserWorkspace } from '../../workspace/userWorkspace/userWorkspace.entit
 import { CreateUserDto } from './dto/create-user.dto';
 import { Workspace } from '../../workspace/workspace.entity';
 import { Project } from '../../project/project.entity';
+import { Template } from '../../template/template.entity';
 
 @Entity({ customRepository: () => UserRepository })
 export class User {
@@ -41,6 +42,9 @@ export class User {
 
     @OneToMany('Project', 'owner')
     private projects = new Collection<Project>(this);
+
+    @OneToMany('Template', 'author')
+    private templates = new Collection<Template>(this);
 
     private constructor(
         uuid: string,

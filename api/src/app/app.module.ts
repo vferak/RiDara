@@ -12,6 +12,7 @@ import { WorkspaceModule } from './workspace/workspace.module';
 import { OntologyModule } from './ontology/ontology.module';
 import { ProjectModule } from './project/project.module';
 import { UserModule } from './shared/user/user.module';
+import { TemplateModule } from './template/template.module';
 
 const configModuleOptions: ConfigModuleOptions = {
     load: [configuration],
@@ -28,6 +29,7 @@ const configModuleOptions: ConfigModuleOptions = {
         WorkspaceModule,
         OntologyModule,
         ProjectModule,
+        TemplateModule,
     ],
     controllers: [AppController],
     providers: [AppService],

@@ -15,7 +15,12 @@ export const useOntology = () => {
         });
     }
 
+    const getOntologyFiles = async (): Promise<AsyncData<OntologyFile[], any>> => {
+        return useApiFetch<OntologyFile[]>(`${workspaceUrlPrefix}/files`);
+    }
+
     return {
         loadOntologyFile: loadOntologyFile,
+        getOntologyFiles: getOntologyFiles,
     };
 }

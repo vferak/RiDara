@@ -207,6 +207,113 @@
           "nullable": false,
           "mappedType": "string"
         },
+        "author_uuid": {
+          "name": "author_uuid",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "create_date": {
+          "name": "create_date",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        },
+        "ontology_file_uuid": {
+          "name": "ontology_file_uuid",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        }
+      },
+      "name": "template",
+      "indexes": [
+        {
+          "columnNames": [
+            "author_uuid"
+          ],
+          "composite": false,
+          "keyName": "template_author_uuid_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "ontology_file_uuid"
+          ],
+          "composite": false,
+          "keyName": "template_ontology_file_uuid_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "uuid"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "template_author_uuid_foreign": {
+          "constraintName": "template_author_uuid_foreign",
+          "columnNames": [
+            "author_uuid"
+          ],
+          "localTableName": "template",
+          "referencedColumnNames": [
+            "uuid"
+          ],
+          "referencedTableName": "user",
+          "updateRule": "cascade"
+        },
+        "template_ontology_file_uuid_foreign": {
+          "constraintName": "template_ontology_file_uuid_foreign",
+          "columnNames": [
+            "ontology_file_uuid"
+          ],
+          "localTableName": "template",
+          "referencedColumnNames": [
+            "uuid"
+          ],
+          "referencedTableName": "ontology_file",
+          "updateRule": "cascade"
+        }
+      }
+    },
+    {
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
         "owner_uuid": {
           "name": "owner_uuid",
           "type": "varchar(255)",

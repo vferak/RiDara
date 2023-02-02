@@ -20,20 +20,27 @@ export class OntologyNode {
     @Property()
     private name!: string;
 
-
     @ManyToOne({ entity: () => OntologyFile })
     private ontologyFile!: OntologyFile;
 
-    private constructor(uuid: string, name: string, ontologyFile: OntologyFile) {
+    private constructor(
+        uuid: string,
+        name: string,
+        ontologyFile: OntologyFile,
+    ) {
         this.uuid = uuid;
         this.name = name;
         this.ontologyFile = ontologyFile;
     }
 
     public static create(
-        createNodeOntologyDto: CreateFileOntologyDto
+        createNodeOntologyDto: CreateFileOntologyDto,
     ): OntologyNode {
         const uuid = v4();
-        return new OntologyNode(uuid, createNodeOntologyDto.name, createNodeOntologyDto.ontologyFile);
+        return new OntologyNode(
+            uuid,
+            createNodeOntologyDto.name,
+            createNodeOntologyDto.ontologyFile,
+        );
     }
 }

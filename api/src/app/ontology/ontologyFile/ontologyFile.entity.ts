@@ -10,6 +10,7 @@ import { v4 } from 'uuid';
 import { OntologyFileRepository } from './ontologyFIle.repository';
 import { CreateFileOntologyDto } from '../dto/create-file-ontology.dto';
 import { OntologyNode } from '../ontologyNode/ontologyNode.entity';
+import { Template } from '../../template/template.entity';
 
 @Entity({ customRepository: () => OntologyFileRepository })
 export class OntologyFile {
@@ -26,6 +27,9 @@ export class OntologyFile {
 
     @OneToMany('OntologyNode', 'ontologyFile')
     private ontologyNodes = new Collection<OntologyNode>(this);
+
+    @OneToMany('Template', 'ontologyFile')
+    private templates = new Collection<Template>(this);
 
     private constructor(uuid: string, name: string, createDate: Date) {
         this.uuid = uuid;
