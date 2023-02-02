@@ -14,9 +14,8 @@ const navs = [
     {
         name: 'Current workspace',
         links: [
-            {name: 'New project', route: '/project', icon: 'gg-add-r'},
-            {name: 'Projects', route: `/project/user/${user.value.uuid}`, icon: 'gg-album'},
-            {name: 'Workspace settings', route: '/diagrams', icon: 'gg-options'},
+            {name: 'Projects', route: `/project/user/${user.value!.uuid}`, icon: 'gg-album'},
+            {name: 'Workspace settings', route: '/workspaces', icon: 'gg-options'},
         ],
     },
     {
@@ -45,7 +44,7 @@ const navs = [
                 <label for="site-drawer" class="drawer-overlay"></label>
                 <aside class='w-80 bg-base-300 h-full'>
                     <div class='hidden lg:flex px-4 py-2'>
-                        <NuxtLink class='btn btn-ghost justify-start normal-case text-3xl font-bold w-full' to="/diagrams">RiDara</NuxtLink>
+                        <NuxtLink class='btn btn-ghost justify-start normal-case text-3xl font-bold w-full' to="/dashboard">RiDara</NuxtLink>
                     </div>
                     <div class='flex flex-col'>
                         <div v-for='nav in navs' :key='nav.name'>

@@ -11,7 +11,7 @@ const props = defineProps<{
     name: string,
     field: FieldContext,
     type: string,
-    options: SelectOption[],
+    options?: SelectOption[],
 }>();
 
 const value = props.field.value;

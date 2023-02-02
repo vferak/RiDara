@@ -12,6 +12,9 @@ export default defineNuxtPlugin(() => {
         if (modeler === undefined) {
             modeler = new Modeler({
                 container: container,
+                keyboard: {
+                    bindTo: document
+                },
                 propertiesPanel: {
                     parent: propertiesPanel,
                     layout: {

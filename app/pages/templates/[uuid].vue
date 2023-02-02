@@ -6,7 +6,7 @@ const templateUuid = route.params.uuid.toString();
 
 const { data: xml } = await getTemplateBpmnFile(templateUuid);
 
-const successToast = useState<boolean>();
+const successToast = useState<boolean>(() => false);
 
 onBeforeRouteLeave((to, from, next) => {
     const confirmed = confirm('Are you sure you want to leave? All unsaved progress will be lost.');

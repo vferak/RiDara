@@ -9,16 +9,30 @@ const emit = defineEmits<{
     (event: 'save-bpmn', xml: string): void
 }>();
 
+const saveKeyListener = (event: { ctrlKey: any; metaKey: any; code: string; preventDefault: () => void; }) => {
+    if (!(event.ctrlKey || event.metaKey) || event.code !== 'KeyS') {
+        return;
+    }
+
+    event.preventDefault();
+    saveDiagram();
+};
+
 onMounted(async () => {
-    $bpmnModeler.init('#canvas', '#properties')
+    $bpmnModeler.init('#canvas', '#properties');
+
     try {
         await $bpmnModeler.get().importXML(props.xml);
     } catch (err) {
         console.log('error rendering', err);
     }
+
+    document.addEventListener('keydown', saveKeyListener);
 });
 
 onUnmounted(() => {
+    document.removeEventListener('keydown', saveKeyListener);
+
     $bpmnModeler.destroy();
 })
 

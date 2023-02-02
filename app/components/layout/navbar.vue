@@ -20,7 +20,7 @@ const logOut = (): void => {
             </label>
         </div>
         <div class='flex-1'>
-            <NuxtLink to='/diagrams' class='lg:hidden btn btn-ghost normal-case text-xl'>RiDara</NuxtLink>
+            <NuxtLink to='/dashboard' class='lg:hidden btn btn-ghost normal-case text-xl'>RiDara</NuxtLink>
         </div>
         <div class='flex-none gap-5'>
             <ThemeToggle />
