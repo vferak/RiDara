@@ -23,8 +23,24 @@ export const useTemplate = () => {
         return useApiFetch<Template[]>(templateUrlPrefix);
     }
 
+    const getTemplateBpmnFile = async (templateUuid: string): Promise<AsyncData<string, any>> => {
+        return useApiFetch<string>(`${templateUrlPrefix}/${templateUuid}/file`);
+    }
+
+    const saveTemplateBpmnFile = async (templateUuid: string, xml: string): Promise<AsyncData<void, any>> => {
+        return useApiFetch<void>(`${templateUrlPrefix}/save-file`, {
+            method: 'PATCH',
+            body: {
+                templateUuid: templateUuid,
+                bpmnFileData: xml
+            }
+        });
+    }
+
     return {
         createTemplate: createTemplate,
         getTemplates: getTemplates,
+        getTemplateBpmnFile: getTemplateBpmnFile,
+        saveTemplateBpmnFile: saveTemplateBpmnFile,
     };
 }

@@ -30,18 +30,23 @@ export class Template {
     @ManyToOne({ entity: () => OntologyFile, eager: true })
     private ontologyFile!: OntologyFile;
 
+    @Property()
+    private readonly fileName!: string;
+
     private constructor(
         uuid: string,
         name: string,
         author: User,
         createDate: Date,
         ontologyFile: OntologyFile,
+        fileName: string,
     ) {
         this.uuid = uuid;
         this.name = name;
         this.author = author;
         this.createDate = createDate;
         this.ontologyFile = ontologyFile;
+        this.fileName = fileName;
     }
 
     public static create(
@@ -57,6 +62,11 @@ export class Template {
             user,
             date,
             ontologyFile,
+            createTemplateDto.fileName,
         );
+    }
+
+    public getFileName(): string {
+        return this.fileName;
     }
 }

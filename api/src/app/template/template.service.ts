@@ -11,6 +11,10 @@ export class TemplateService {
         private readonly templateRepository: TemplateRepository,
     ) {}
 
+    public async getOneByUuid(templateUuid: string): Promise<Template> {
+        return this.templateRepository.findOneOrFail({ uuid: templateUuid });
+    }
+
     public async create(
         user: User,
         ontologyFile: OntologyFile,

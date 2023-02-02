@@ -5,6 +5,10 @@ const props = defineProps<{
     xml: string
 }>();
 
+const emit = defineEmits<{
+    (event: 'save-bpmn', xml: string): void
+}>();
+
 onMounted(async () => {
     $bpmnModeler.init('#canvas', '#properties')
     try {
@@ -20,7 +24,7 @@ onUnmounted(() => {
 
 const saveDiagram = async () => {
     const xml = await $bpmnModeler.get().saveXML();
-    console.log(xml);
+    emit('save-bpmn', xml.xml);
 }
 </script>
 

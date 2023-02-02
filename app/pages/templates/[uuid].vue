@@ -1,6 +1,12 @@
 <script setup lang='ts'>
-const { data: xmlBlob } = await useFetch<Blob>('/diagram.bpmn');
-const xml = await xmlBlob.value?.text();
+const route = useRoute();
+const { getTemplateBpmnFile, saveTemplateBpmnFile } = useTemplate();
+
+const templateUuid = route.params.uuid.toString();
+
+const { data: xml } = await getTemplateBpmnFile(templateUuid);
+
+const successToast = useState<boolean>();
 
 onBeforeRouteLeave((to, from, next) => {
     const confirmed = confirm('Are you sure you want to leave? All unsaved progress will be lost.');
@@ -11,10 +17,18 @@ onBeforeRouteLeave((to, from, next) => {
 
     next();
 });
+
+const saveTemplateFile = async (xml: string): Promise<void> => {
+    await saveTemplateBpmnFile(templateUuid, xml);
+    successToast.value = true;
+}
 </script>
 
 <template>
     <div class='h-full'>
-        <BpmnModeler :xml='xml'/>
+        <Toast v-model='successToast'>
+            <AlertSuccess>Diagram saved!</AlertSuccess>
+        </Toast>
+        <BpmnModeler :xml='xml' @save-bpmn='saveTemplateFile'/>
     </div>
 </template>

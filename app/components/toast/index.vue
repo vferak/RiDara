@@ -20,7 +20,7 @@ watchEffect(() => {
                 enter-to-class='opacity-100 scale-100'
                 leave-active-class='duration-200 ease-in'
                 leave-to-class='opacity-0 scale-90'>
-        <div v-if='props.modelValue' class='toast toast-top toast-end mt-20'>
+        <div v-if='props.modelValue' class='toast toast-top toast-end mt-20 z-50'>
             <slot />
         </div>
     </Transition>
