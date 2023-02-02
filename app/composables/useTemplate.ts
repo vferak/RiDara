@@ -19,7 +19,12 @@ export const useTemplate = () => {
         );
     }
 
+    const getTemplates = async (): Promise<AsyncData<Template[], any>> => {
+        return useApiFetch<Template[]>(templateUrlPrefix);
+    }
+
     return {
         createTemplate: createTemplate,
+        getTemplates: getTemplates,
     };
 }

@@ -117,4 +117,9 @@ export class User {
         await this.projects.init();
         return this.projects.getItems();
     }
+
+    public async getTemplates(): Promise<Template[]> {
+        await this.templates.init();
+        return this.templates.getItems();
+    }
 }

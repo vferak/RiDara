@@ -40,6 +40,10 @@ export default defineNuxtPlugin(() => {
         }
     }
 
+    const destroy = (): Modeler => {
+        modeler = undefined;
+    }
+
     const get = (): Modeler => {
         return modeler;
     }
@@ -48,7 +52,8 @@ export default defineNuxtPlugin(() => {
         provide: {
             bpmnModeler: {
                 init,
-                get
+                get,
+                destroy
             }
         }
     };

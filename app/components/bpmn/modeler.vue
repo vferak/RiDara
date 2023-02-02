@@ -7,12 +7,15 @@ const props = defineProps<{
 
 onMounted(async () => {
     $bpmnModeler.init('#canvas', '#properties')
-
     try {
         await $bpmnModeler.get().importXML(props.xml);
     } catch (err) {
         console.log('error rendering', err);
     }
+});
+
+onUnmounted(() => {
+    $bpmnModeler.destroy();
 })
 
 const saveDiagram = async () => {

@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { TemplateService } from './template.service';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { CurrentUser } from '../common/decorators/user.decorator';
@@ -28,5 +28,10 @@ export class TemplateController {
             ontologyFile,
             createTemplateDto,
         );
+    }
+
+    @Get()
+    public async getAllForUser(@CurrentUser() user: User): Promise<Template[]> {
+        return await user.getTemplates();
     }
 }
