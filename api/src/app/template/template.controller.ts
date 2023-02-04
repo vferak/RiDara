@@ -54,6 +54,13 @@ export class TemplateController {
         return fs.readFileSync(template.getFileName()).toString();
     }
 
+    @Get(':templateUuid')
+    public async getTemplate(
+        @Param('templateUuid') templateUuid: string,
+    ): Promise<Template> {
+        return await this.templateService.getOneByUuid(templateUuid);
+    }
+
     @Patch('save-file')
     public async saveTemplateFile(
         @Body('templateUuid') templateUuid: string,

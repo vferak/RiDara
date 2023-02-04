@@ -5,10 +5,18 @@ import { BpmnPropertiesPanelModule, BpmnPropertiesProviderModule } from 'bpmn-js
 import upmmPropertiesProviderModule from './upmm/provider';
 import upmmModdleDescriptor from './upmm/descriptor.json';
 
+export type SelectOption = {
+    value: string,
+    label: string,
+}
+
 export default defineNuxtPlugin(() => {
     let modeler: Modeler;
 
-    const init = (container: string, propertiesPanel: string): Modeler => {
+    const init = (container: string, propertiesPanel: string, upmmElements: SelectOption[]): Modeler => {
+        // @ts-ignore
+        window['upmmElements'] = upmmElements;
+
         if (modeler === undefined) {
             modeler = new Modeler({
                 container: container,

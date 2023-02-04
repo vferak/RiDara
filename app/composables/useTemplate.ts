@@ -23,6 +23,10 @@ export const useTemplate = () => {
         return useApiFetch<Template[]>(templateUrlPrefix);
     }
 
+    const getTemplate = async (templateUuid: string): Promise<AsyncData<Template, any>> => {
+        return useApiFetch<Template>(`${templateUrlPrefix}/${templateUuid}`);
+    }
+
     const getTemplateBpmnFile = async (templateUuid: string): Promise<AsyncData<string, any>> => {
         return useApiFetch<string>(`${templateUrlPrefix}/${templateUuid}/file`);
     }
@@ -40,6 +44,7 @@ export const useTemplate = () => {
     return {
         createTemplate: createTemplate,
         getTemplates: getTemplates,
+        getTemplate: getTemplate,
         getTemplateBpmnFile: getTemplateBpmnFile,
         saveTemplateBpmnFile: saveTemplateBpmnFile,
     };

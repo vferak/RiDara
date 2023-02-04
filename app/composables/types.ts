@@ -32,3 +32,8 @@ export type Project = {
     workspace: Workspace,
     path: string,
 }
+
+export type OntologyNode = {
+    uuid: string,
+    name: string,
+}

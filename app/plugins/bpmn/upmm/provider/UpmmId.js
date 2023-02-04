@@ -27,12 +27,10 @@ function UpmmId(props) {
         });
     }
 
-    const getOptions = (element) => {
+    const getOptions = () => {
         return [
             { value: '', label: translate('<none>') },
-            { value: 'timeDate', label: translate('Date') },
-            { value: 'timeDuration', label: translate('Duration') },
-            { value: 'timeCycle', label: translate('Cycle') }
+            ...window['upmmElements']
         ];
     };
 

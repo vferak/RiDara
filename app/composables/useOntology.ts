@@ -1,26 +1,31 @@
 import { AsyncData } from '#app';
-import { OntologyFile } from '~/composables/types';
+import { OntologyFile, OntologyNode } from '~/composables/types';
 
 export const useOntology = () => {
-    const workspaceUrlPrefix = '/ontology';
+    const ontologyUrlPrefix = '/ontology';
 
     const loadOntologyFile = async (name: string, file: File): Promise<AsyncData<OntologyFile, any>> => {
         const formData = new FormData();
         formData.append('name', name);
         formData.append('file', file);
 
-        return useApiFetch<OntologyFile>(`${workspaceUrlPrefix}/loadFile`, {
+        return useApiFetch<OntologyFile>(`${ontologyUrlPrefix}/loadFile`, {
             method: 'POST',
             body: formData
         });
     }
 
     const getOntologyFiles = async (): Promise<AsyncData<OntologyFile[], any>> => {
-        return useApiFetch<OntologyFile[]>(`${workspaceUrlPrefix}/files`);
+        return useApiFetch<OntologyFile[]>(`${ontologyUrlPrefix}/files`);
+    }
+
+    const getOntologyNodes = async (ontologyFileUuid: string): Promise<AsyncData<OntologyNode[], any>> => {
+        return useApiFetch<OntologyNode[]>(`${ontologyUrlPrefix}/${ontologyFileUuid}/nodes`);
     }
 
     return {
         loadOntologyFile: loadOntologyFile,
         getOntologyFiles: getOntologyFiles,
+        getOntologyNodes: getOntologyNodes,
     };
 }

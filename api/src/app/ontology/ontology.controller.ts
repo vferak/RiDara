@@ -38,6 +38,12 @@ export class OntologyController {
     public async displayNodes(
         @Param('uuid', OntlogyFileByUuidPipe) ontologyFile: OntologyFile,
     ): Promise<OntologyNode[]> {
-        return ontologyFile.getNodes();
+        const nodes = await ontologyFile.getNodes();
+        return nodes.sort((a, b) => {
+            const aName = a.getName().toUpperCase();
+            const bName = b.getName().toUpperCase();
+
+            return aName > bName ? 1 : bName > aName ? -1 : 0;
+        });
     }
 }

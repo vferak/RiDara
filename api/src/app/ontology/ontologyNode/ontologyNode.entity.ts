@@ -43,4 +43,8 @@ export class OntologyNode {
             createNodeOntologyDto.ontologyFile,
         );
     }
+
+    public getName(): string {
+        return this.name;
+    }
 }

@@ -1,10 +1,20 @@
 <script setup lang='ts'>
 const route = useRoute();
-const { getTemplateBpmnFile, saveTemplateBpmnFile } = useTemplate();
+const { getTemplate, getTemplateBpmnFile, saveTemplateBpmnFile } = useTemplate();
+const { getOntologyNodes } = useOntology();
 
 const templateUuid = route.params.uuid.toString();
 
+const { data: template } = await getTemplate(templateUuid);
+const { data: ontologyNodes } = await getOntologyNodes(template.value!.ontologyFile.uuid);
 const { data: xml } = await getTemplateBpmnFile(templateUuid);
+
+const upmmOptions = ontologyNodes.value!.map((ontologyNode) => {
+    return {
+        value: ontologyNode.uuid,
+        label: ontologyNode.name,
+    }
+});
 
 const successToast = useState<boolean>(() => false);
 
@@ -29,6 +39,6 @@ const saveTemplateFile = async (xml: string): Promise<void> => {
         <Toast v-model='successToast'>
             <AlertSuccess>Diagram saved!</AlertSuccess>
         </Toast>
-        <BpmnModeler :xml='xml' @save-bpmn='saveTemplateFile'/>
+        <BpmnModeler :xml='xml' :upmm-options='upmmOptions' @save-bpmn='saveTemplateFile'/>
     </div>
 </template>
