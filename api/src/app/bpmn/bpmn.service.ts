@@ -1,18 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
-import { OntologyNode } from '../ontology/ontologyNode/ontologyNode.entity';
-import { OntologyNodeRepository } from '../ontology/ontologyNode/ontologyNode.repository';
+import { BpmnData } from './bpmn.data';
+import { BpmnElementData } from './bpmnElement.data';
 
 @Injectable()
 export class BpmnService {
-    public constructor(
-        private readonly ontologyNodeRepository: OntologyNodeRepository,
-    ) {}
-
-    public async parseBpmnFile(pathToBpmn: string): Promise<any> {
-        const bpmnFile = fs.readFileSync(pathToBpmn, 'utf8');
+    private createModdle() {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const moddle = require('bpmn-moddle')({
+        return require('bpmn-moddle')({
             upmm: {
                 name: 'UPMM',
                 prefix: 'upmm',
@@ -36,6 +31,12 @@ export class BpmnService {
                 ],
             },
         });
+    }
+
+    public async parseBpmnFile(pathToBpmn: string): Promise<BpmnData> {
+        const moddle = this.createModdle();
+
+        const bpmnFile = fs.readFileSync(pathToBpmn, 'utf8');
 
         const {
             rootElement: rootElement,
@@ -45,56 +46,37 @@ export class BpmnService {
 
         const objects = rootElement.get('rootElements')[0].flowElements;
 
-        let classes = [];
+        const bpmnElements = objects
+            .filter(
+                (object) =>
+                    object !== undefined &&
+                    object.upmmId !== undefined &&
+                    object.upmmId !== '',
+            )
+            .map((object) => {
+                return new BpmnElementData(
+                    object.$type,
+                    object.id,
+                    object.upmmId,
+                );
+            });
 
-        for (const obj of objects) {
-            if (obj.upmmId !== undefined) {
-                if (obj.upmmId === '') {
-                    continue;
-                } else {
-                    const node =
-                        await this.ontologyNodeRepository.findOneOrFail(
-                            obj.upmmId.toString(),
-                        );
+        //     .map(async (object) => {
+        //         return await this.ontologyNodeRepository.findOneOrFail(
+        //             object.upmmId.toString(),
+        //         );
+        //     })
+        //     .sort((a, b) => (a.getName() > b.getName()) ? 1 : ((b.getName() > a.getName()) ? -1 : 0))
+        //     .reduce(
+        //         (acc, e) => acc.set(e, (acc.get(e) || 0) + 1),
+        //         new Map<string, number>(),
+        //     );
+        //
+        // let nodesTotal = 0;
+        // for (const [key, value] of map) {
+        //     nodesTotal = nodesTotal + value;
+        // }
 
-                    classes.push(node.getName());
-                }
-            }
-        }
-
-        let nodesTotal = 0;
-        classes = classes.sort();
-
-        const map = classes.reduce(
-            (acc, e) => acc.set(e, (acc.get(e) || 0) + 1),
-            new Map(),
-        );
-
-        for (const [key, value] of map) {
-            nodesTotal = nodesTotal + value;
-        }
-
-        return [map, nodesTotal];
-    }
-
-    public async parseOntologyNodes(
-        ontologyNodes: OntologyNode[],
-    ): Promise<any> {
-        let names = [];
-        ontologyNodes = ontologyNodes.filter(
-            (templateNode) =>
-                templateNode.getName() === 'Entity' ||
-                templateNode.getName() === 'Problem',
-        );
-
-        for (const obj of ontologyNodes) {
-            names.push(obj.getName());
-        }
-
-        names = names.sort();
-        return names.reduce(
-            (acc, e) => acc.set(e, (acc.get(e) || 0) + 1),
-            new Map(),
-        );
+        return new BpmnData(bpmnElements);
     }
 }

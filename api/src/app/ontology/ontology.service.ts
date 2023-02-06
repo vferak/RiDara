@@ -60,4 +60,19 @@ export class OntologyService {
         }
         await this.ontologyFileRepository.flush();
     }
+
+    public async parseOntologyNodes(
+        ontologyNodes: OntologyNode[],
+    ): Promise<Map<string, number>> {
+        return ontologyNodes
+            .filter((templateNode) =>
+                ['Entity', 'Problem'].includes(templateNode.getName()),
+            )
+            .map((templateNode) => templateNode.getName())
+            .sort()
+            .reduce(
+                (acc, e) => acc.set(e, (acc.get(e) || 0) + 1),
+                new Map<string, number>(),
+            );
+    }
 }

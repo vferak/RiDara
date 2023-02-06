@@ -8,6 +8,6 @@ import { OntologyNodeModule } from './ontologyNode/ontologyNode.module';
     imports: [OntologyFileModule, OntologyNodeModule],
     controllers: [OntologyController],
     providers: [OntologyService],
-    exports: [OntologyService],
+    exports: [OntologyService, OntologyFileModule, OntologyNodeModule],
 })
 export class OntologyModule {}

@@ -1,27 +1,13 @@
+import { BpmnElementData } from './bpmnElement.data';
+
 export class BpmnData {
-    private numberOfElements: number;
-    private elements: Map<string, number>;
-    private references?: object;
+    private readonly elements: BpmnElementData[];
 
-    public constructor(
-        numberOfElements: number,
-        elements: Map<string, number>,
-        references?: object,
-    ) {
-        this.numberOfElements = numberOfElements;
+    public constructor(elements: BpmnElementData[]) {
         this.elements = elements;
-        this.references = references;
     }
 
-    public getNumberOfElements(): number {
-        return this.numberOfElements;
-    }
-
-    public getElements(): Map<string, number> {
+    public getElements(): BpmnElementData[] {
         return this.elements;
-    }
-
-    public getReferences(): object {
-        return this.references;
     }
 }
