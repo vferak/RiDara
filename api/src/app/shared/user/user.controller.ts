@@ -38,7 +38,11 @@ export class UserController {
     @Get('profile')
     public async getProfile(@CurrentUser() user: User): Promise<object> {
         await user.getWorkspaces();
-        return user;
+        const userProjects = await user.getProjects();
+        return {
+            user: user,
+            projects: userProjects,
+        };
     }
 
     @Get()
@@ -52,6 +56,14 @@ export class UserController {
         @Body() updateUserDto: UpdateUserDto,
     ): Promise<User> {
         return this.userService.update(user, updateUserDto);
+    }
+
+    @Patch('changePassword')
+    public async changePassword(
+        @CurrentUser() user: User,
+        @Body() updateUserDto: UpdateUserDto,
+    ): Promise<User> {
+        return this.userService.updatePasword(user, updateUserDto);
     }
 
     @Delete(':uuid')

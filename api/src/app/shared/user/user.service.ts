@@ -38,11 +38,20 @@ export class UserService {
         user: User,
         updateUserDto: UpdateUserDto,
     ): Promise<User> {
+        user.update(updateUserDto);
+        await this.userRepository.flush();
+
+        return user;
+    }
+
+    public async updatePasword(
+        user: User,
+        updateUserDto: UpdateUserDto,
+    ): Promise<User> {
         updateUserDto.password = await this.bcryptService.hash(
             updateUserDto.password,
         );
-        user.update(updateUserDto);
-
+        user.updatePassword(updateUserDto);
         await this.userRepository.flush();
 
         return user;

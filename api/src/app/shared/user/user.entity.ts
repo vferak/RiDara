@@ -79,6 +79,9 @@ export class User {
         this.email = updateUserDto.email;
         this.firstName = updateUserDto.firstName;
         this.lastName = updateUserDto.lastName;
+    }
+
+    public updatePassword(updateUserDto: UpdateUserDto): void {
         this.password = updateUserDto.password;
     }
     public getEmail(): string {
