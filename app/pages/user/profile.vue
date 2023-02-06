@@ -14,7 +14,7 @@ const { data: userData } = await getUserProfile();
                 </div>
             </figure>
             <div class="card-body items-center text-center">
-                <h2 class="card-title">{{ userData.email }}</h2>
+                <h2 class="card-title">{{ userData.user.email }}</h2>
                 <p>Normal user</p>
                 <div class="stats shadow">
                     <div class="stat place-items-center">

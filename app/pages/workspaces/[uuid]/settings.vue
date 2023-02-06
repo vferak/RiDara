@@ -4,7 +4,7 @@ const { getWorkspace, getUsersFromWorkspace, updateWorkspace } = useWorkspace();
 
 const uuid = route.params.uuid.toString();
 
-const { data: workspace, refresh: refreshWorkspace } = getWorkspace(uuid);
+const { data: workspace, refresh: refreshWorkspace } = await getWorkspace(uuid);
 const { data: users } = getUsersFromWorkspace(uuid);
 
 const modalState = useState<boolean>(() => false);
@@ -19,7 +19,7 @@ const closeModal = async () => {
 
 const update = async (name: string) => {
     await updateWorkspace(workspace.value!.uuid,name);
-    refreshWorkspace();
+    await refreshWorkspace();
     await closeModal();
 };
 

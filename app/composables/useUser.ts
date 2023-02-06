@@ -31,12 +31,16 @@ export const useUser = () => {
         });
     };
 
+    const getUser = async (): Promise<AsyncData<User, any>> => {
+        return useApiFetch<User>(userUrlPrefix);
+    };
 
-    const getUserProfile = async (): Promise<AsyncData<User, any>> => {
-        return useApiFetch<User>(`${userUrlPrefix}/profile`);
+    const getUserProfile = async (): Promise<AsyncData<{user: User, projects: Project[]}, any>> => {
+        return useApiFetch<{user: User, projects: Project[]}>(`${userUrlPrefix}/profile`);
     };
 
     return {
+        getUser: getUser,
         updateUser: updateUser,
         getUserProfile: getUserProfile,
         registerUser: registerUser,

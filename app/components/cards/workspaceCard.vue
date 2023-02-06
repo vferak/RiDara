@@ -1,12 +1,18 @@
 <script setup lang='ts'>
 import { Workspace } from '~/composables/types';
 
+const { setCurrentWorkspace } = useCurrentWorkspace();
+
 const { workspace } = defineProps<{ workspace: Workspace }>();
+
+const setWorkspace = (): void => {
+    setCurrentWorkspace(workspace.uuid);
+}
 </script>
 
 <template>
     <div>
-        <NuxtLink :to="{ name: 'workspaces-uuid-settings', params: { uuid: workspace.uuid }}">
+        <NuxtLink @click='setWorkspace' to="projects">
             <div class='card w-50 bg-base-200 shadow-xl'>
                 <div class='card-body'>
                     <h2 class='card-title'>{{ workspace.name }}</h2>

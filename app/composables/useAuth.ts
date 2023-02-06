@@ -1,13 +1,22 @@
+import { useCurrentUser } from '~/composables/useCurrentUser';
+
 export const useAuth = () => {
+    const { clearCurrentUser } = useCurrentUser();
+    const { clearCurrentWorkspace } = useCurrentWorkspace();
+
+
     const jwtCookie = useCookie<string|undefined>('jwt');
 
     const logIn = async (email: string, password: string): Promise<void> => {
         const body = { username: email, password: password };
 
-        const { data: data, error: error } = await useApiFetch('/auth/login', {
-            method: 'POST',
-            body: body
-        });
+        const { data: data, error: error } = await useApiFetch<string>(
+            '/auth/login',
+            {
+                method: 'POST',
+                body: body
+            }
+        );
 
         if (error.value) {
             logOut();
@@ -15,11 +24,13 @@ export const useAuth = () => {
             throw error;
         }
 
-        jwtCookie.value = JSON.stringify(data.value);
+        jwtCookie.value = data.value;
     }
 
     const logOut = (): void => {
         jwtCookie.value = undefined;
+        clearCurrentUser();
+        clearCurrentWorkspace();
     }
 
     const getJWT = (): string|undefined => {

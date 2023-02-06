@@ -26,6 +26,7 @@ import { TemplateService } from '../template/template.service';
 import * as path from 'path';
 import { BpmnData } from '../bpmn/bpmn.data';
 import { OntologyNode } from '../ontology/ontologyNode/ontologyNode.entity';
+import { WorkspaceService } from '../workspace/workspace.service';
 
 @Controller('project')
 export class ProjectController {
@@ -35,6 +36,7 @@ export class ProjectController {
         private readonly bpmnService: BpmnService,
         private readonly templateService: TemplateService,
         private readonly ontologyService: OntologyService,
+        private readonly workspaceService: WorkspaceService,
     ) {}
 
     @Post('')
@@ -69,11 +71,14 @@ export class ProjectController {
         return this.projectService.update(project, updateProjectDto);
     }
 
-    @Get('user/:uuid')
+    @Get('workspace/:uuid')
     public async displayUsersProjects(
-        @CurrentUser() user: User,
+        @Param('uuid') workspaceUuid: string,
     ): Promise<Project[]> {
-        return user.getProjects();
+        const workspace = await this.workspaceService.getOneByUuid(
+            workspaceUuid,
+        );
+        return workspace.getProjects();
     }
 
     /*@Get(':uuid')
