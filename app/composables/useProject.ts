@@ -15,6 +15,23 @@ export const useProject = () => {
         );
     }
 
+    const importProject = async (name: string, workspace: string, file: File, templateUuid: string): Promise<AsyncData<Project, any>> => {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('workspace', workspace);
+        formData.append('file', file);
+        formData.append('templateUuid', templateUuid);
+
+        return useApiFetch<Project>(
+            `${projectUrlPrefix}/import`,
+            {
+                method: 'POST',
+                body: formData,
+            }
+        );
+    }
+
+
     const getProjects = async (uuid: string): Promise<AsyncData<Project[], any>> => {
         return useApiFetch<Project[]>(`${projectUrlPrefix}/workspace/${uuid}`);
     }
@@ -68,5 +85,6 @@ export const useProject = () => {
         saveProjectBpmnFile: saveProjectBpmnFile,
         analyzeFirstLevel: analyzeFirstLevel,
         getNodesByProject: getNodesByProject,
+        importProject: importProject,
     };
 }

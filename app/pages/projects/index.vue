@@ -2,8 +2,10 @@
 const { getWorkspace } = useWorkspace();
 const { getCurrentWorkspace } = useCurrentWorkspace();
 const { getTemplates } = useTemplate();
-const { getProjects, createProject } = useProject();
-const { modalState, openModal, closeModal } = useModal('project-create');
+const { getProjects, createProject, importProject } = useProject();
+
+const { modalState: createState, openModal: createOpen, closeModal: createClose } = useModal('project-create');
+const { modalState: importState , openModal: importOpen, closeModal: importClose } = useModal('project-import');
 
 const currentWorkspace = await getCurrentWorkspace();
 
@@ -15,7 +17,13 @@ const { data: workspace } = await getWorkspace(currentWorkspace!.value!.uuid)
 const create = async (name: string, templateUuid: string, blankFile: boolean): Promise<void> => {
     await createProject(name, workspace.value!, templateUuid, blankFile);
     await refreshProject();
-    closeModal();
+    createClose();
+};
+
+const upload = async (name: string, file: File, templateUuid: string): Promise<void> => {
+    await importProject(name, workspace.value!.uuid, file, templateUuid);
+    await refreshProject();
+    importClose();
 };
 </script>
 
@@ -26,10 +34,13 @@ const create = async (name: string, templateUuid: string, blankFile: boolean): P
                 <p class='mb-4 mt-4 text-4xl font-bold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white'>
                     Projects</p>
                 <div>
-                    <button @click='openModal' class='btn mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
+                    <button @click='createOpen' class='btn mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
                         New project
                     </button>
 
+                    <button @click='importOpen' class='btn ml-4 mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
+                        Import project
+                    </button>
                 </div>
             </div>
 
@@ -37,9 +48,14 @@ const create = async (name: string, templateUuid: string, blankFile: boolean): P
                 <CardsProjectCard v-for='project in projects' :key='project.uuid' :project='project' />
             </div>
         </div>
-        <Modal v-model='modalState'>
+        <Modal v-model='createState'>
             <h3 class='text-lg font-bold'>Create new project</h3>
             <FormProject @form-sent='create' :templates='templates' />
+        </Modal>
+
+        <Modal v-model='importState'>
+            <h3 class='text-lg font-bold'>Import project</h3>
+            <ImportProjectFile @form-sent='upload' :templates='templates' />
         </Modal>
 
     </div>

@@ -49,10 +49,16 @@ export class BpmnService {
 
         for (const obj of objects) {
             if (obj.upmmId !== undefined) {
-                const node = await this.ontologyNodeRepository.findOneOrFail(
-                    obj.upmmId.toString(),
-                );
-                classes.push(node.getName());
+                if (obj.upmmId === '') {
+                    continue;
+                } else {
+                    const node =
+                        await this.ontologyNodeRepository.findOneOrFail(
+                            obj.upmmId.toString(),
+                        );
+
+                    classes.push(node.getName());
+                }
             }
         }
 

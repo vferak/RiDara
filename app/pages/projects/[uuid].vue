@@ -33,13 +33,14 @@ onBeforeRouteLeave((to, from, next) => {
 let missingMap = useState<Map<string, number>>(() => new Map<string, number>());
 let notRecognizedMap = useState<Map<string, number>>(() => new Map<string, number>());
 let overExtendsMap = useState<Map<string, number>>(() => new Map<string, number>());
+let percentValue = useState<number>(() => 0);
 
 const analyze = async (): Promise<void> => {
-    const result = await analyzeFirstLevel (projectUuid);
+    const result = await analyzeFirstLevel(projectUuid);
     const arg = JSON.parse(JSON.stringify(result.data.value));
-    const percentValue = arg[0];
+    percentValue.value = arg[0];
 
-    if (arg.length !== 1) {
+    if (arg[1] !== null) {
         let missingJson = arg[1][0];
         let notRecognizedToJson = arg[1][1];
         let overExtendsToJson = arg[1][2];
@@ -52,8 +53,6 @@ const analyze = async (): Promise<void> => {
         notRecognizedMap.value = new Map<string, number>(notRecognizedToJson);
         overExtendsMap.value = new Map<string, number>(overExtendsToJson);
     }
-
-
 }
 const saveProjectFile = async (xml: string): Promise<void> => {
     await saveProjectBpmnFile(projectUuid, xml);
@@ -66,6 +65,9 @@ const saveProjectFile = async (xml: string): Promise<void> => {
         <button @click='analyze' class='btn btn-primary mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
             Analyze
         </button>
+        <div>
+            {{ percentValue }}
+        </div>
         <div v-if='missingMap.size !== 0' v-for="(value, key) in missingMap" :key="key">
             <p>Missing elements:
                 {{ value[0] }} - {{ value[1] }}</p>

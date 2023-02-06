@@ -112,31 +112,36 @@ export class ProjectController {
         fs.writeFileSync(project.getPath(), bpmnFileData);
     }
 
-    /* @Post('import')
+    @Post('import')
     @UseInterceptors(
         FileInterceptor('file', {
             storage: diskStorage({
                 destination: function (req, file, cb) {
-                    cb(null, './resources/bpmn/');
+                    cb(null, './resources/bpmn/project/');
                 },
                 filename: function (req, file, cb) {
-                    cb(null, file.originalname);
+                    const name = req.body.name;
+                    const fileName = name + Date.now() + '.bpmn';
+                    cb(null, fileName);
                 },
             }),
         }),
     )
-    async uploadedFile(
+    async importFile(
         @Body() createProjectDto: CreateProjectDto,
         @CurrentUser() user: User,
         @UploadedFile() file: Express.Multer.File,
+        @Body('templateUuid') templateUuid: string,
     ) {
-        createProjectDto.path = './' + file.path;
+        createProjectDto.path = path.join(process.cwd(), file.path);
+        const template = await this.templateService.getOneByUuid(templateUuid);
         const project = await this.projectService.create(
             createProjectDto,
             user,
+            template,
         );
         return project;
-    }*/
+    }
 
     @Get(':uuid/analyze1')
     public async firstLevelAnalyze(

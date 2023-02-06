@@ -12,7 +12,7 @@ const { handleSubmit } = $veeValidate.useForm({
             file: $z
                 .any()
                 .refine(
-                    () => ['text/turtle'].includes(fileData.value?.type),
+                    () => fileData.value?.name.split('.').pop() === "ttl",
                     "Only .ttl file is supported."
                 )
         })
