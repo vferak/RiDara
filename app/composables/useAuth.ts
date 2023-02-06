@@ -2,6 +2,8 @@ import { useCurrentUser } from '~/composables/useCurrentUser';
 
 export const useAuth = () => {
     const { clearCurrentUser } = useCurrentUser();
+    const { clearCurrentWorkspace } = useCurrentWorkspace();
+
 
     const jwtCookie = useCookie<string|undefined>('jwt');
 
@@ -28,6 +30,7 @@ export const useAuth = () => {
     const logOut = (): void => {
         jwtCookie.value = undefined;
         clearCurrentUser();
+        clearCurrentWorkspace();
     }
 
     const getJWT = (): string|undefined => {

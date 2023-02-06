@@ -1,31 +1,19 @@
 <script setup lang='ts'>
-import { User, Workspace } from '~/composables/types';
-
-const route = useRoute();
+const { getWorkspace } = useWorkspace();
+const { getCurrentWorkspace } = useCurrentWorkspace();
 const { getTemplates } = useTemplate();
 const { getProjects, createProject } = useProject();
 const { modalState, openModal, closeModal } = useModal('project-create');
-const uuid = route.params.uuid.toString();
 
-const { data: projects, refresh: refreshProject } = await getProjects(uuid);
+const currentWorkspace = await getCurrentWorkspace();
 
-//TODO odjebat po workspaces
-const { getUserProfile } = useUser();
-const {data: user} = await getUserProfile();
+const { data: projects, refresh: refreshProject } = await getProjects(currentWorkspace!.value!.uuid);
 const {data: templates} = await getTemplates();
-const userData: User = {
-    email: user.value?.email,
-    password: user.value?.password,
-    uuid: user.value?.uuid,
-    userWorkspaces: user.value?.userWorkspaces
-}
 
-let workspace: Workspace = {
-uuid:'316e1b5f-ca7d-4c6f-8145-82493b4ab3a5',name:'Kokot',owner: userData,
-}
+const { data: workspace } = await getWorkspace(currentWorkspace!.value!.uuid)
 
 const create = async (name: string, templateUuid: string, blankFile: boolean): Promise<void> => {
-    await createProject(name, workspace, templateUuid, blankFile);
+    await createProject(name, workspace.value!, templateUuid, blankFile);
     await refreshProject();
     closeModal();
 };

@@ -16,7 +16,7 @@ export const useProject = () => {
     }
 
     const getProjects = async (uuid: string): Promise<AsyncData<Project[], any>> => {
-        return useApiFetch<Project[]>(`${projectUrlPrefix}/user/${uuid}`);
+        return useApiFetch<Project[]>(`${projectUrlPrefix}/workspace/${uuid}`);
     }
 
     const updateProject = (uuid: string, name: string) => {

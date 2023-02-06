@@ -7,6 +7,7 @@ import { AnalyzeModule } from '../shared/analyze/analyze.module';
 import { BpmnModule } from '../bpmn/bpmn.module';
 import { OntologyModule } from '../ontology/ontology.module';
 import { TemplateModule } from '../template/template.module';
+import { WorkspaceModule } from '../workspace/workspace.module';
 
 @Module({
     imports: [
@@ -15,6 +16,7 @@ import { TemplateModule } from '../template/template.module';
         BpmnModule,
         OntologyModule,
         TemplateModule,
+        WorkspaceModule,
     ],
     controllers: [ProjectController],
     providers: [ProjectService],

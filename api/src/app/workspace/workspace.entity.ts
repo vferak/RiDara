@@ -14,6 +14,7 @@ import { WorkspaceRepository } from './workspace.repository';
 import { EntityManager } from '@mikro-orm/mariadb';
 import { User } from '../shared/user/user.entity';
 import { UserWorkspace } from './userWorkspace/userWorkspace.entity';
+import { Project } from '../project/project.entity';
 
 @Entity({ customRepository: () => WorkspaceRepository })
 export class Workspace {
@@ -30,6 +31,9 @@ export class Workspace {
 
     @OneToMany('UserWorkspace', 'workspace')
     private userWorkspaces = new Collection<UserWorkspace>(this);
+
+    @OneToMany('Project', 'workspace')
+    private projects = new Collection<Project>(this);
 
     private constructor(uuid: string, name: string, owner: User) {
         this.uuid = uuid;
@@ -74,5 +78,10 @@ export class Workspace {
 
     public remove(entityManager: EntityManager): void {
         entityManager.remove(this);
+    }
+
+    public async getProjects(): Promise<Project[]> {
+        await this.projects.init();
+        return this.projects.getItems();
     }
 }

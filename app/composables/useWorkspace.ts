@@ -20,8 +20,10 @@ export const useWorkspace = () => {
         return useApiFetch<Workspace[]>(workspaceUrlPrefix);
     }
 
-    const getWorkspace = (uuid: string) => {
-        return useApiFetch(`${workspaceUrlPrefix}/${uuid}/settings`);
+    const getWorkspace = async (uuid: string): Promise<AsyncData<Workspace, any>> => {
+        return useApiFetch<Workspace>(
+            `${workspaceUrlPrefix}/${uuid}`
+        );
     }
 
     const getUsersFromWorkspace = (uuid: string) => {
