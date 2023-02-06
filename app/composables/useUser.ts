@@ -1,5 +1,5 @@
 import { AsyncData } from '#app';
-import { Project, User } from '~/composables/types';
+import { User } from '~/composables/types';
 
 export const useUser = () => {
     const userUrlPrefix = '/user';

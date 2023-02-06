@@ -1,7 +1,9 @@
 <script setup lang='ts'>
 const { getUserProfile } = useUser();
+const { setCurrentUser } = useCurrentUser();
 
 const { data: user } = await getUserProfile();
+setCurrentUser(user.value!);
 
 const navs = [
     {
