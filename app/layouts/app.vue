@@ -1,9 +1,9 @@
 <script setup lang='ts'>
-const { getUserProfile } = useUser();
+const { getUser } = useUser();
 const { setCurrentUser } = useCurrentUser();
 const { getCurrentWorkspace } = useCurrentWorkspace();
 
-const { data: user } = await getUserProfile();
+const { data: user } = await getUser();
 
 setCurrentUser(user.value!);
 const currentWorkspace = await getCurrentWorkspace();

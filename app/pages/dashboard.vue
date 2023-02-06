@@ -1,11 +1,11 @@
 <script setup lang='ts'>
 const { getWorkspaces } = useWorkspace();
-const { getUserProfile } = useUser();
+const { getUser } = useUser();
 
 const date = useDateFormat(useNow(), 'dddd, MMMM DD, YYYY')
 const time = useDateFormat(useNow(), 'HH:mm:ss')
 
-const { data: user } = await getUserProfile();
+const { data: user } = await getUser();
 
 const { data: workspaces } = await getWorkspaces();
 const firstName = user.value?.firstName;
