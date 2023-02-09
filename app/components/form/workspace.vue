@@ -24,7 +24,7 @@ if(props.name !== undefined) {
 
 const onSubmit = handleSubmit(async (): Promise<void> => {
     emit('formSent', name.value.value);
-    name.setValue('');
+    name.setValue(name.value.value);
     name.meta.touched = false;
 });
 

@@ -52,7 +52,6 @@ export const useProject = () => {
     }
 
     const saveProjectBpmnFile = async (projectUuid: string, xml: string): Promise<AsyncData<void, any>> => {
-        console.log(projectUuid);
         return useApiFetch<void>(`${projectUrlPrefix}/saveFile`, {
             method: 'PATCH',
             body: {

@@ -84,4 +84,9 @@ export class Workspace {
         await this.projects.init();
         return this.projects.getItems();
     }
+
+    public async getUserWorkspaces(): Promise<UserWorkspace[]> {
+        await this.userWorkspaces.init();
+        return this.userWorkspaces.getItems();
+    }
 }

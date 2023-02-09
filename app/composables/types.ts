@@ -37,3 +37,10 @@ export type OntologyNode = {
     uuid: string,
     name: string,
 }
+
+export type UserWorkspace = {
+    uuid: string,
+    user: User,
+    workspace: Workspace,
+    role: string,
+}

@@ -24,7 +24,7 @@ const navs = useState(() => [
         visible: !!currentWorkspace?.value,
         links: [
             {name: 'Projects', route: `/projects`, icon: 'gg-album'},
-            {name: 'Workspace settings', route: `workspaces/${currentWorkspace.value?.uuid}/settings`, icon: 'gg-options'},
+            {name: 'Workspace settings', route: `/workspaces/${currentWorkspace.value?.uuid}/settings`, icon: 'gg-options'},
         ],
     },
     {

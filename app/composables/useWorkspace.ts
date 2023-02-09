@@ -1,5 +1,5 @@
 import { AsyncData } from '#app';
-import { Workspace } from '~/composables/types';
+import { User, UserWorkspace, Workspace } from '~/composables/types';
 
 export const useWorkspace = () => {
     const workspaceUrlPrefix = '/workspace';
@@ -26,8 +26,12 @@ export const useWorkspace = () => {
         );
     }
 
-    const getUsersFromWorkspace = (uuid: string) => {
-        return useApiFetch(`${workspaceUrlPrefix}/${uuid}/users`);
+    const getUsersFromWorkspace = async (uuid: string): Promise<AsyncData<UserWorkspace[], any>>  => {
+        return useApiFetch<UserWorkspace[]>(`${workspaceUrlPrefix}/${uuid}/users`);
+    }
+
+    const getUsersNotInWorkspace = async (uuid: string): Promise<AsyncData<User[], any>>  => {
+        return useApiFetch<User[]>(`${workspaceUrlPrefix}/${uuid}/users_not_in_workspace`);
     }
 
     const updateWorkspace = (uuid: string, name: string) => {
@@ -41,11 +45,37 @@ export const useWorkspace = () => {
         );
     }
 
+    const addUserToWorkspace = (userUuid: string, workspaceUuid: string, role: string) => {
+        const body = { userUuid: userUuid, workspaceUuid: workspaceUuid, role: role };
+
+        return useApiFetch(
+            `${workspaceUrlPrefix}/${workspaceUuid}/add_user`, {
+                method: 'POST',
+                body: body,
+            }
+        );
+    }
+
+    const removeUserFromWorkspace = (userUuid: string, workspaceUuid: string) => {
+        const body = { userUuid: userUuid, workspaceUuid: workspaceUuid };
+
+        return useApiFetch(
+            `${workspaceUrlPrefix}/${workspaceUuid}/remove_user`, {
+                method: 'POST',
+                body: body,
+            }
+        );
+    }
+
+
     return {
         getWorkspaces: getWorkspaces,
         createWorkspace: createWorkspace,
         getWorkspace: getWorkspace,
         getUsersFromWorkspace: getUsersFromWorkspace,
-        updateWorkspace: updateWorkspace
+        updateWorkspace: updateWorkspace,
+        addUserToWorkspace: addUserToWorkspace,
+        removeUserFromWorkspace: removeUserFromWorkspace,
+        getUsersNotInWorkspace: getUsersNotInWorkspace,
     };
 }

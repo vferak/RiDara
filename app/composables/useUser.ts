@@ -39,11 +39,16 @@ export const useUser = () => {
         return useApiFetch<{user: User, projects: Project[]}>(`${userUrlPrefix}/profile`);
     };
 
+    const getUsers = async (): Promise<AsyncData<User[], any>> => {
+        return useApiFetch<User[]>(`${userUrlPrefix}/all`);
+    };
+
     return {
         getUser: getUser,
         updateUser: updateUser,
         getUserProfile: getUserProfile,
         registerUser: registerUser,
         updateUserPassword: updateUserPassword,
+        getUsers: getUsers
     };
 };
