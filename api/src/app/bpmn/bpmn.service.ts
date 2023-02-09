@@ -60,23 +60,6 @@ export class BpmnService {
                     object.upmmId,
                 );
             });
-
-        //     .map(async (object) => {
-        //         return await this.ontologyNodeRepository.findOneOrFail(
-        //             object.upmmId.toString(),
-        //         );
-        //     })
-        //     .sort((a, b) => (a.getName() > b.getName()) ? 1 : ((b.getName() > a.getName()) ? -1 : 0))
-        //     .reduce(
-        //         (acc, e) => acc.set(e, (acc.get(e) || 0) + 1),
-        //         new Map<string, number>(),
-        //     );
-        //
-        // let nodesTotal = 0;
-        // for (const [key, value] of map) {
-        //     nodesTotal = nodesTotal + value;
-        // }
-
         return new BpmnData(bpmnElements);
     }
 }

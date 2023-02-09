@@ -8,4 +8,16 @@ export class BpmnElementData {
         this.id = id;
         this.upmmUuid = upmmUuid;
     }
+
+    public getId() {
+        return this.id;
+    }
+
+    public getType() {
+        return this.type;
+    }
+
+    public getUpmmUuid() {
+        return this.upmmUuid;
+    }
 }

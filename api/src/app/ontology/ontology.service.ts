@@ -6,6 +6,7 @@ import { OntologyFileRepository } from './ontologyFile/ontologyFIle.repository';
 import { OntologyNodeRepository } from './ontologyNode/ontologyNode.repository';
 import { OntologyFile } from './ontologyFile/ontologyFile.entity';
 import { OntologyNode } from './ontologyNode/ontologyNode.entity';
+import { BpmnData } from '../bpmn/bpmn.data';
 
 @Injectable()
 export class OntologyService {
@@ -74,5 +75,32 @@ export class OntologyService {
                 (acc, e) => acc.set(e, (acc.get(e) || 0) + 1),
                 new Map<string, number>(),
             );
+    }
+
+    public async getProjectNodes(
+        bpmnData: BpmnData,
+    ): Promise<Map<string, number>> {
+        const data = await Promise.all(
+            bpmnData.getElements().map(async (object) => {
+                return await this.ontologyNodeRepository.findOneOrFail(
+                    object.getUpmmUuid().toString(),
+                );
+            }),
+        );
+        const map = data
+            .sort((a, b) =>
+                a.getName() > b.getName()
+                    ? 1
+                    : b.getName() > a.getName()
+                    ? -1
+                    : 0,
+            )
+            .reduce(
+                (acc, e) =>
+                    acc.set(e.getName(), (acc.get(e.getName()) || 0) + 1),
+                new Map<string, number>(),
+            );
+
+        return map;
     }
 }

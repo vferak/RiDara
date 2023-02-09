@@ -157,10 +157,13 @@ export class ProjectController {
             templateNodes,
         );
 
-        const [percent, maps] = await this.analyzeService.firstLevelAnalyze(
+        const projectNodesMap = await this.ontologyService.getProjectNodes(
             bpmnData,
+        );
+
+        const [percent, maps] = await this.analyzeService.firstLevelAnalyze(
+            projectNodesMap,
             templateNodesMap,
-            {},
         );
 
         return [percent, maps];
