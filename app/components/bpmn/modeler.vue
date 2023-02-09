@@ -50,6 +50,16 @@ const saveDiagram = async () => {
             <div id="canvas" class='col-span-3'></div>
             <div id="properties" class='border-l-4'></div>
         </div>
-        <div @click='saveDiagram' class='fixed bottom-10'>Save</div>
+        <div class="flex justify-between fixed bottom-14 items-center ml-2">
+            <button @click='saveDiagram' class="btn btn-success">Save</button>
+            <div class="dropdown dropdown-top m-0">
+                <label tabindex="0" class="btn m-1">Download</label>
+                <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-200 rounded-box w-52">
+                    <li><a>BPMN</a></li>
+                    <li><a>PNG</a></li>
+                </ul>
+            </div>
+        </div>
+
     </div>
 </template>

@@ -1,11 +1,14 @@
 <script setup lang='ts'>
+import { Project } from '~/composables/types';
+
 const { getWorkspace } = useWorkspace();
 const { getCurrentWorkspace } = useCurrentWorkspace();
 const { getTemplates } = useTemplate();
-const { getProjects, createProject, importProject } = useProject();
+const { getProjects, createProject, importProject, updateProject } = useProject();
 
 const { modalState: createState, openModal: createOpen, closeModal: createClose } = useModal('project-create');
 const { modalState: importState , openModal: importOpen, closeModal: importClose } = useModal('project-import');
+const { modalState: editState, openModal: editOpen, closeModal: editClose } = useModal('project-edit');
 
 const currentWorkspace = await getCurrentWorkspace();
 
@@ -13,6 +16,8 @@ const { data: projects, refresh: refreshProject } = await getProjects(currentWor
 const {data: templates} = await getTemplates();
 
 const { data: workspace } = await getWorkspace(currentWorkspace!.value!.uuid)
+
+const projectToEdit = useState<Project>();
 
 const create = async (name: string, templateUuid: string, blankFile: boolean): Promise<void> => {
     await createProject(name, workspace.value!, templateUuid, blankFile);
@@ -25,6 +30,18 @@ const upload = async (name: string, file: File, templateUuid: string): Promise<v
     await refreshProject();
     importClose();
 };
+
+const editProject = async (name: string, templateUuid: string): Promise<void> => {
+    await updateProject(projectToEdit.value.uuid, name, templateUuid);
+    await refreshProject();
+    editClose();
+};
+
+const emitValueEdit = async (project: Project): Promise<void> => {
+    editOpen();
+    projectToEdit.value = project;
+}
+
 </script>
 
 <template>
@@ -45,7 +62,7 @@ const upload = async (name: string, file: File, templateUuid: string): Promise<v
             </div>
 
             <div class='grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5'>
-                <CardsProjectCard v-for='project in projects' :key='project.uuid' :project='project' />
+                <CardsProjectCard v-for='project in projects' :key='project.uuid' :project='project' @edit-project='emitValueEdit'/>
             </div>
         </div>
         <Modal v-model='createState'>
@@ -55,7 +72,12 @@ const upload = async (name: string, file: File, templateUuid: string): Promise<v
 
         <Modal v-model='importState'>
             <h3 class='text-lg font-bold'>Import project</h3>
-            <ImportProjectFile @form-sent='upload' :templates='templates' />
+            <FormImportProjectFile @form-sent='upload' :templates='templates' />
+        </Modal>
+
+        <Modal v-model='editState' v-if='editState'>
+            <h3 class='text-lg font-bold'>Edit project</h3>
+            <FormEditProject @form-sent='editProject' :templates='templates' :name='projectToEdit.name' :template-name='projectToEdit.template.name' :template-uuid='projectToEdit.template.uuid' />
         </Modal>
 
     </div>

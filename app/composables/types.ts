@@ -31,6 +31,7 @@ export type Project = {
     owner: User,
     workspace: Workspace,
     path: string,
+    template: Template,
 }
 
 export type OntologyNode = {

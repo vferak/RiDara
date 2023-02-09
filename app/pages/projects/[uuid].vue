@@ -1,6 +1,7 @@
 <script setup lang='ts'>
-
 const route = useRoute();
+const { modalState, openModal, closeModal } = useModal('project-analyze');
+
 const { getProjectFile, saveProjectBpmnFile, analyzeFirstLevel, getNodesByProject } = useProject();
 
 const projectUuid = route.params.uuid.toString();
@@ -45,14 +46,23 @@ const analyze = async (): Promise<void> => {
         let notRecognizedToJson = arg[1][1];
         let overExtendsToJson = arg[1][2];
 
-        missingJson = JSON.parse(missingJson);
-        notRecognizedToJson = JSON.parse(notRecognizedToJson);
-        overExtendsToJson = JSON.parse(overExtendsToJson);
+        if (JSON.stringify(missingJson) === '{}' && JSON.stringify(overExtendsToJson) === '{}'
+            && JSON.stringify(notRecognizedToJson) === '{}') {
+            missingMap.value = new Map<string, number>();
+            notRecognizedMap.value = new Map<string, number>();
+            overExtendsMap.value = new Map<string, number>();
+        } else {
+            missingJson = JSON.parse(missingJson);
+            notRecognizedToJson = JSON.parse(notRecognizedToJson);
+            overExtendsToJson = JSON.parse(overExtendsToJson);
 
-        missingMap.value = new Map<string, number>(missingJson);
-        notRecognizedMap.value = new Map<string, number>(notRecognizedToJson);
-        overExtendsMap.value = new Map<string, number>(overExtendsToJson);
+            missingMap.value = new Map<string, number>(missingJson);
+            notRecognizedMap.value = new Map<string, number>(notRecognizedToJson);
+            overExtendsMap.value = new Map<string, number>(overExtendsToJson);
+        }
+        openModal();
     }
+
 }
 const saveProjectFile = async (xml: string): Promise<void> => {
     await saveProjectBpmnFile(projectUuid, xml);
@@ -62,32 +72,17 @@ const saveProjectFile = async (xml: string): Promise<void> => {
 
 <template>
     <div class='h-full'>
-        <button @click='analyze' class='btn btn-primary mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
-            Analyze
-        </button>
-        <div>
-            {{ percentValue }}
-        </div>
-        <div v-if='missingMap.size !== 0' v-for="(value, key) in missingMap" :key="key">
-            <p>Missing elements:
-                {{ value[0] }} - {{ value[1] }}</p>
-        </div>
-
-        <div v-if='notRecognizedMap.size !== 0' v-for="(value, key) in notRecognizedMap" :key="key">
-            <p>Not recognized elements:
-                {{ value[0] }} - {{ value[1] }}</p>
-        </div>
-
-        <div v-if='overExtendsMap.size !== 0' v-for="(value, key) in overExtendsMap" :key="key">
-            <p>Over extends elements:
-                {{ value[0] }} - {{ value[1] }}</p>
-        </div>
-
-
         <Toast v-model='successToast'>
             <AlertSuccess>Diagram saved!</AlertSuccess>
         </Toast>
         <BpmnModeler :xml='xml' :upmm-options='upmmOptions' @save-bpmn='saveProjectFile'/>
-
+    </div>
+    <Modal v-if='modalState' v-model='modalState'>
+        <AnalyzeCard :missmissing-map='missingMap' :not-recognized-map='notRecognizedMap' :over-extends-map='overExtendsMap' :percent-value='percentValue'/>
+    </Modal>
+    <div class="flex justify-between fixed bottom-32 items-center ml-2">
+        <button @click='analyze' class='btn btn-primary mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
+            Analyze
+        </button>
     </div>
 </template>

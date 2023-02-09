@@ -22,8 +22,10 @@ export class AnalyzeService {
             },
         );
 
+        const emptyMaps: Array<any> = [new Map(), new Map(), new Map()];
+
         if (areEqual) {
-            return [100];
+            return [100, emptyMaps];
         }
         const missing = new Map();
         const overExtends = new Map();

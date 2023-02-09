@@ -29,8 +29,9 @@ export class ProjectService {
     public async update(
         project: Project,
         updateProjectDto: UpdateProjectDto,
+        template: Template,
     ): Promise<Project> {
-        project.update(updateProjectDto);
+        project.update(updateProjectDto, template);
         await this.projectRepository.flush();
         return project;
     }

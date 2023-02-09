@@ -74,8 +74,12 @@ export class Project {
         );
     }
 
-    public update(updateProjectDto: UpdateProjectDto): void {
+    public update(
+        updateProjectDto: UpdateProjectDto,
+        template: Template,
+    ): void {
         this.name = updateProjectDto.name;
+        this.template = template;
     }
 
     public getPath(): string {

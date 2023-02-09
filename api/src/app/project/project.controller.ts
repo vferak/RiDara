@@ -67,8 +67,10 @@ export class ProjectController {
     public async update(
         @Param('uuid', ProjectByUuidPipe) project: Project,
         @Body() updateProjectDto: UpdateProjectDto,
+        @Body('templateUuid') templateUuid: string,
     ): Promise<Project> {
-        return this.projectService.update(project, updateProjectDto);
+        const template = await this.templateService.getOneByUuid(templateUuid);
+        return this.projectService.update(project, updateProjectDto, template);
     }
 
     @Get('workspace/:uuid')

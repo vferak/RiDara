@@ -8,7 +8,7 @@ const emit = defineEmits<{
 }>();
 </script>
 <template>
-    <div v-show='props.modelValue' class='modal cursor-pointer left-80 visible opacity-100 pointer-events-auto' @click="emit('update:modelValue', false)">
+    <div v-show='props.modelValue' class='modal left-80 visible opacity-100 pointer-events-auto' @click="emit('update:modelValue', false)">
         <div class='modal-box relative' @click.stop>
             <slot/>
         </div>
