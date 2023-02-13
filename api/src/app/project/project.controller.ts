@@ -147,20 +147,23 @@ export class ProjectController {
     public async firstLevelAnalyze(
         @Param('uuid', ProjectByUuidPipe) project: Project,
     ): Promise<Array<any>[]> {
-        const [parsedFileData, totalNodes] =
-            await this.bpmnService.parseBpmnFile(project.getPath());
+        const bpmnData = await this.bpmnService.parseBpmnFile(
+            project.getPath(),
+        );
 
         const ontologyFile = project.getTemplate().getOntologyFile();
         const templateNodes = await ontologyFile.getNodes();
-        const templateNodesMap = await this.bpmnService.parseOntologyNodes(
+        const templateNodesMap = await this.ontologyService.parseOntologyNodes(
             templateNodes,
         );
-        const bpmnData = new BpmnData(totalNodes, parsedFileData);
+
+        const projectNodesMap = await this.ontologyService.getProjectNodes(
+            bpmnData,
+        );
 
         const [percent, maps] = await this.analyzeService.firstLevelAnalyze(
-            bpmnData,
+            projectNodesMap,
             templateNodesMap,
-            {},
         );
 
         return [percent, maps];

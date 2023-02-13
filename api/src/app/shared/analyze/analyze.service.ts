@@ -1,23 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { BpmnData } from '../../bpmn/bpmn.data';
 
 @Injectable()
 export class AnalyzeService {
     public async firstLevelAnalyze(
-        bpmnData: BpmnData,
+        projectNodes: Map<string, number>,
         templatesNodes: Map<string, number>,
-        templateReferences?: object,
     ): Promise<any> {
         let successfullNodes = 0;
         let badNodes = 0;
+
         console.log('Template map', templatesNodes);
-        console.log('Bpmn map', bpmnData.getElements());
+        console.log('Bpmn map', projectNodes);
         const fullSuccess = templatesNodes.size;
-        const areEqual = [...bpmnData.getElements().entries()].every(
+
+        const areEqual = [...templatesNodes.entries()].every(
             ([key, value], index) => {
                 return (
                     [key, value].toString() ===
-                    [...templatesNodes.entries()][index].toString()
+                    [...projectNodes.entries()][index].toString()
                 );
             },
         );
@@ -25,11 +25,10 @@ export class AnalyzeService {
         if (areEqual) {
             return [100];
         }
-
         const missing = new Map();
         const overExtends = new Map();
         const notRecognized = new Map();
-        bpmnData.getElements().forEach((value, key) => {
+        projectNodes.forEach((value, key) => {
             if (!templatesNodes.has(key)) {
                 notRecognized.set(key, value);
                 badNodes += 1;
@@ -50,11 +49,11 @@ export class AnalyzeService {
         });
 
         templatesNodes.forEach((value, key) => {
-            if (!bpmnData.getElements().has(key)) {
+            if (!projectNodes.has(key)) {
                 missing.set(key, value);
             } else {
-                if (!(bpmnData.getElements().get(key) === value)) {
-                    if (value > bpmnData.getElements().get(key)) {
+                if (!(projectNodes.get(key) === value)) {
+                    if (value > projectNodes.get(key)) {
                         missing.set(key, value);
                     }
                 }

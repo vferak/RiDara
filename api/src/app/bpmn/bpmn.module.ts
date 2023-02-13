@@ -1,15 +1,10 @@
 import { Module } from '@nestjs/common';
-import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { BpmnService } from './bpmn.service';
-import { OntologyFile } from '../ontology/ontologyFile/ontologyFile.entity';
-import { OntologyNode } from '../ontology/ontologyNode/ontologyNode.entity';
+import { OntologyModule } from '../ontology/ontology.module';
 
 @Module({
-    imports: [
-        MikroOrmModule.forFeature([OntologyFile]),
-        MikroOrmModule.forFeature([OntologyNode]),
-    ],
+    imports: [OntologyModule],
     providers: [BpmnService],
-    exports: [BpmnService, MikroOrmModule],
+    exports: [BpmnService],
 })
 export class BpmnModule {}
