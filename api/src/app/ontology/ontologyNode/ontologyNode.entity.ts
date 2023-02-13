@@ -12,6 +12,7 @@ import { OntologyFile } from '../ontologyFile/ontologyFile.entity';
 import { OntologyNodeRepository } from './ontologyNode.repository';
 import { CreateFileOntologyDto } from '../dto/create-file-ontology.dto';
 import { TemplateNode } from '../../template/templateNode/templateNode.entity';
+import { OntologyRelation } from '../ontologyRelation/ontologyRelation.entity';
 
 @Entity({ customRepository: () => OntologyNodeRepository })
 export class OntologyNode {
@@ -28,6 +29,12 @@ export class OntologyNode {
 
     @OneToMany('TemplateNode', 'ontologyNode')
     private templateNodes = new Collection<TemplateNode>(this);
+
+    @OneToMany('OntologyRelation', 'targetRef')
+    private targetRefs = new Collection<OntologyRelation>(this);
+
+    @OneToMany('OntologyRelation', 'sourceRef')
+    private sourceRefs = new Collection<OntologyRelation>(this);
 
     private constructor(
         uuid: string,
@@ -52,5 +59,15 @@ export class OntologyNode {
 
     public getName(): string {
         return this.name;
+    }
+
+    public async getSourceRef(): Promise<OntologyRelation[]> {
+        await this.sourceRefs.init();
+        return this.sourceRefs.getItems();
+    }
+
+    public async getTargetRef(): Promise<OntologyRelation[]> {
+        await this.targetRefs.init();
+        return this.targetRefs.getItems();
     }
 }

@@ -15,6 +15,8 @@ import { OntologyService } from './ontology.service';
 import { OntologyFile } from './ontologyFile/ontologyFile.entity';
 import { OntologyNode } from './ontologyNode/ontologyNode.entity';
 import { OntlogyFileByUuidPipe } from './pipes/ontlogyFile-by-uuid.pipe';
+import { OntlogyNodeByUuidPipe } from './pipes/ontlogyNode-by-uuid.pipe';
+import { OntologyRelation } from './ontologyRelation/ontologyRelation.entity';
 
 @Controller('ontology')
 export class OntologyController {
@@ -45,5 +47,19 @@ export class OntologyController {
 
             return aName > bName ? 1 : bName > aName ? -1 : 0;
         });
+    }
+
+    @Get(':uuid/get_targets')
+    public async getTargetsOfNode(
+        @Param('uuid', OntlogyNodeByUuidPipe) ontologyNode: OntologyNode,
+    ): Promise<OntologyRelation[]> {
+        return await ontologyNode.getSourceRef();
+    }
+
+    @Get(':uuid/get_targets')
+    public async getSourcesOfNode(
+        @Param('uuid', OntlogyNodeByUuidPipe) ontologyNode: OntologyNode,
+    ): Promise<OntologyRelation[]> {
+        return await ontologyNode.getTargetRef();
     }
 }

@@ -125,6 +125,94 @@
           "nullable": false,
           "mappedType": "string"
         },
+        "source_ref_uuid": {
+          "name": "source_ref_uuid",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "target_ref_uuid": {
+          "name": "target_ref_uuid",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        }
+      },
+      "name": "ontology_relation",
+      "indexes": [
+        {
+          "columnNames": [
+            "source_ref_uuid"
+          ],
+          "composite": false,
+          "keyName": "ontology_relation_source_ref_uuid_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "target_ref_uuid"
+          ],
+          "composite": false,
+          "keyName": "ontology_relation_target_ref_uuid_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "uuid"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "ontology_relation_source_ref_uuid_foreign": {
+          "constraintName": "ontology_relation_source_ref_uuid_foreign",
+          "columnNames": [
+            "source_ref_uuid"
+          ],
+          "localTableName": "ontology_relation",
+          "referencedColumnNames": [
+            "uuid"
+          ],
+          "referencedTableName": "ontology_node",
+          "updateRule": "cascade"
+        },
+        "ontology_relation_target_ref_uuid_foreign": {
+          "constraintName": "ontology_relation_target_ref_uuid_foreign",
+          "columnNames": [
+            "target_ref_uuid"
+          ],
+          "localTableName": "ontology_relation",
+          "referencedColumnNames": [
+            "uuid"
+          ],
+          "referencedTableName": "ontology_node",
+          "updateRule": "cascade"
+        }
+      }
+    },
+    {
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
         "email": {
           "name": "email",
           "type": "varchar(255)",
