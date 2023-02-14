@@ -24,7 +24,6 @@ import { BpmnService } from '../bpmn/bpmn.service';
 import { OntologyService } from '../ontology/ontology.service';
 import { TemplateService } from '../template/template.service';
 import * as path from 'path';
-import { BpmnData } from '../bpmn/bpmn.data';
 import { OntologyNode } from '../ontology/ontologyNode/ontologyNode.entity';
 import { WorkspaceService } from '../workspace/workspace.service';
 
@@ -153,6 +152,14 @@ export class ProjectController {
             project.getPath(),
         );
 
+        //LEVEL 2 analyze data
+        const templateBpmnData = await this.bpmnService.parseBpmnFile(
+            project.getTemplate().getFileName(),
+        );
+
+        const copyBpmnData = bpmnData.getElements();
+        //////////////////////////////////////////////////////
+
         const ontologyFile = project.getTemplate().getOntologyFile();
         const templateNodes = await ontologyFile.getNodes();
         const templateNodesMap = await this.ontologyService.parseOntologyNodes(
@@ -166,8 +173,30 @@ export class ProjectController {
         const [percent, maps] = await this.analyzeService.firstLevelAnalyze(
             projectNodesMap,
             templateNodesMap,
+            copyBpmnData,
+            templateBpmnData.getElements(),
         );
 
         return [percent, maps];
+    }
+
+    @Get(':uuid/analyze2')
+    public async secondLevelAnalyze(
+        @Param('uuid', ProjectByUuidPipe) project: Project,
+    ): Promise<any> {
+        const projectBpmnData = await this.bpmnService.parseBpmnFile(
+            project.getPath(),
+        );
+
+        const templateBpmnData = await this.bpmnService.parseBpmnFile(
+            project.getTemplate().getFileName(),
+        );
+
+        const errorMap = await this.analyzeService.secondLevelAnalyze(
+            projectBpmnData.getElements(),
+            templateBpmnData.getElements(),
+        );
+
+        return errorMap;
     }
 }

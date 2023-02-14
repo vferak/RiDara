@@ -2,7 +2,7 @@
 const route = useRoute();
 const { modalState, openModal, closeModal } = useModal('project-analyze');
 
-const { getProjectFile, saveProjectBpmnFile, analyzeFirstLevel, getNodesByProject } = useProject();
+const { getProjectFile, saveProjectBpmnFile, analyzeFirstLevel, getNodesByProject, analyzeSecondLevel } = useProject();
 
 const projectUuid = route.params.uuid.toString();
 
@@ -31,39 +31,48 @@ onBeforeRouteLeave((to, from, next) => {
     next();
 });
 
-let missingMap = useState<Map<string, number>>(() => new Map<string, number>());
-let notRecognizedMap = useState<Map<string, number>>(() => new Map<string, number>());
-let overExtendsMap = useState<Map<string, number>>(() => new Map<string, number>());
-let percentValue = useState<number>(() => 0);
+let missingMapFirstLevel = useState<Map<string, number>>(() => new Map<string, number>());
+let notRecognizedMapFirstLevel = useState<Map<string, number>>(() => new Map<string, number>());
+let overExtendsMapFirstLevel = useState<Map<string, number>>(() => new Map<string, number>());
+let errorsShapeMapSecondLevel = useState<Map<string, string>>(() => new Map<string, string>());
+let percentValueFirstLevel = useState<number>(() => 0);
+let percentValueSecondLevel = useState<number>(() => 0);
 
-const analyze = async (): Promise<void> => {
+const analyze1 = async (): Promise<void> => {
     const result = await analyzeFirstLevel(projectUuid);
     const arg = JSON.parse(JSON.stringify(result.data.value));
-    percentValue.value = arg[0];
+    percentValueFirstLevel.value = arg[0][0];
 
     if (arg[1] !== null) {
-        let missingJson = arg[1][0];
-        let notRecognizedToJson = arg[1][1];
-        let overExtendsToJson = arg[1][2];
+        let missingJsonFirstLevel = arg[1][0];
+        let notRecognizedJsonFirstLevel = arg[1][1];
+        let overExtendsJsonFirstLevel = arg[1][2];
 
-        if (JSON.stringify(missingJson) === '{}' && JSON.stringify(overExtendsToJson) === '{}'
-            && JSON.stringify(notRecognizedToJson) === '{}') {
-            missingMap.value = new Map<string, number>();
-            notRecognizedMap.value = new Map<string, number>();
-            overExtendsMap.value = new Map<string, number>();
+        if (JSON.stringify(missingJsonFirstLevel) === '{}' && JSON.stringify(overExtendsJsonFirstLevel) === '{}'
+            && JSON.stringify(notRecognizedJsonFirstLevel) === '{}') {
+            missingMapFirstLevel.value = new Map<string, number>();
+            notRecognizedMapFirstLevel.value = new Map<string, number>();
+            overExtendsMapFirstLevel.value = new Map<string, number>();
         } else {
-            missingJson = JSON.parse(missingJson);
-            notRecognizedToJson = JSON.parse(notRecognizedToJson);
-            overExtendsToJson = JSON.parse(overExtendsToJson);
+            missingJsonFirstLevel = JSON.parse(missingJsonFirstLevel);
+            notRecognizedJsonFirstLevel = JSON.parse(notRecognizedJsonFirstLevel);
+            overExtendsJsonFirstLevel = JSON.parse(overExtendsJsonFirstLevel);
 
-            missingMap.value = new Map<string, number>(missingJson);
-            notRecognizedMap.value = new Map<string, number>(notRecognizedToJson);
-            overExtendsMap.value = new Map<string, number>(overExtendsToJson);
+            missingMapFirstLevel.value = new Map<string, number>(missingJsonFirstLevel);
+            notRecognizedMapFirstLevel.value = new Map<string, number>(notRecognizedJsonFirstLevel);
+            overExtendsMapFirstLevel.value = new Map<string, number>(overExtendsJsonFirstLevel);
+        }
+
+        if (missingMapFirstLevel.value.size === 0 && notRecognizedMapFirstLevel.value.size === 0 && overExtendsMapFirstLevel.value.size === 0) {
+            let errorsShapeJsonSecondLevel = arg[1][3];
+            percentValueSecondLevel.value = arg[0][1];
+            errorsShapeJsonSecondLevel = JSON.parse(errorsShapeJsonSecondLevel);
+            errorsShapeMapSecondLevel.value = new Map<string, string>(errorsShapeJsonSecondLevel);
         }
         openModal();
     }
-
 }
+
 const saveProjectFile = async (xml: string): Promise<void> => {
     await saveProjectBpmnFile(projectUuid, xml);
     successToast.value = true;
@@ -78,10 +87,12 @@ const saveProjectFile = async (xml: string): Promise<void> => {
         <BpmnModeler :xml='xml' :upmm-options='upmmOptions' @save-bpmn='saveProjectFile'/>
     </div>
     <Modal v-if='modalState' v-model='modalState'>
-        <AnalyzeCard :missmissing-map='missingMap' :not-recognized-map='notRecognizedMap' :over-extends-map='overExtendsMap' :percent-value='percentValue'/>
+        <CardsAnalyzeCard :missmissing-map='missingMapFirstLevel' :not-recognized-map='notRecognizedMapFirstLevel'
+                          :over-extends-map='overExtendsMapFirstLevel' :percent-value-first='percentValueFirstLevel' :shape-map='errorsShapeMapSecondLevel'
+                          :percent-value-second='percentValueSecondLevel'/>
     </Modal>
     <div class="flex justify-between fixed bottom-32 items-center ml-2">
-        <button @click='analyze' class='btn btn-primary mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
+        <button @click='analyze1' class='btn btn-primary mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
             Analyze
         </button>
     </div>

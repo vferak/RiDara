@@ -68,6 +68,14 @@ export const useProject = () => {
         );
     }
 
+    const analyzeSecondLevel = (uuid: string) => {
+        return useApiFetch(
+            `${projectUrlPrefix}/${uuid}/analyze2`, {
+                method: 'GET',
+            }
+        );
+    }
+
     const getNodesByProject = async (uuid: string): Promise<AsyncData<OntologyNode[], any>> => {
         return useApiFetch<OntologyNode[]>(
             `${projectUrlPrefix}/${uuid}/nodes`,
@@ -84,5 +92,6 @@ export const useProject = () => {
         analyzeFirstLevel: analyzeFirstLevel,
         getNodesByProject: getNodesByProject,
         importProject: importProject,
+        analyzeSecondLevel: analyzeSecondLevel,
     };
 }
