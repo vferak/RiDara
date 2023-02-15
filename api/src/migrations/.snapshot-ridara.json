@@ -314,6 +314,94 @@
           "nullable": false,
           "mappedType": "string"
         },
+        "template_uuid": {
+          "name": "template_uuid",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "ontology_node_uuid": {
+          "name": "ontology_node_uuid",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        }
+      },
+      "name": "template_node",
+      "indexes": [
+        {
+          "columnNames": [
+            "template_uuid"
+          ],
+          "composite": false,
+          "keyName": "template_node_template_uuid_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "ontology_node_uuid"
+          ],
+          "composite": false,
+          "keyName": "template_node_ontology_node_uuid_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "uuid"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "template_node_template_uuid_foreign": {
+          "constraintName": "template_node_template_uuid_foreign",
+          "columnNames": [
+            "template_uuid"
+          ],
+          "localTableName": "template_node",
+          "referencedColumnNames": [
+            "uuid"
+          ],
+          "referencedTableName": "template",
+          "updateRule": "cascade"
+        },
+        "template_node_ontology_node_uuid_foreign": {
+          "constraintName": "template_node_ontology_node_uuid_foreign",
+          "columnNames": [
+            "ontology_node_uuid"
+          ],
+          "localTableName": "template_node",
+          "referencedColumnNames": [
+            "uuid"
+          ],
+          "referencedTableName": "ontology_node",
+          "updateRule": "cascade"
+        }
+      }
+    },
+    {
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
         "name": {
           "name": "name",
           "type": "varchar(255)",

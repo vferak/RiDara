@@ -1,7 +1,9 @@
 import {
+    Collection,
     Entity,
     EntityRepositoryType,
     ManyToOne,
+    OneToMany,
     PrimaryKey,
     Property,
 } from '@mikro-orm/core';
@@ -10,6 +12,7 @@ import { TemplateRepository } from './template.repository';
 import { OntologyFile } from '../ontology/ontologyFile/ontologyFile.entity';
 import { User } from '../shared/user/user.entity';
 import { CreateTemplateDto } from './dto/create-template.dto';
+import { TemplateNode } from './templateNode/templateNode.entity';
 
 @Entity({ customRepository: () => TemplateRepository })
 export class Template {
@@ -29,6 +32,9 @@ export class Template {
 
     @ManyToOne({ entity: () => OntologyFile, eager: true })
     private ontologyFile!: OntologyFile;
+
+    @OneToMany('TemplateNode', 'template')
+    private templateNodes = new Collection<TemplateNode>(this);
 
     @Property()
     private readonly fileName!: string;

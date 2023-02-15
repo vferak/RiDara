@@ -1,7 +1,9 @@
 import {
+    Collection,
     Entity,
     EntityRepositoryType,
     ManyToOne,
+    OneToMany,
     PrimaryKey,
     Property,
 } from '@mikro-orm/core';
@@ -9,6 +11,7 @@ import { v4 } from 'uuid';
 import { OntologyFile } from '../ontologyFile/ontologyFile.entity';
 import { OntologyNodeRepository } from './ontologyNode.repository';
 import { CreateFileOntologyDto } from '../dto/create-file-ontology.dto';
+import { TemplateNode } from '../../template/templateNode/templateNode.entity';
 
 @Entity({ customRepository: () => OntologyNodeRepository })
 export class OntologyNode {
@@ -22,6 +25,9 @@ export class OntologyNode {
 
     @ManyToOne({ entity: () => OntologyFile })
     private ontologyFile!: OntologyFile;
+
+    @OneToMany('TemplateNode', 'ontologyNode')
+    private templateNodes = new Collection<TemplateNode>(this);
 
     private constructor(
         uuid: string,

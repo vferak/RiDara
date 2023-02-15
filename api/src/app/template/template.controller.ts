@@ -7,12 +7,16 @@ import { OntologyService } from '../ontology/ontology.service';
 import { Template } from './template.entity';
 import * as fs from 'fs';
 import * as path from 'path';
+import { BpmnService } from '../bpmn/bpmn.service';
+import { TemplateNodeService } from './templateNode/templateNode.service';
 
 @Controller('template')
 export class TemplateController {
     constructor(
         private readonly templateService: TemplateService,
         private readonly ontologyService: OntologyService,
+        private readonly bpmnService: BpmnService,
+        private readonly templateNodeService: TemplateNodeService,
     ) {}
 
     @Post()
@@ -69,6 +73,12 @@ export class TemplateController {
         const template = await this.templateService.getOneByUuid(templateUuid);
 
         fs.writeFileSync(template.getFileName(), bpmnFileData);
+
+        const bpmnData = await this.bpmnService.parseBpmnFile(
+            template.getFileName(),
+        );
+
+        await this.templateNodeService.createFromBpmnData(bpmnData, template);
     }
 
     @Get()
