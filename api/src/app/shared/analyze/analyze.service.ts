@@ -5,25 +5,25 @@ import { AnalyzeData } from './analyze.data';
 @Injectable()
 export class AnalyzeService {
     public async firstLevelAnalyze(
-        projectNodes: Map<string, number>,
-        templatesNodes: Map<string, number>,
-        projectNodesCopy: BpmnElementData[],
-        templatesNodesCopy: BpmnElementData[],
+        projectNodesMap: Map<string, number>,
+        templatesNodesMap: Map<string, number>,
+        projectNodes: BpmnElementData[],
+        templatesNodes: BpmnElementData[],
     ): Promise<AnalyzeData> {
         let successfullNodes = 0;
         let badNodes = 0;
         const percentArray = [];
 
-        console.log('Template map', templatesNodes);
-        console.log('Bpmn map', projectNodes);
-        const fullSuccess = templatesNodes.size;
+        console.log('Template map', templatesNodesMap);
+        console.log('Bpmn map', projectNodesMap);
+        const fullSuccess = templatesNodesMap.size;
         let areEqual: boolean;
-        if (templatesNodes.size === projectNodes.size) {
-            areEqual = [...templatesNodes.entries()].every(
+        if (templatesNodesMap.size === projectNodesMap.size) {
+            areEqual = [...templatesNodesMap.entries()].every(
                 ([key, value], index) => {
                     return (
                         [key, value].toString() ===
-                        [...projectNodes.entries()][index].toString()
+                        [...projectNodesMap.entries()][index].toString()
                     );
                 },
             );
@@ -33,8 +33,8 @@ export class AnalyzeService {
 
         if (areEqual) {
             const [percent, errorMap] = await this.secondLevelAnalyze(
-                projectNodesCopy,
-                templatesNodesCopy,
+                projectNodes,
+                templatesNodes,
             );
 
             percentArray.push(100);
@@ -54,31 +54,40 @@ export class AnalyzeService {
         const missing = new Map();
         const overExtends = new Map();
         const notRecognized = new Map();
-        projectNodes.forEach((value, key) => {
-            if (!templatesNodes.has(key)) {
+        projectNodesMap.forEach((value, key) => {
+            if (!templatesNodesMap.has(key)) {
                 notRecognized.set(key, value);
                 badNodes += 1;
             } else {
-                if (!(templatesNodes.get(key) === value)) {
-                    if (value > templatesNodes.get(key)) {
-                        overExtends.set(key, value - templatesNodes.get(key));
+                if (!(templatesNodesMap.get(key) === value)) {
+                    if (value > templatesNodesMap.get(key)) {
+                        overExtends.set(
+                            key,
+                            value - templatesNodesMap.get(key),
+                        );
                     } else {
-                        notRecognized.set(key, value - templatesNodes.get(key));
+                        notRecognized.set(
+                            key,
+                            value - templatesNodesMap.get(key),
+                        );
                     }
                     badNodes += 1;
                 }
             }
-            if (templatesNodes.has(key) && templatesNodes.get(key) === value) {
+            if (
+                templatesNodesMap.has(key) &&
+                templatesNodesMap.get(key) === value
+            ) {
                 successfullNodes += 1;
             }
         });
 
-        templatesNodes.forEach((value, key) => {
-            if (!projectNodes.has(key)) {
+        templatesNodesMap.forEach((value, key) => {
+            if (!projectNodesMap.has(key)) {
                 missing.set(key, value);
             } else {
-                if (!(projectNodes.get(key) === value)) {
-                    if (value > projectNodes.get(key)) {
+                if (!(projectNodesMap.get(key) === value)) {
+                    if (value > projectNodesMap.get(key)) {
                         missing.set(key, value);
                     }
                 }
