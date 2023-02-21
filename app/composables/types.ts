@@ -45,3 +45,11 @@ export type UserWorkspace = {
     workspace: Workspace,
     role: string,
 }
+
+export type AnalyzedJsonData = {
+    percentArray: Array<number>;
+    missingMap?: string;
+    notRecognizedMap?: string;
+    overExtendsMap?: string;
+    shapeMap?: string;
+}

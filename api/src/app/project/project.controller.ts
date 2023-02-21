@@ -26,6 +26,7 @@ import { TemplateService } from '../template/template.service';
 import * as path from 'path';
 import { OntologyNode } from '../ontology/ontologyNode/ontologyNode.entity';
 import { WorkspaceService } from '../workspace/workspace.service';
+import { AnalyzedJsonData } from '../shared/analyze/analyzedJson.data';
 
 @Controller('project')
 export class ProjectController {
@@ -147,7 +148,7 @@ export class ProjectController {
     @Get(':uuid/analyze1')
     public async firstLevelAnalyze(
         @Param('uuid', ProjectByUuidPipe) project: Project,
-    ): Promise<Array<any>[]> {
+    ): Promise<AnalyzedJsonData> {
         const bpmnData = await this.bpmnService.parseBpmnFile(
             project.getPath(),
         );
@@ -170,14 +171,34 @@ export class ProjectController {
             bpmnData,
         );
 
-        const [percent, maps] = await this.analyzeService.firstLevelAnalyze(
+        const analyzeData = await this.analyzeService.firstLevelAnalyze(
             projectNodesMap,
             templateNodesMap,
             copyBpmnData,
             templateBpmnData.getElements(),
         );
 
-        return [percent, maps];
+        const percentArray = analyzeData.getPercentArray();
+        const missingToJson = analyzeData.mapToJson(
+            analyzeData.getMissingMap(),
+        );
+        const notRecognizedToJson = analyzeData.mapToJson(
+            analyzeData.getNotRecognizedMap(),
+        );
+        const overExtendsToJson = analyzeData.mapToJson(
+            analyzeData.getOverExtendsMap(),
+        );
+        const shapeToJson = analyzeData.mapToJson(analyzeData.getShapeMap());
+
+        const analyzeJsonData = new AnalyzedJsonData(
+            percentArray,
+            missingToJson,
+            notRecognizedToJson,
+            overExtendsToJson,
+            shapeToJson,
+        );
+
+        return analyzeJsonData;
     }
 
     @Get(':uuid/analyze2')

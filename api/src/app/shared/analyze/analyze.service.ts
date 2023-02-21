@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BpmnElementData } from '../../bpmn/bpmnElement.data';
+import { AnalyzeData } from './analyze.data';
 
 @Injectable()
 export class AnalyzeService {
@@ -8,7 +9,7 @@ export class AnalyzeService {
         templatesNodes: Map<string, number>,
         projectNodesCopy: BpmnElementData[],
         templatesNodesCopy: BpmnElementData[],
-    ): Promise<any> {
+    ): Promise<AnalyzeData> {
         let successfullNodes = 0;
         let badNodes = 0;
         const percentArray = [];
@@ -30,22 +31,24 @@ export class AnalyzeService {
             areEqual = false;
         }
 
-        const maps: Array<any> = [];
-
         if (areEqual) {
-            const equalMaps: Array<any> = [new Map(), new Map(), new Map()];
             const [percent, errorMap] = await this.secondLevelAnalyze(
                 projectNodesCopy,
                 templatesNodesCopy,
             );
-            const errorMapToJson = JSON.stringify(
-                Array.from(errorMap.entries()),
-            );
 
-            equalMaps.push(errorMapToJson);
             percentArray.push(100);
             percentArray.push(percent);
-            return [percentArray, equalMaps];
+
+            const analyzeData = new AnalyzeData(
+                percentArray,
+                new Map(),
+                new Map(),
+                new Map(),
+                errorMap,
+            );
+
+            return analyzeData;
         }
 
         const missing = new Map();
@@ -59,7 +62,6 @@ export class AnalyzeService {
                 if (!(templatesNodes.get(key) === value)) {
                     if (value > templatesNodes.get(key)) {
                         overExtends.set(key, value - templatesNodes.get(key));
-                        successfullNodes += 1;
                     } else {
                         notRecognized.set(key, value - templatesNodes.get(key));
                     }
@@ -95,21 +97,18 @@ export class AnalyzeService {
             '%',
         );
 
-        const missingToJson = JSON.stringify(Array.from(missing.entries()));
-        const notRecognizedToJson = JSON.stringify(
-            Array.from(notRecognized.entries()),
-        );
-        const overExtendsToJson = JSON.stringify(
-            Array.from(overExtends.entries()),
-        );
         const percentMatch = (successfullNodes / fullSuccess) * 100;
         percentArray.push(percentMatch);
+        percentArray.push(0);
 
-        maps.push(missingToJson);
-        maps.push(notRecognizedToJson);
-        maps.push(overExtendsToJson);
+        const analyzeData = new AnalyzeData(
+            percentArray,
+            missing,
+            notRecognized,
+            overExtends,
+        );
 
-        return [percentArray, maps];
+        return analyzeData;
     }
 
     public async secondLevelAnalyze(

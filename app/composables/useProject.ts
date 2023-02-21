@@ -1,5 +1,5 @@
 import { AsyncData } from '#app';
-import { OntologyNode, Project, Workspace } from '~/composables/types';
+import { AnalyzedJsonData, OntologyNode, Project, Workspace } from '~/composables/types';
 
 export const useProject = () => {
     const projectUrlPrefix = '/project';
@@ -60,15 +60,15 @@ export const useProject = () => {
         });
     }
 
-    const analyzeFirstLevel = (uuid: string) => {
-        return useApiFetch(
+    const analyzeFirstLevel = async (uuid: string): Promise<AsyncData<AnalyzedJsonData, any>> => {
+        return useApiFetch<AnalyzedJsonData>(
             `${projectUrlPrefix}/${uuid}/analyze1`, {
                 method: 'GET',
             }
         );
     }
 
-    const analyzeSecondLevel = (uuid: string) => {
+    const analyzeSecondLevel = async (uuid: string) => {
         return useApiFetch(
             `${projectUrlPrefix}/${uuid}/analyze2`, {
                 method: 'GET',
