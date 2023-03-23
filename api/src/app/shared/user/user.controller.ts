@@ -22,8 +22,10 @@ export class UserController {
 
     @Public()
     @Post('register')
-    public async register(@Body() createUserDto: CreateUserDto): Promise<User> {
-        return this.userService.register(createUserDto);
+    public async register(
+        @Body() createUserDto: CreateUserDto,
+    ): Promise<boolean> {
+        return await this.userService.register(createUserDto);
     }
     @Get('/all')
     public async getAll(): Promise<User[]> {

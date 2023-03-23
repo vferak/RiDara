@@ -1,4 +1,5 @@
 <script setup lang='ts'>
+
 const router = useRouter();
 const { registerUser } = useUser();
 const { $z, $veeValidate } = useNuxtApp();
@@ -30,8 +31,8 @@ const password = $veeValidate.useField<string>('password');
 const password_again = $veeValidate.useField<string>('password_again');
 
 const onSubmit = handleSubmit(async (): Promise<void> => {
-    await registerUser(email.value.value, firstName.value.value, lastName.value.value, password.value.value);
-    router.push({ path: '/', query: {'registration_successful': 1} });
+    const {data: register} = await registerUser(email.value.value, firstName.value.value, lastName.value.value, password.value.value);
+    router.push({ path: '/', query: {'registration_successful': JSON.parse(register.value!) ? 1 : 0 } });
 });
 </script>
 <template>

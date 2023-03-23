@@ -1,15 +1,28 @@
 <script setup lang='ts'>
 const route = useRoute();
 const success = useState<boolean>();
+const fail = useState<boolean>();
 
 watchEffect(() => {
-   success.value = !!(route.query.registration_successful);
+    if (route.query.registration_successful === '1')
+    {
+        fail.value = false;
+        success.value = true;
+    }
+    if (route.query.registration_successful === '0')
+    {
+        success.value = false;
+        fail.value = true;
+    }
 });
 </script>
 <template>
     <div class='container mx-auto h-full'>
         <Toast v-model='success'>
             <AlertSuccess>Registration successful</AlertSuccess>
+        </Toast>
+        <Toast v-model='fail'>
+            <AlertError>User with this email already exists</AlertError>
         </Toast>
         <div class='flex h-full justify-center items-center'>
             <div class='card bg-base-100 shadow-xl w-1/3 mb-48'>

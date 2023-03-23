@@ -12,14 +12,20 @@ export class UserService {
         private readonly bcryptService: BcryptService,
     ) {}
 
-    public async register(createUserDto: CreateUserDto): Promise<User> {
+    public async register(createUserDto: CreateUserDto): Promise<boolean> {
         createUserDto.password = await this.bcryptService.hash(
             createUserDto.password,
         );
-        const user = User.create(createUserDto);
-        await this.userRepository.persistAndFlush(user);
 
-        return user;
+        const userExists = await this.findOneByEmail(createUserDto.email);
+
+        if (userExists === null) {
+            const user = User.create(createUserDto);
+            await this.userRepository.persistAndFlush(user);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public async findAll(): Promise<User[]> {

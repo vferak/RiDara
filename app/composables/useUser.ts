@@ -1,10 +1,10 @@
-import { AsyncData } from '#app';
 import { Project, User } from '~/composables/types';
+import { AsyncData } from '#app';
 
 export const useUser = () => {
     const userUrlPrefix = '/user';
 
-    const registerUser = (email: string, firstName: string, lastName: string, password: string) => {
+    const registerUser = async (email: string, firstName: string, lastName: string, password: string): Promise<AsyncData<string, any>> => {
         const body = { email: email, firstName: firstName, lastName: lastName, password: password };
 
         return useApiFetch(`${userUrlPrefix}/register`, {
