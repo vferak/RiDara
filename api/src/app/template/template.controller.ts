@@ -6,7 +6,6 @@ import { User } from '../shared/user/user.entity';
 import { OntologyService } from '../ontology/ontology.service';
 import { Template } from './template.entity';
 import * as fs from 'fs';
-import * as path from 'path';
 import { BpmnService } from '../bpmn/bpmn.service';
 import { TemplateNodeService } from './templateNode/templateNode.service';
 
@@ -25,24 +24,11 @@ export class TemplateController {
         @Body('ontologyFileUuid') ontologyFileUuid: string,
         @Body() createTemplateDto: CreateTemplateDto,
     ): Promise<Template> {
-        const bpmnResourcesPath = path.join(process.cwd(), 'resources', 'bpmn');
-
-        const blankFileName = path.join(bpmnResourcesPath, 'blank.bpmn');
-
-        const fileName = path.join(
-            bpmnResourcesPath,
-            'template',
-            `${createTemplateDto.name}${Date.now()}.bpmn`,
-        );
-
-        fs.copyFileSync(blankFileName, fileName);
-        createTemplateDto.fileName = fileName;
-
         const ontologyFile = await this.ontologyService.getOneFileByUuid(
             ontologyFileUuid,
         );
 
-        return this.templateService.create(
+        return await this.templateService.create(
             currentUser,
             ontologyFile,
             createTemplateDto,
@@ -55,7 +41,7 @@ export class TemplateController {
     ): Promise<string> {
         const template = await this.templateService.getOneByUuid(templateUuid);
 
-        return fs.readFileSync(template.getFileName()).toString();
+        return fs.readFileSync(await template.getDraftFileName()).toString();
     }
 
     @Get(':templateUuid')
@@ -72,11 +58,11 @@ export class TemplateController {
     ): Promise<void> {
         const template = await this.templateService.getOneByUuid(templateUuid);
 
-        fs.writeFileSync(template.getFileName(), bpmnFileData);
+        const draftFileName = await template.getDraftFileName();
 
-        const bpmnData = await this.bpmnService.parseBpmnFile(
-            template.getFileName(),
-        );
+        fs.writeFileSync(draftFileName, bpmnFileData);
+
+        const bpmnData = await this.bpmnService.parseBpmnFile(draftFileName);
 
         await this.templateNodeService.createFromBpmnData(bpmnData, template);
     }
@@ -84,5 +70,14 @@ export class TemplateController {
     @Get()
     public async getAllForUser(@CurrentUser() user: User): Promise<Template[]> {
         return await user.getTemplates();
+    }
+
+    @Patch(':templateUuid/publish')
+    public async publishTemplate(
+        @Param('templateUuid') templateUuid: string,
+    ): Promise<void> {
+        const template = await this.templateService.getOneByUuid(templateUuid);
+
+        await this.templateService.publishNewTemplateVersion(template);
     }
 }

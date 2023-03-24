@@ -41,11 +41,21 @@ export const useTemplate = () => {
         });
     }
 
+    const publishTemplate = async (templateUuid: string): Promise<AsyncData<void, any>> => {
+        return useApiFetch<void>(
+            `${templateUrlPrefix}/${templateUuid}/publish`,
+            {
+                method: 'PATCH',
+            }
+        );
+    }
+
     return {
         createTemplate: createTemplate,
         getTemplates: getTemplates,
         getTemplate: getTemplate,
         getTemplateBpmnFile: getTemplateBpmnFile,
         saveTemplateBpmnFile: saveTemplateBpmnFile,
+        publishTemplate: publishTemplate,
     };
 }

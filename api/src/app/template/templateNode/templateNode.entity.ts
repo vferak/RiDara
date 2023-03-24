@@ -6,8 +6,8 @@ import {
 } from '@mikro-orm/core';
 import { v4 } from 'uuid';
 import { TemplateNodeRepository } from './templateNode.repository';
-import { Template } from '../template.entity';
 import { OntologyNode } from '../../ontology/ontologyNode/ontologyNode.entity';
+import { TemplateVersion } from '../templateVersion/templateVersion.entity';
 
 @Entity({ customRepository: () => TemplateNodeRepository })
 export class TemplateNode {
@@ -16,27 +16,31 @@ export class TemplateNode {
     @PrimaryKey()
     private uuid: string;
 
-    @ManyToOne({ entity: () => Template })
-    private template!: Template;
+    @ManyToOne({ entity: () => TemplateVersion })
+    private templateVersion!: TemplateVersion;
 
     @ManyToOne({ entity: () => OntologyNode })
     private ontologyNode!: OntologyNode;
 
     private constructor(
         uuid: string,
-        template: Template,
+        templateVersion: TemplateVersion,
         ontologyNode: OntologyNode,
     ) {
         this.uuid = uuid;
-        this.template = template;
+        this.templateVersion = templateVersion;
         this.ontologyNode = ontologyNode;
     }
 
     public static create(
-        template: Template,
+        templateVersion: TemplateVersion,
         ontologyNode: OntologyNode,
     ): TemplateNode {
         const uuid = v4();
-        return new TemplateNode(uuid, template, ontologyNode);
+        return new TemplateNode(uuid, templateVersion, ontologyNode);
+    }
+
+    public getOntologyNode(): OntologyNode {
+        return this.ontologyNode;
     }
 }

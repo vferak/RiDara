@@ -322,15 +322,6 @@
           "primary": false,
           "nullable": false,
           "mappedType": "string"
-        },
-        "file_name": {
-          "name": "file_name",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "string"
         }
       },
       "name": "template",
@@ -411,6 +402,97 @@
           "nullable": false,
           "mappedType": "string"
         },
+        "file_name": {
+          "name": "file_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "create_date": {
+          "name": "create_date",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        },
+        "state": {
+          "name": "state",
+          "type": "enum('published', 'draft', 'history')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "enumItems": [
+            "published",
+            "draft",
+            "history"
+          ],
+          "mappedType": "enum"
+        }
+      },
+      "name": "template_version",
+      "indexes": [
+        {
+          "columnNames": [
+            "template_uuid"
+          ],
+          "composite": false,
+          "keyName": "template_version_template_uuid_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "uuid"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "template_version_template_uuid_foreign": {
+          "constraintName": "template_version_template_uuid_foreign",
+          "columnNames": [
+            "template_uuid"
+          ],
+          "localTableName": "template_version",
+          "referencedColumnNames": [
+            "uuid"
+          ],
+          "referencedTableName": "template",
+          "updateRule": "cascade"
+        }
+      }
+    },
+    {
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "template_version_uuid": {
+          "name": "template_version_uuid",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
         "ontology_node_uuid": {
           "name": "ontology_node_uuid",
           "type": "varchar(255)",
@@ -425,10 +507,10 @@
       "indexes": [
         {
           "columnNames": [
-            "template_uuid"
+            "template_version_uuid"
           ],
           "composite": false,
-          "keyName": "template_node_template_uuid_index",
+          "keyName": "template_node_template_version_uuid_index",
           "primary": false,
           "unique": false
         },
@@ -453,16 +535,16 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "template_node_template_uuid_foreign": {
-          "constraintName": "template_node_template_uuid_foreign",
+        "template_node_template_version_uuid_foreign": {
+          "constraintName": "template_node_template_version_uuid_foreign",
           "columnNames": [
-            "template_uuid"
+            "template_version_uuid"
           ],
           "localTableName": "template_node",
           "referencedColumnNames": [
             "uuid"
           ],
-          "referencedTableName": "template",
+          "referencedTableName": "template_version",
           "updateRule": "cascade"
         },
         "template_node_ontology_node_uuid_foreign": {
