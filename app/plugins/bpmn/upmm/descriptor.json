@@ -15,6 +15,11 @@
                     "name": "upmmId",
                     "isAttr": true,
                     "type": "String"
+                },
+                {
+                    "name": "upmmName",
+                    "isAttr": true,
+                    "type": "String"
                 }
             ]
         }

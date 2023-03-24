@@ -17,20 +17,27 @@ function UpmmId(props) {
     const translate = useService('translate');
     const debounce = useService('debounceInput');
 
+    const upmmElements = window['upmmElements'];
+
     const getValue = () => {
         return element.businessObject.upmmId || '';
     }
 
     const setValue = value => {
+        const upmmElement = upmmElements.filter(
+            (upmmElement) => upmmElement.value === value
+        ).shift();
+
         return modeling.updateProperties(element, {
-            upmmId: value
+            upmmId: upmmElement.value,
+            upmmName: upmmElement.label,
         });
     }
 
     const getOptions = () => {
         return [
             { value: '', label: translate('<none>') },
-            ...window['upmmElements']
+            ...upmmElements
         ];
     };
 

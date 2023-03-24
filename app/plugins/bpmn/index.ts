@@ -3,6 +3,7 @@ import Modeler from 'bpmn-js/lib/Modeler';
 // @ts-ignore
 import { BpmnPropertiesPanelModule, BpmnPropertiesProviderModule } from 'bpmn-js-properties-panel';
 import upmmPropertiesProviderModule from './upmm/provider';
+import upmmRendererModule from './upmm/renderer';
 import upmmModdleDescriptor from './upmm/descriptor.json';
 
 export type SelectOption = {
@@ -43,6 +44,7 @@ export default defineNuxtPlugin(() => {
                     BpmnPropertiesPanelModule,
                     BpmnPropertiesProviderModule,
                     upmmPropertiesProviderModule,
+                    upmmRendererModule,
                 ],
                 moddleExtensions: {
                     upmmModdleDescriptor
