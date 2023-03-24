@@ -6,6 +6,8 @@ import { Template } from './template.entity';
 import { OntologyModule } from '../ontology/ontology.module';
 import { BpmnModule } from '../bpmn/bpmn.module';
 import { TemplateNodeModule } from './templateNode/templateNode.module';
+import { TemplateFileModule } from './templateFile/templateFile.module';
+import { TemplateVersionModule } from './templateVersion/templateVersion.module';
 
 @Module({
     imports: [
@@ -13,6 +15,8 @@ import { TemplateNodeModule } from './templateNode/templateNode.module';
         BpmnModule,
         OntologyModule,
         TemplateNodeModule,
+        TemplateVersionModule,
+        TemplateFileModule,
     ],
     controllers: [TemplateController],
     providers: [TemplateService],

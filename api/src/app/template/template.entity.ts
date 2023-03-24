@@ -7,12 +7,14 @@ import {
     PrimaryKey,
     Property,
 } from '@mikro-orm/core';
-import { v4 } from 'uuid';
 import { TemplateRepository } from './template.repository';
 import { OntologyFile } from '../ontology/ontologyFile/ontologyFile.entity';
 import { User } from '../shared/user/user.entity';
 import { CreateTemplateDto } from './dto/create-template.dto';
-import { TemplateNode } from './templateNode/templateNode.entity';
+import { TemplateVersion } from './templateVersion/templateVersion.entity';
+import { TemplateFileService } from './templateFile/templateFile.service';
+import { Uuid } from '../common/uuid/uuid';
+import { TemplateVersionState } from './templateVersion/templateVersionState.enum';
 
 @Entity({ customRepository: () => TemplateRepository })
 export class Template {
@@ -31,13 +33,10 @@ export class Template {
     private createDate!: Date;
 
     @ManyToOne({ entity: () => OntologyFile, eager: true })
-    private ontologyFile!: OntologyFile;
+    private readonly ontologyFile!: OntologyFile;
 
-    @OneToMany('TemplateNode', 'template')
-    private templateNodes = new Collection<TemplateNode>(this);
-
-    @Property()
-    private readonly fileName!: string;
+    @OneToMany('TemplateVersion', 'template')
+    private templateVersions!: Collection<TemplateVersion>;
 
     private constructor(
         uuid: string,
@@ -45,38 +44,79 @@ export class Template {
         author: User,
         createDate: Date,
         ontologyFile: OntologyFile,
-        fileName: string,
     ) {
+        this.templateVersions = new Collection<TemplateVersion>(this);
+
         this.uuid = uuid;
         this.name = name;
         this.author = author;
         this.createDate = createDate;
         this.ontologyFile = ontologyFile;
-        this.fileName = fileName;
     }
 
-    public static create(
+    public static async create(
         user: User,
         ontologyFile: OntologyFile,
         createTemplateDto: CreateTemplateDto,
-    ): Template {
-        const uuid = v4();
+    ): Promise<Template> {
         const date = new Date();
+        const uuid = Uuid.createV4();
+
         return new Template(
-            uuid,
+            uuid.asString(),
             createTemplateDto.name,
             user,
             date,
             ontologyFile,
-            createTemplateDto.fileName,
         );
     }
 
-    public getFileName(): string {
-        return this.fileName;
+    public async getDraftFileName(): Promise<string> {
+        return (await this.getVersionDraft())
+            .getFileData()
+            .getFilePathWithName();
+    }
+
+    public async getPublishedFileName(): Promise<string> {
+        return (await this.getVersionPublished())
+            .getFileData()
+            .getFilePathWithName();
     }
 
     public getOntologyFile(): OntologyFile {
         return this.ontologyFile;
+    }
+
+    public async getVersionDraft(): Promise<TemplateVersion | undefined> {
+        await this.templateVersions.init();
+        return this.templateVersions
+            .getItems()
+            .filter(
+                (templateVersion: TemplateVersion) =>
+                    templateVersion.getState() === TemplateVersionState.DRAFT,
+            )
+            .shift();
+    }
+
+    public async getVersionPublished(): Promise<TemplateVersion | undefined> {
+        await this.templateVersions.init();
+        return this.templateVersions
+            .getItems()
+            .filter(
+                (templateVersion: TemplateVersion) =>
+                    templateVersion.getState() ===
+                    TemplateVersionState.PUBLISHED,
+            )
+            .shift();
+    }
+
+    public async publishDraftVersion(
+        templateFileService: TemplateFileService,
+    ): Promise<TemplateVersion> {
+        const draftVersion = await this.getVersionDraft();
+        return await TemplateVersion.duplicate(
+            templateFileService,
+            draftVersion,
+        );
     }
 }

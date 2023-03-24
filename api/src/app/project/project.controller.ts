@@ -54,7 +54,7 @@ export class ProjectController {
         if (blank) {
             templateFile = path.join(bpmnResourcesPath, 'blank.bpmn');
         } else {
-            templateFile = template.getFileName();
+            templateFile = template.getPublishedFileName();
         }
         const fileName = createProjectDto.name + Date.now() + '.bpmn';
         const pathToFile = path.join(bpmnResourcesPath, 'project', fileName);
@@ -155,7 +155,7 @@ export class ProjectController {
             project.getPath(),
         );
         const templateBpmnData = await this.bpmnService.parseBpmnFile(
-            project.getTemplate().getFileName(),
+            await project.getTemplate().getPublishedFileName(),
         );
         const secondLevelBpmnData = bpmnData.getElements();
 
