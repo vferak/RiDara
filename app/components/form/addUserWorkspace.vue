@@ -7,7 +7,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (event: 'formSent', userUuid: string, role: string): void
+    (event: 'formSent', userUuid: string): void
 }>();
 
 const createUserOptions = (users: User[]) => {
@@ -30,32 +30,12 @@ watchEffect(() => {
     users.value = createUserOptions(props.users);
 })
 
-const roles = [
-    {
-        value: '',
-        name: 'Select user',
-        disabled: true,
-    },
-    {
-        value: 'admin',
-        name: 'Admin',
-        disabled: false,
-    },
-    {
-        value: 'user',
-        name: 'User',
-        disabled: false,
-    },
-];
-
 const { handleSubmit, resetForm } = $veeValidate.useForm({
     validationSchema: $veeValidate.toFormValidator(
         $z.object({
             userUuid: $z.string().refine((value) => value !== '' && users.value.some(
                 (users) => users.value === value,
             ), { message: 'Selected invalid user' }),
-            role: $z.string().refine((value) => value !== '' && (roles[1].value === value ||
-                roles[2].value === value), { message: 'Selected invalid role' }),
         }),
     ),
 });
@@ -63,14 +43,10 @@ const { handleSubmit, resetForm } = $veeValidate.useForm({
 const userUuid = $veeValidate.useField<string>('userUuid');
 userUuid.setValue('');
 
-const role = $veeValidate.useField<string>('role');
-role.setValue('');
-
 const onSubmit = handleSubmit(async (): Promise<void> => {
-    emit('formSent', userUuid.value.value, role.value.value);
+    emit('formSent', userUuid.value.value);
     resetForm();
     userUuid.setValue('');
-    role.setValue('');
 });
 
 </script>
@@ -78,7 +54,6 @@ const onSubmit = handleSubmit(async (): Promise<void> => {
 <template>
     <form @submit='onSubmit' class='flex flex-col mb-4'>
         <FormInputBase :name='"User"' :type='"select"' :field='userUuid' :options='users' />
-        <FormInputBase :name='"Role"' :type='"select"' :field='role' :options='roles' />
         <input type='submit' value='Submit' class='btn btn-sm mt-4' />
     </form>
 </template>

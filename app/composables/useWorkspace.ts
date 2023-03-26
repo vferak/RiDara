@@ -45,8 +45,8 @@ export const useWorkspace = () => {
         );
     }
 
-    const addUserToWorkspace = (userUuid: string, workspaceUuid: string, role: string) => {
-        const body = { userUuid: userUuid, workspaceUuid: workspaceUuid, role: role };
+    const addUserToWorkspace = (userUuid: string, workspaceUuid: string) => {
+        const body = { userUuid: userUuid, workspaceUuid: workspaceUuid};
 
         return useApiFetch(
             `${workspaceUrlPrefix}/${workspaceUuid}/add_user`, {

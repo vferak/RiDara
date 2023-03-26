@@ -27,8 +27,8 @@ const update = async (name: string) => {
     await closeModal();
 };
 
-const addUser = async (userUuid: string, role: string) => {
-    await addUserToWorkspace(userUuid, workspace.value!.uuid, role);
+const addUser = async (userUuid: string) => {
+    await addUserToWorkspace(userUuid, workspace.value!.uuid);
     await refreshWorkspace();
     await refreshUsers();
     await refreshUsersNotInWorkspace();
@@ -37,7 +37,9 @@ const addUser = async (userUuid: string, role: string) => {
 
 const removeUser = async (userUuid: string) => {
     await removeUserFromWorkspace(userUuid, workspace.value!.uuid);
+    await refreshWorkspace();
     await refreshUsers();
+    await refreshUsersNotInWorkspace();
 };
 
 </script>
@@ -73,7 +75,6 @@ const removeUser = async (userUuid: string) => {
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>Role</th>
                             <th></th>
                         </tr>
                         </thead>
@@ -86,9 +87,6 @@ const removeUser = async (userUuid: string) => {
                             </td>
                             <td>
                                {{ useWorkspace.user.email }}
-                            </td>
-                            <td>
-                                {{ useWorkspace.role }}
                             </td>
                             <th>
                                 <button @click='removeUser(useWorkspace.user.uuid)' class="btn btn-ghost btn-xs">Remove</button>

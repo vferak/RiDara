@@ -111,7 +111,7 @@ export class WorkspaceController {
         return this.workspaceService.addUserToWorkspace(
             workspace,
             user,
-            addUserToWorkspaceDto.role,
+            'admin',
         );
     }
 
