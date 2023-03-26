@@ -17,7 +17,7 @@ const create = async (name: string): Promise<void> => {
     <div>
         <div class='container mx-auto'>
             <div class='flex items-center justify-between'>
-                <p class='mb-4 mt-4 text-4xl font-bold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white'>
+                <p class='mb-4 mt-4 text-4xl font-bold tracking-tight leading-none md:text-5xl lg:text-6xl dark:text-white'>
                     Workspaces</p>
                 <div>
                     <button @click='openModal' class='btn mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
