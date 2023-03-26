@@ -9,7 +9,7 @@ const { data: userData } = await getUserProfile();
             <figure class="px-10 pt-10">
                 <div class="avatar">
                     <div class="w-24 mask mask-squircle">
-                        <img src="https://api.lorem.space/image/face?hash=47449" />
+                        <img src='/user.png' />
                     </div>
                 </div>
             </figure>
