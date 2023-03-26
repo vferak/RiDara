@@ -34,7 +34,7 @@ export const useWorkspace = () => {
         return useApiFetch<User[]>(`${workspaceUrlPrefix}/${uuid}/users_not_in_workspace`);
     }
 
-    const updateWorkspace = (uuid: string, name: string) => {
+    const updateWorkspace = async (uuid: string, name: string) => {
         const body = { name: name };
 
         return useApiFetch(
@@ -45,7 +45,13 @@ export const useWorkspace = () => {
         );
     }
 
-    const addUserToWorkspace = (userUuid: string, workspaceUuid: string) => {
+    const deleteWorkspace = async (workspaceUuid: string) => {
+        return useApiFetch(`${workspaceUrlPrefix}/${workspaceUuid}`, {
+            method: 'DELETE',
+        });
+    };
+
+    const addUserToWorkspace = async (userUuid: string, workspaceUuid: string) => {
         const body = { userUuid: userUuid, workspaceUuid: workspaceUuid};
 
         return useApiFetch(
@@ -56,7 +62,7 @@ export const useWorkspace = () => {
         );
     }
 
-    const removeUserFromWorkspace = (userUuid: string, workspaceUuid: string) => {
+    const removeUserFromWorkspace = async (userUuid: string, workspaceUuid: string) => {
         const body = { userUuid: userUuid, workspaceUuid: workspaceUuid };
 
         return useApiFetch(
@@ -77,5 +83,6 @@ export const useWorkspace = () => {
         addUserToWorkspace: addUserToWorkspace,
         removeUserFromWorkspace: removeUserFromWorkspace,
         getUsersNotInWorkspace: getUsersNotInWorkspace,
+        deleteWorkspace: deleteWorkspace,
     };
 }

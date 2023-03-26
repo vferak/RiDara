@@ -26,4 +26,12 @@ export class UserWorkspaceService {
         await userWorkspace.remove(this.entityManager);
         await this.userWorkspaceRepository.flush();
     }
+
+    public async removeAllUsers(userWorkspaces: UserWorkspace[]): Promise<void> {
+        for(const userWorkspace of userWorkspaces)
+        {
+            await userWorkspace.remove(this.entityManager);
+        }
+        await this.userWorkspaceRepository.flush();
+    }
 }

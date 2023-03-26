@@ -12,6 +12,7 @@ import { User } from '../shared/user/user.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Template } from '../template/template.entity';
+import { EntityManager } from '@mikro-orm/mariadb';
 
 @Entity({ customRepository: () => ProjectRepository })
 export class Project {
@@ -72,6 +73,10 @@ export class Project {
             date,
             template,
         );
+    }
+
+    public async remove(entityManager: EntityManager): Promise<void> {
+        await entityManager.removeAndFlush(this);
     }
 
     public update(

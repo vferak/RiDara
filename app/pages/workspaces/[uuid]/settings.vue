@@ -1,7 +1,8 @@
 <script setup lang='ts'>
-
+const router = useRouter();
 const route = useRoute();
-const { getWorkspace, getUsersFromWorkspace, updateWorkspace, addUserToWorkspace, removeUserFromWorkspace, getUsersNotInWorkspace } = useWorkspace();
+const { clearCurrentWorkspace } = useCurrentWorkspace();
+const { getWorkspace, getUsersFromWorkspace, updateWorkspace, addUserToWorkspace, removeUserFromWorkspace, getUsersNotInWorkspace, deleteWorkspace } = useWorkspace();
 
 const uuid = route.params.uuid.toString();
 
@@ -42,6 +43,12 @@ const removeUser = async (userUuid: string) => {
     await refreshUsersNotInWorkspace();
 };
 
+const deleteUser = async () => {
+    await deleteWorkspace(workspace.value!.uuid);
+    await clearCurrentWorkspace();
+    router.push('/workspaces');
+};
+
 </script>
 
 <template>
@@ -60,6 +67,9 @@ const removeUser = async (userUuid: string) => {
         <div class="card w-1/2 min-w-min bg-base-200 shadow-xl mx-auto mt-8 px-10 pt-8">
             <div v-if="users" class="mx-auto h-full">
                 <div class='float-right'>
+                    <button @click='deleteUser' class='btn mt-4 mr-3 btn-md'>
+                        Delete workspace
+                    </button>
                     <button @click='openAddUser' class='btn mt-4 btn-md'>
                         Add user
                     </button>
