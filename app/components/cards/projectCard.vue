@@ -21,7 +21,8 @@ const editOpen = async (project: Project): Promise<void> => {
             <div class='card w-50 bg-base-200 shadow-xl'>
                 <div class='card-body'>
                     <h2 class='card-title'>{{ project.name }}</h2>
-                    <p>{{ project.owner.firstName }} {{ project.owner.lastName }}</p>
+                    <p>Owner: <b>{{ project.owner.firstName }} {{ project.owner.lastName }}</b></p>
+                    <p>Template: <b>{{ project.template.name }}</b></p>
                     <div class='card-actions justify-end'>
                         <NuxtLink @click.prevent='editOpen(project)'>
                             <button class='btn btn-sm'>Edit</button>
