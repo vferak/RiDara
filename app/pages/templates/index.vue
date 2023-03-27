@@ -1,9 +1,21 @@
 <script setup lang='ts'>
-const { createTemplate, getTemplates } = useTemplate();
+import { Template } from '~/composables/types';
+
+const { createTemplate, editTemplate, getTemplates } = useTemplate();
 const { getOntologyFiles } = useOntology();
-const { modalState, openModal, closeModal } = useModal('template-create');
+const {
+    modalState: createModalState,
+    openModal: openCreateModal,
+    closeModal: closeCreateModal
+} = useModal('template-create');
+const {
+    modalState: editModalState,
+    openModal: openEditModal,
+    closeModal: closeEditModal
+} = useModal('template-edit');
 
 const { data: templates, refresh: refreshTemplates } = await getTemplates();
+const templateToEdit = useState<Template>();
 const { data: ontologyFiles } = await getOntologyFiles();
 
 const exist = computed(() => templates.value !== null && templates.value?.length === 0);
@@ -11,8 +23,19 @@ const exist = computed(() => templates.value !== null && templates.value?.length
 const create = async (name: string, ontologyFileUuid: string): Promise<void> => {
     await createTemplate(name, ontologyFileUuid);
     await refreshTemplates();
-    closeModal();
+    closeCreateModal();
 };
+
+const edit = async (name: string): Promise<void> => {
+    await editTemplate(templateToEdit.value.uuid, name);
+    await refreshTemplates();
+    closeEditModal();
+};
+
+const editModal = async (template: Template): Promise<void> => {
+    openEditModal();
+    templateToEdit.value = template;
+}
 </script>
 
 <template>
@@ -23,7 +46,7 @@ const create = async (name: string, ontologyFileUuid: string): Promise<void> => 
                     Templates
                 </p>
                 <div>
-                    <button @click='openModal' class='btn btn-primary mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
+                    <button @click='openCreateModal' class='btn btn-primary mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
                         New template
                     </button>
                 </div>
@@ -35,14 +58,23 @@ const create = async (name: string, ontologyFileUuid: string): Promise<void> => 
                         <div class='card-body'>
                             <h2 class='card-title'>{{ template.name }}</h2>
                             <p>{{ template.ontologyFile.name }}</p>
+                            <div class='card-actions justify-end'>
+                                <NuxtLink @click.prevent='editModal(template)'>
+                                    <button class='btn btn-sm'>Edit</button>
+                                </NuxtLink>
+                            </div>
                         </div>
                     </div>
                 </NuxtLink>
             </div>
         </div>
-        <Modal v-model='modalState'>
+        <Modal v-model='createModalState'>
             <h3 class='text-lg font-bold'>Create new template</h3>
             <FormTemplate @form-sent='create' :ontology-files='ontologyFiles' />
+        </Modal>
+        <Modal v-model='editModalState' v-if='editModalState'>
+            <h3 class='text-lg font-bold'>Edit project</h3>
+            <FormTemplate @form-sent='edit' :ontology-files='ontologyFiles' :template='templateToEdit' />
         </Modal>
     </div>
 </template>

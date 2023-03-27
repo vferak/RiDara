@@ -1,10 +1,11 @@
 <script setup lang='ts'>
-import { OntologyFile } from '~/composables/types';
+import { OntologyFile, Template } from '~/composables/types';
 
 const { $z, $veeValidate } = useNuxtApp();
 
 const props = defineProps<{
-    ontologyFiles: OntologyFile[]
+    ontologyFiles: OntologyFile[],
+    template?: Template
 }>();
 
 const emit = defineEmits<{
@@ -36,6 +37,11 @@ const name = $veeValidate.useField<string>('name');
 const ontologyFileUuid = $veeValidate.useField<string>('ontologyFileUuid');
 ontologyFileUuid.setValue('');
 
+if (props.template !== undefined) {
+    name.setValue(props.template.name);
+    ontologyFileUuid.setValue(props.template.ontologyFile.uuid);
+}
+
 const onSubmit = handleSubmit(async (): Promise<void> => {
     emit('formSent', name.value.value, ontologyFileUuid.value.value);
     resetForm();
@@ -46,7 +52,12 @@ const onSubmit = handleSubmit(async (): Promise<void> => {
 <template>
     <form @submit='onSubmit' class='flex flex-col mb-4'>
         <FormInputBase :name='"Name"' :type='"text"' :field='name'/>
-        <FormInputBase :name='"Ontology file"' :type='"select"' :field='ontologyFileUuid' :options='ontologySelectOptions'/>
+        <FormInputBase
+            v-if='props.template === undefined'
+            :name='"Ontology file"' :type='"select"'
+            :field='ontologyFileUuid'
+            :options='ontologySelectOptions'
+        />
         <input type='submit' value='Submit' class='btn btn-sm mt-4'/>
     </form>
 </template>

@@ -35,6 +35,16 @@ export class TemplateController {
         );
     }
 
+    @Patch(':templateUuid')
+    public async edit(
+        @Param('templateUuid') templateUuid: string,
+        @Body() createTemplateDto: CreateTemplateDto,
+    ): Promise<Template> {
+        const template = await this.templateService.getOneByUuid(templateUuid);
+
+        return await this.templateService.edit(template, createTemplateDto);
+    }
+
     @Get(':templateUuid/file')
     public async getTemplateFile(
         @Param('templateUuid') templateUuid: string,

@@ -15,6 +15,7 @@ import { TemplateVersion } from './templateVersion/templateVersion.entity';
 import { TemplateFileService } from './templateFile/templateFile.service';
 import { Uuid } from '../common/uuid/uuid';
 import { TemplateVersionState } from './templateVersion/templateVersionState.enum';
+import { EditTemplateDto } from './dto/edit-template.dto';
 
 @Entity({ customRepository: () => TemplateRepository })
 export class Template {
@@ -69,6 +70,11 @@ export class Template {
             date,
             ontologyFile,
         );
+    }
+
+    public edit(editTemplateDto: EditTemplateDto): Template {
+        this.name = editTemplateDto.name;
+        return this;
     }
 
     public async getDraftFileName(): Promise<string> {

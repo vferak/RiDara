@@ -19,6 +19,21 @@ export const useTemplate = () => {
         );
     }
 
+    const editTemplate = async (
+        templateUuid: string,
+        name: string,
+    ): Promise<AsyncData<Template, any>> => {
+        const body = { name: name };
+
+        return useApiFetch<Template>(
+            `${templateUrlPrefix}/${templateUuid}`,
+            {
+                method: 'PATCH',
+                body: body,
+            }
+        );
+    }
+
     const getTemplates = async (): Promise<AsyncData<Template[], any>> => {
         return useApiFetch<Template[]>(templateUrlPrefix);
     }
@@ -57,5 +72,6 @@ export const useTemplate = () => {
         getTemplateBpmnFile: getTemplateBpmnFile,
         saveTemplateBpmnFile: saveTemplateBpmnFile,
         publishTemplate: publishTemplate,
+        editTemplate: editTemplate,
     };
 }

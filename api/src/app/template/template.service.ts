@@ -8,6 +8,7 @@ import { TemplateVersionRepository } from './templateVersion/templateVersion.rep
 import { TemplateFileService } from './templateFile/templateFile.service';
 import { TemplateVersion } from './templateVersion/templateVersion.entity';
 import { TemplateNode } from './templateNode/templateNode.entity';
+import { EditTemplateDto } from './dto/edit-template.dto';
 
 @Injectable()
 export class TemplateService {
@@ -49,6 +50,16 @@ export class TemplateService {
             draftVersion,
         ]);
 
+        return template;
+    }
+
+    public async edit(
+        template: Template,
+        editTemplateDto: EditTemplateDto,
+    ): Promise<Template> {
+        template.edit(editTemplateDto);
+
+        await this.templateRepository.flush();
         return template;
     }
 
