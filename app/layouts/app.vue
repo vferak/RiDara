@@ -27,7 +27,10 @@ const navs = useState(() => [
             {name: 'Workspace settings', route: `/workspaces/${currentWorkspace.value?.uuid}/settings`, icon: 'gg-options'},
         ],
     },
-    {
+]);
+
+if (user.value!.role === 'admin') {
+    navs.value.push({
         key: 'admin',
         name: 'Admin',
         visible: true,
@@ -35,8 +38,8 @@ const navs = useState(() => [
             {name: 'Templates', route: '/templates', icon: 'gg-template'},
             {name: 'Ontology files', route: '/ontology/files', icon: 'gg-file-document'},
         ],
-    },
-]);
+    })
+}
 
 watch(currentWorkspace, () => {
     const workspaceNav = navs.value.find((nav) => nav.key === 'workspace');

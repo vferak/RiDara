@@ -11,6 +11,7 @@ export type User = {
     email: string,
     password: string,
     userWorkspaces: string[],
+    role: string,
 }
 
 export type OntologyFile = {
