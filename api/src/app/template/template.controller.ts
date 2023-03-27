@@ -78,8 +78,8 @@ export class TemplateController {
     }
 
     @Get()
-    public async getAllForUser(@CurrentUser() user: User): Promise<Template[]> {
-        return await user.getTemplates();
+    public async getAllForUser(): Promise<Template[]> {
+        return await this.templateService.getTemplates();
     }
 
     @Patch(':templateUuid/publish')

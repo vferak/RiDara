@@ -18,6 +18,10 @@ export class TemplateService {
         private readonly templateFileService: TemplateFileService,
     ) {}
 
+    public async getTemplates(): Promise<Template[]> {
+        return this.templateRepository.findAll();
+    }
+
     public async getOneByUuid(templateUuid: string): Promise<Template> {
         return this.templateRepository.findOneOrFail({ uuid: templateUuid });
     }
