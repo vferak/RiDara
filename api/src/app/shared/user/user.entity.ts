@@ -15,7 +15,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { Workspace } from '../../workspace/workspace.entity';
 import { Project } from '../../project/project.entity';
 import { Template } from '../../template/template.entity';
-import { UserRole } from './userRole.enum';
+import { UserRole } from './role/userRole.enum';
 
 @Entity({ customRepository: () => UserRepository })
 export class User {
