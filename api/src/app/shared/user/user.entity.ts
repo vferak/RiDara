@@ -2,6 +2,7 @@ import {
     Collection,
     Entity,
     EntityRepositoryType,
+    Enum,
     OneToMany,
     PrimaryKey,
     Property,
@@ -14,6 +15,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { Workspace } from '../../workspace/workspace.entity';
 import { Project } from '../../project/project.entity';
 import { Template } from '../../template/template.entity';
+import { UserRole } from './role/userRole.enum';
 
 @Entity({ customRepository: () => UserRepository })
 export class User {
@@ -37,6 +39,9 @@ export class User {
     @Property()
     private createDate!: Date;
 
+    @Enum(() => UserRole)
+    private role: UserRole;
+
     @OneToMany('UserWorkspace', 'user')
     private userWorkspaces = new Collection<UserWorkspace>(this);
 
@@ -53,6 +58,7 @@ export class User {
         lastName: string,
         password: string,
         createDate: Date,
+        role: UserRole,
     ) {
         this.uuid = uuid;
         this.email = email;
@@ -60,6 +66,7 @@ export class User {
         this.lastName = lastName;
         this.password = password;
         this.createDate = createDate;
+        this.role = role;
     }
 
     public static create(createUserDto: CreateUserDto): User {
@@ -72,6 +79,7 @@ export class User {
             createUserDto.lastName,
             createUserDto.password,
             date,
+            UserRole.BASIC,
         );
     }
 
