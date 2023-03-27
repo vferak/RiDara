@@ -15,14 +15,15 @@ import { OntologyService } from './ontology.service';
 import { OntologyFile } from './ontologyFile/ontologyFile.entity';
 import { OntologyNode } from './ontologyNode/ontologyNode.entity';
 import { OntlogyFileByUuidPipe } from './pipes/ontlogyFile-by-uuid.pipe';
-import { OntlogyNodeByUuidPipe } from './pipes/ontlogyNode-by-uuid.pipe';
-import { OntologyRelation } from './ontologyRelation/ontologyRelation.entity';
+import { UserRoles } from '../shared/user/role/userRole.decorator';
+import { UserRole } from '../shared/user/role/userRole.enum';
 
 @Controller('ontology')
 export class OntologyController {
     constructor(private readonly ontologyService: OntologyService) {}
 
     @Post('loadFile')
+    @UserRoles(UserRole.ADMIN)
     @UseInterceptors(FileInterceptor('file'))
     public async uploadFile(
         @UploadedFile() file: Express.Multer.File,
@@ -32,11 +33,13 @@ export class OntologyController {
     }
 
     @Get('files')
+    @UserRoles(UserRole.ADMIN)
     public async displayFiles(): Promise<OntologyFile[]> {
         return this.ontologyService.findAll();
     }
 
     @Get(':uuid/nodes')
+    @UserRoles(UserRole.ADMIN)
     public async displayNodes(
         @Param('uuid', OntlogyFileByUuidPipe) ontologyFile: OntologyFile,
     ): Promise<OntologyNode[]> {
@@ -47,19 +50,5 @@ export class OntologyController {
 
             return aName > bName ? 1 : bName > aName ? -1 : 0;
         });
-    }
-
-    @Get(':uuid/get_targets')
-    public async getTargetsOfNode(
-        @Param('uuid', OntlogyNodeByUuidPipe) ontologyNode: OntologyNode,
-    ): Promise<OntologyRelation[]> {
-        return await ontologyNode.getSourceRef();
-    }
-
-    @Get(':uuid/get_targets')
-    public async getSourcesOfNode(
-        @Param('uuid', OntlogyNodeByUuidPipe) ontologyNode: OntologyNode,
-    ): Promise<OntologyRelation[]> {
-        return await ontologyNode.getTargetRef();
     }
 }

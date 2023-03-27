@@ -8,6 +8,8 @@ import { Template } from './template.entity';
 import * as fs from 'fs';
 import { BpmnService } from '../bpmn/bpmn.service';
 import { TemplateNodeService } from './templateNode/templateNode.service';
+import { UserRole } from '../shared/user/role/userRole.enum';
+import { UserRoles } from '../shared/user/role/userRole.decorator';
 
 @Controller('template')
 export class TemplateController {
@@ -19,6 +21,7 @@ export class TemplateController {
     ) {}
 
     @Post()
+    @UserRoles(UserRole.ADMIN)
     public async create(
         @CurrentUser() currentUser: User,
         @Body('ontologyFileUuid') ontologyFileUuid: string,
@@ -36,6 +39,7 @@ export class TemplateController {
     }
 
     @Patch(':templateUuid')
+    @UserRoles(UserRole.ADMIN)
     public async edit(
         @Param('templateUuid') templateUuid: string,
         @Body() createTemplateDto: CreateTemplateDto,
@@ -62,6 +66,7 @@ export class TemplateController {
     }
 
     @Patch('save-file')
+    @UserRoles(UserRole.ADMIN)
     public async saveTemplateFile(
         @Body('templateUuid') templateUuid: string,
         @Body('bpmnFileData') bpmnFileData: string,
@@ -83,6 +88,7 @@ export class TemplateController {
     }
 
     @Patch(':templateUuid/publish')
+    @UserRoles(UserRole.ADMIN)
     public async publishTemplate(
         @Param('templateUuid') templateUuid: string,
     ): Promise<void> {

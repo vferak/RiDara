@@ -13,7 +13,7 @@ const { modalState: editState, openModal: editOpen, closeModal: editClose } = us
 const currentWorkspace = await getCurrentWorkspace();
 
 const { data: projects, refresh: refreshProject } = await getProjects(currentWorkspace!.value!.uuid);
-const {data: templates} = await getTemplates();
+const { data: templates } = await getTemplates();
 
 const { data: workspace } = await getWorkspace(currentWorkspace!.value!.uuid)
 
