@@ -258,6 +258,19 @@
           "nullable": false,
           "length": 0,
           "mappedType": "datetime"
+        },
+        "role": {
+          "name": "role",
+          "type": "enum('basic', 'admin')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "enumItems": [
+            "basic",
+            "admin"
+          ],
+          "mappedType": "enum"
         }
       },
       "name": "user",
