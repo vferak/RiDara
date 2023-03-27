@@ -71,3 +71,10 @@ export type RelationErrorDeserializedData = {
     missingRelations?: Map<string, string> | undefined;
     overExtendsRelations?: Map<string, string> | undefined;
 }
+
+export type ErrorTemplate = {
+    upmmUuid: string | undefined;
+    outgoing?: string[] | undefined;
+    missing?: string[] | undefined;
+    overExtends?: string[] | undefined;
+}

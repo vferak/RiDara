@@ -62,6 +62,7 @@ export class BpmnService {
         }
 
         const bpmnDatas: BpmnData[] = [];
+
         for (const object of objects) {
             const bpmnElementsData = this.createBpmnElementDataFromBaseObjects(
                 object.flowElements,
@@ -77,12 +78,14 @@ export class BpmnService {
             },
             [],
         );
+
         return new BpmnData(bpmnElementsObjects[0].getElements());
     }
 
     private createBpmnElementDataFromBaseObjects(
         objects: any,
         references: any[],
+        parentProcessId?: string,
     ): BpmnElementData[] {
         const bpmnElements = [];
         for (const object of objects) {
@@ -133,19 +136,29 @@ export class BpmnService {
                 object.elementId,
             );
 
+            if (parentProcessId !== undefined) {
+                bpmnData.setParentId(parentProcessId);
+            }
+
             if (object.hasOwnProperty('flowElements')) {
                 const childElements = this.createBpmnElementDataFromBaseObjects(
                     object.flowElements,
                     references,
+                    object.id,
                 );
                 bpmnData.setChildElements(childElements);
+
                 for (const childElement of childElements) {
+                    if (childElement.getUpmmUuid() === undefined) {
+                        continue;
+                    }
                     bpmnElements.push(childElement);
                 }
             }
 
             bpmnElements.push(bpmnData);
         }
+
         return bpmnElements;
     }
 }

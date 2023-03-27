@@ -7,6 +7,7 @@ export class BpmnElementData {
     private readonly incoming?: string[];
 
     private childElements?: BpmnElementData[];
+    private parentId?: string;
     private upmmName?: string;
     private elementId?: string;
 
@@ -18,18 +19,27 @@ export class BpmnElementData {
         incoming?: string[],
         upmmName?: string,
         elementId?: string,
-    ) {
+    ){
         this.type = type;
         this.id = id;
         this.upmmUuid = upmmUuid;
         this.incoming = incoming;
         this.outgoing = outgoing;
         this.childElements = [];
+        this.parentId = '';
         this.upmmName = upmmName;
         this.elementId = elementId;
     }
     public setChildElements(values: BpmnElementData[]): void {
         this.childElements = values;
+    }
+
+    public setParentId(value: string): void {
+        this.parentId = value;
+    }
+
+    public getParentId(): string {
+        return this.parentId;
     }
 
     public getId(): string {

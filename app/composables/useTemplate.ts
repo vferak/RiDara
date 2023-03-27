@@ -65,6 +65,14 @@ export const useTemplate = () => {
         );
     }
 
+    const analyze = async (uuid: string): Promise<AsyncData<void, any>> => {
+        return useApiFetch<void>(
+            `${templateUrlPrefix}/${uuid}/analyze`, {
+                method: 'GET',
+            }
+        );
+    }
+
     return {
         createTemplate: createTemplate,
         getTemplates: getTemplates,
@@ -73,5 +81,6 @@ export const useTemplate = () => {
         saveTemplateBpmnFile: saveTemplateBpmnFile,
         publishTemplate: publishTemplate,
         editTemplate: editTemplate,
+        analyze: analyze,
     };
 }
