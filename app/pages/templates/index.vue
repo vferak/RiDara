@@ -73,7 +73,7 @@ const editModal = async (template: Template): Promise<void> => {
             <FormTemplate @form-sent='create' :ontology-files='ontologyFiles' />
         </Modal>
         <Modal v-model='editModalState' v-if='editModalState'>
-            <h3 class='text-lg font-bold'>Edit project</h3>
+            <h3 class='text-lg font-bold'>Edit template</h3>
             <FormTemplate @form-sent='edit' :ontology-files='ontologyFiles' :template='templateToEdit' />
         </Modal>
     </div>

@@ -38,6 +38,23 @@ export class TemplateController {
         );
     }
 
+    @Patch('save-file')
+    @UserRoles(UserRole.ADMIN)
+    public async saveTemplateFile(
+        @Body('templateUuid') templateUuid: string,
+        @Body('bpmnFileData') bpmnFileData: string,
+    ): Promise<void> {
+        const template = await this.templateService.getOneByUuid(templateUuid);
+
+        const draftFileName = await template.getDraftFileName();
+
+        fs.writeFileSync(draftFileName, bpmnFileData);
+
+        const bpmnData = await this.bpmnService.parseBpmnFile(draftFileName);
+
+        await this.templateNodeService.createFromBpmnData(bpmnData, template);
+    }
+
     @Patch(':templateUuid')
     @UserRoles(UserRole.ADMIN)
     public async edit(
@@ -63,23 +80,6 @@ export class TemplateController {
         @Param('templateUuid') templateUuid: string,
     ): Promise<Template> {
         return await this.templateService.getOneByUuid(templateUuid);
-    }
-
-    @Patch('save-file')
-    @UserRoles(UserRole.ADMIN)
-    public async saveTemplateFile(
-        @Body('templateUuid') templateUuid: string,
-        @Body('bpmnFileData') bpmnFileData: string,
-    ): Promise<void> {
-        const template = await this.templateService.getOneByUuid(templateUuid);
-
-        const draftFileName = await template.getDraftFileName();
-
-        fs.writeFileSync(draftFileName, bpmnFileData);
-
-        const bpmnData = await this.bpmnService.parseBpmnFile(draftFileName);
-
-        await this.templateNodeService.createFromBpmnData(bpmnData, template);
     }
 
     @Get()
