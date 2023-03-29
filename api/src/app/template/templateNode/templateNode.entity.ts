@@ -19,7 +19,7 @@ export class TemplateNode {
     @ManyToOne({ entity: () => TemplateVersion })
     private templateVersion!: TemplateVersion;
 
-    @ManyToOne({ entity: () => OntologyNode })
+    @ManyToOne({ entity: () => OntologyNode, eager: true })
     private ontologyNode!: OntologyNode;
 
     private constructor(

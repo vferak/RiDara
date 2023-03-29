@@ -114,15 +114,6 @@ export class OntologyService {
         ontologyNodes: OntologyNode[],
     ): Promise<Map<string, number>> {
         return ontologyNodes
-            .filter((templateNode) =>
-                [
-                    'Goal',
-                    'Process_Step',
-                    'Argument',
-                    'Activity',
-                    'Action',
-                ].includes(templateNode.getName()),
-            )
             .map((templateNode) => templateNode.getName())
             .sort()
             .reduce(

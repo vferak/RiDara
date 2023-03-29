@@ -16,6 +16,7 @@ import { UuidInterface } from '../../common/uuid/uuid.interface';
 import { Uuid } from '../../common/uuid/uuid';
 import { TemplateFileService } from '../templateFile/templateFile.service';
 import { TemplateVersionState } from './templateVersionState.enum';
+import { OntologyNode } from '../../ontology/ontologyNode/ontologyNode.entity';
 
 @Entity({ customRepository: () => TemplateVersionRepository })
 export class TemplateVersion {
@@ -118,6 +119,14 @@ export class TemplateVersion {
     public async getNodes(): Promise<TemplateNode[]> {
         await this.templateNodes.init();
         return this.templateNodes.getItems();
+    }
+
+    public async getOntologyNodes(): Promise<OntologyNode[]> {
+        const ontologyNodes = [];
+        for (const templateNode of await this.getNodes()) {
+            ontologyNodes.push(templateNode.getOntologyNode());
+        }
+        return ontologyNodes;
     }
 
     private markAsPublished(): void {
