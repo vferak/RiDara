@@ -17,10 +17,14 @@ import { OntologyNode } from './ontologyNode/ontologyNode.entity';
 import { OntlogyFileByUuidPipe } from './pipes/ontlogyFile-by-uuid.pipe';
 import { UserRoles } from '../shared/user/role/userRole.decorator';
 import { UserRole } from '../shared/user/role/userRole.enum';
+import { TurtleService } from '../shared/turtle/turtle.service';
 
 @Controller('ontology')
 export class OntologyController {
-    constructor(private readonly ontologyService: OntologyService) {}
+    constructor(
+        private readonly ontologyService: OntologyService,
+        private readonly turtleService: TurtleService,
+    ) {}
 
     @Post('loadFile')
     @UserRoles(UserRole.ADMIN)
@@ -29,7 +33,12 @@ export class OntologyController {
         @UploadedFile() file: Express.Multer.File,
         @Body() createFileOntologyDto: CreateFileOntologyDto,
     ) {
-        await this.ontologyService.loadFile(file, createFileOntologyDto);
+        const turtleData = this.turtleService.parseTurtleFile(file.buffer);
+
+        await this.ontologyService.createOntologyFile(
+            turtleData,
+            createFileOntologyDto,
+        );
     }
 
     @Get('files')

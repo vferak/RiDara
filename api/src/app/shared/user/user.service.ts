@@ -13,14 +13,10 @@ export class UserService {
     ) {}
 
     public async register(createUserDto: CreateUserDto): Promise<boolean> {
-        createUserDto.password = await this.bcryptService.hash(
-            createUserDto.password,
-        );
-
         const userExists = await this.findOneByEmail(createUserDto.email);
 
         if (userExists === null) {
-            const user = User.create(createUserDto);
+            const user = User.create(this.bcryptService, createUserDto);
             await this.userRepository.persistAndFlush(user);
             return true;
         } else {

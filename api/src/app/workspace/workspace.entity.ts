@@ -7,7 +7,6 @@ import {
     PrimaryKey,
     Property,
 } from '@mikro-orm/core';
-import { v4 } from 'uuid';
 import { CreateWorkspaceDto } from './dto/create-workspace.dto';
 import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
 import { WorkspaceRepository } from './workspace.repository';
@@ -15,6 +14,8 @@ import { EntityManager } from '@mikro-orm/mariadb';
 import { User } from '../shared/user/user.entity';
 import { UserWorkspace } from './userWorkspace/userWorkspace.entity';
 import { Project } from '../project/project.entity';
+import { Uuid } from '../common/uuid/uuid';
+import { UuidInterface } from '../common/uuid/uuid.interface';
 
 @Entity({ customRepository: () => WorkspaceRepository })
 export class Workspace {
@@ -35,18 +36,22 @@ export class Workspace {
     @OneToMany('Project', 'workspace')
     private projects = new Collection<Project>(this);
 
-    private constructor(uuid: string, name: string, owner: User) {
-        this.uuid = uuid;
+    private constructor(uuid: UuidInterface, name: string, owner: User) {
+        this.uuid = uuid.asString();
         this.name = name;
         this.owner = owner;
     }
 
-    public static create(
+    public static async create(
         createWorkspaceDto: CreateWorkspaceDto,
         owner: User,
-    ): Workspace {
-        const uuid = v4();
-        return new Workspace(uuid, createWorkspaceDto.name, owner);
+    ): Promise<Workspace> {
+        const uuid = Uuid.createV4();
+        const workspace = new Workspace(uuid, createWorkspaceDto.name, owner);
+
+        await UserWorkspace.create(workspace, owner);
+
+        return workspace;
     }
 
     public update(updateWorkspaceDto: UpdateWorkspaceDto): void {
@@ -66,14 +71,13 @@ export class Workspace {
     }
 
     public async getUsers(): Promise<User[]> {
-        await this.userWorkspaces.init();
+        if (!this.userWorkspaces.isInitialized()) {
+            await this.userWorkspaces.init();
+        }
+
         return this.userWorkspaces
             .getItems()
             .map((userWorkspace: UserWorkspace) => userWorkspace.getUser());
-    }
-
-    public addUserWorkspace(userWorkspace: UserWorkspace): void {
-        this.userWorkspaces.add(userWorkspace);
     }
 
     public remove(entityManager: EntityManager): void {
@@ -88,5 +92,9 @@ export class Workspace {
     public async getUserWorkspaces(): Promise<UserWorkspace[]> {
         await this.userWorkspaces.init();
         return this.userWorkspaces.getItems();
+    }
+
+    public async addUser(user: User): Promise<UserWorkspace> {
+        return await UserWorkspace.create(this, user);
     }
 }
