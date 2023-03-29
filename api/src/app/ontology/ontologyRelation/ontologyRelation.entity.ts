@@ -4,10 +4,10 @@ import {
     ManyToOne,
     PrimaryKey,
 } from '@mikro-orm/core';
-import { v4 } from 'uuid';
 import { OntologyRelationRepository } from './ontologyRelation.repository';
-import { CreateRelationOntologyDto } from '../dto/create-relation-ontology.dto';
 import { OntologyNode } from '../ontologyNode/ontologyNode.entity';
+import { Uuid } from '../../common/uuid/uuid';
+import { UuidInterface } from '../../common/uuid/uuid.interface';
 
 @Entity({ customRepository: () => OntologyRelationRepository })
 export class OntologyRelation {
@@ -23,24 +23,21 @@ export class OntologyRelation {
     private targetRef!: OntologyNode;
 
     private constructor(
-        uuid: string,
+        uuid: UuidInterface,
         sourceRef: OntologyNode,
         targetRef: OntologyNode,
     ) {
-        this.uuid = uuid;
+        this.uuid = uuid.asString();
         this.sourceRef = sourceRef;
         this.targetRef = targetRef;
     }
 
     public static create(
-        createRelationOntologyDto: CreateRelationOntologyDto,
+        sourceRef: OntologyNode,
+        targetRef: OntologyNode,
     ): OntologyRelation {
-        const uuid = v4();
-        return new OntologyRelation(
-            uuid,
-            createRelationOntologyDto.sourceRef,
-            createRelationOntologyDto.targerRef,
-        );
+        const uuid = Uuid.createV4();
+        return new OntologyRelation(uuid, sourceRef, targetRef);
     }
 
     public getSourceRef(): OntologyNode {

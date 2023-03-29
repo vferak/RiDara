@@ -7,12 +7,13 @@ import {
     PrimaryKey,
     Property,
 } from '@mikro-orm/core';
-import { v4 } from 'uuid';
 import { OntologyFile } from '../ontologyFile/ontologyFile.entity';
 import { OntologyNodeRepository } from './ontologyNode.repository';
-import { CreateFileOntologyDto } from '../dto/create-file-ontology.dto';
 import { TemplateNode } from '../../template/templateNode/templateNode.entity';
 import { OntologyRelation } from '../ontologyRelation/ontologyRelation.entity';
+import { CreateNodeOntologyDto } from '../dto/create-node-ontology.dto';
+import { Uuid } from '../../common/uuid/uuid';
+import { UuidInterface } from '../../common/uuid/uuid.interface';
 
 @Entity({ customRepository: () => OntologyNodeRepository })
 export class OntologyNode {
@@ -37,24 +38,21 @@ export class OntologyNode {
     private sourceRefs = new Collection<OntologyRelation>(this);
 
     private constructor(
-        uuid: string,
+        uuid: UuidInterface,
         name: string,
         ontologyFile: OntologyFile,
     ) {
-        this.uuid = uuid;
+        this.uuid = uuid.asString();
         this.name = name;
         this.ontologyFile = ontologyFile;
     }
 
     public static create(
-        createNodeOntologyDto: CreateFileOntologyDto,
+        ontologyFile: OntologyFile,
+        createNodeOntologyDto: CreateNodeOntologyDto,
     ): OntologyNode {
-        const uuid = v4();
-        return new OntologyNode(
-            uuid,
-            createNodeOntologyDto.name,
-            createNodeOntologyDto.ontologyFile,
-        );
+        const uuid = Uuid.createV4();
+        return new OntologyNode(uuid, createNodeOntologyDto.name, ontologyFile);
     }
 
     public getName(): string {
