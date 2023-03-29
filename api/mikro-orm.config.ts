@@ -18,6 +18,11 @@ const configMicroOrm: MikroOrmModuleOptions = {
     migrations: {
         path: 'src/migrations',
     },
+    seeder: {
+        path: './dist/src/seeders', // path to the folder with seeders
+        pathTs: './src/seeders', // path to the folder with TS seeders (if used, we should put path to compiled files in `path`)
+        defaultSeeder: 'DatabaseSeeder', // default seeder class name
+    },
 };
 
 export default configMicroOrm;
