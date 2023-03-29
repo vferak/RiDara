@@ -16,6 +16,7 @@ import { Workspace } from '../../workspace/workspace.entity';
 import { Project } from '../../project/project.entity';
 import { Template } from '../../template/template.entity';
 import { UserRole } from './role/userRole.enum';
+import { BcryptService } from '../../common/providers/bcrypt.service';
 
 @Entity({ customRepository: () => UserRepository })
 export class User {
@@ -69,15 +70,20 @@ export class User {
         this.role = role;
     }
 
-    public static create(createUserDto: CreateUserDto): User {
+    public static async create(
+        bcryptService: BcryptService,
+        createUserDto: CreateUserDto,
+    ): Promise<User> {
         const uuid = v4();
         const date = new Date();
+        const password = await bcryptService.hash(createUserDto.password);
+
         return new User(
             uuid,
             createUserDto.email,
             createUserDto.firstName,
             createUserDto.lastName,
-            createUserDto.password,
+            password,
             date,
             UserRole.BASIC,
         );
@@ -120,9 +126,6 @@ export class User {
     public getPassword(): string {
         return this.password;
     }
-    public addUserWorkspace(userWorkspace: UserWorkspace): void {
-        this.userWorkspaces.add(userWorkspace);
-    }
 
     public async getProjects(): Promise<Project[]> {
         await this.projects.init();
@@ -132,5 +135,9 @@ export class User {
     public async getTemplates(): Promise<Template[]> {
         await this.templates.init();
         return this.templates.getItems();
+    }
+
+    public markAsAdmin(): void {
+        this.role = UserRole.ADMIN;
     }
 }
