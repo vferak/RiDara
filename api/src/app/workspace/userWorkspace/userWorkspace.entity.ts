@@ -27,23 +27,21 @@ export class UserWorkspace {
         this.workspace = workspace;
         this.user = user;
         this.role = role;
-        workspace.addUserWorkspace(this);
-        user.addUserWorkspace(this);
     }
 
     public static async create(
         workspace: Workspace,
         user: User,
-        role: string,
     ): Promise<UserWorkspace> {
-        const users = await workspace.getUsers();
-        for (const us of users) {
-            if (us.getUuid() === user.getUuid()) {
+        const workspaceUsers = await workspace.getUsers();
+
+        for (const workspaceUser of workspaceUsers) {
+            if (workspaceUser.getUuid() === user.getUuid()) {
                 throw new BadRequestException('User already in workspace');
             }
         }
 
-        return new UserWorkspace(workspace, user, role);
+        return new UserWorkspace(workspace, user, 'admin');
     }
 
     public getWorkspace(): Workspace {

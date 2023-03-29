@@ -108,11 +108,7 @@ export class WorkspaceController {
             addUserToWorkspaceDto.workspaceUuid,
         );
 
-        return this.workspaceService.addUserToWorkspace(
-            workspace,
-            user,
-            'admin',
-        );
+        return this.workspaceService.addUserToWorkspace(workspace, user);
     }
 
     @Post(':uuid/remove_user')

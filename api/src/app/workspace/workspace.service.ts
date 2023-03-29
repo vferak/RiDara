@@ -22,17 +22,9 @@ export class WorkspaceService {
         createWorkspaceDto: CreateWorkspaceDto,
         user: User,
     ): Promise<Workspace> {
-        const workspace = Workspace.create(createWorkspaceDto, user);
+        const workspace = await Workspace.create(createWorkspaceDto, user);
+
         this.workspaceRepository.persist(workspace);
-        await this.workspaceRepository.flush();
-
-        const userWorkspace = await UserWorkspace.create(
-            workspace,
-            user,
-            'admin',
-        );
-
-        this.userWorkspaceRepository.persist(userWorkspace);
         await this.workspaceRepository.flush();
 
         return workspace;
@@ -83,9 +75,9 @@ export class WorkspaceService {
     public async addUserToWorkspace(
         workspace: Workspace,
         user: User,
-        role: string,
     ): Promise<void> {
-        const userWorkspace = await UserWorkspace.create(workspace, user, role);
-        await this.userWorkspaceRepository.persistAndFlush(userWorkspace);
+        await workspace.addUser(user);
+
+        await this.userWorkspaceRepository.flush();
     }
 }
