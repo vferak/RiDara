@@ -95,7 +95,10 @@ export class ProjectController {
     public async getNodesByProject(
         @Param('uuid', ProjectByUuidPipe) project: Project,
     ): Promise<OntologyNode[]> {
-        return project.getTemplate().getOntologyFile().getNodes();
+        const projectVersion = await project
+            .getTemplate()
+            .getVersionPublished();
+        return await projectVersion.getOntologyNodes();
     }
 
     @Get(':uuid/file')
@@ -151,16 +154,21 @@ export class ProjectController {
         @Param('uuid', ProjectByUuidPipe) project: Project,
     ): Promise<AnalyzedJsonData> {
         let analyzedData: AnalyzeData;
+
         const bpmnData = await this.bpmnService.parseBpmnFile(
             project.getPath(),
         );
+
         const templateBpmnData = await this.bpmnService.parseBpmnFile(
             await project.getTemplate().getPublishedFileName(),
         );
         const secondLevelBpmnData = bpmnData.getElements();
 
-        const ontologyFile = project.getTemplate().getOntologyFile();
-        const templateNodes = await ontologyFile.getNodes();
+        const publishedTemplateVersion = await project
+            .getTemplate()
+            .getVersionPublished();
+
+        const templateNodes = await publishedTemplateVersion.getOntologyNodes();
         const templateNodesMap = await this.ontologyService.parseOntologyNodes(
             templateNodes,
         );
