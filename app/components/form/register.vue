@@ -3,6 +3,7 @@
 const router = useRouter();
 const { registerUser } = useUser();
 const { $z, $veeValidate } = useNuxtApp();
+const fail = useState<boolean>();
 
 const { handleSubmit } = $veeValidate.useForm({
     validationSchema: $veeValidate.toFormValidator(
@@ -32,10 +33,18 @@ const password_again = $veeValidate.useField<string>('password_again');
 
 const onSubmit = handleSubmit(async (): Promise<void> => {
     const {data: register} = await registerUser(email.value.value, firstName.value.value, lastName.value.value, password.value.value);
-    router.push({ path: '/', query: {'registration_successful': JSON.parse(register.value!) ? 1 : 0 } });
+    const registration = JSON.parse(register.value!);
+    if (registration) {
+        router.push({ path: '/', query: {'registration_successful': JSON.parse(register.value!) ? 1 : 0 } });
+    } else {
+        fail.value = true;
+    }
 });
 </script>
 <template>
+    <Toast v-model='fail'>
+        <AlertError>User with this email already exists</AlertError>
+    </Toast>
     <form @submit='onSubmit' class='flex flex-col'>
         <FormInputBase :name='"First name"' :type='"text"' :field='firstName' />
         <FormInputBase :name='"Last name"' :type='"text"' :field='lastName' />
