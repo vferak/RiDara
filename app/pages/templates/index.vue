@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { Template } from '~/composables/types';
 
-const { createTemplate, editTemplate, getTemplates } = useTemplate();
+const { createTemplate, editTemplate, getTemplates, importTemplate } = useTemplate();
 const { getOntologyFiles } = useOntology();
 const {
     modalState: createModalState,
@@ -13,6 +13,12 @@ const {
     openModal: openEditModal,
     closeModal: closeEditModal
 } = useModal('template-edit');
+const {
+    modalState: importModalState,
+    openModal: openImportModal,
+    closeModal: closeImportModal
+} = useModal('template-import');
+
 
 const { data: templates, refresh: refreshTemplates } = await getTemplates();
 const templateToEdit = useState<Template>();
@@ -36,6 +42,13 @@ const editModal = async (template: Template): Promise<void> => {
     openEditModal();
     templateToEdit.value = template;
 }
+
+const importTemplateSubmit = async (name: string, ontologyFileUuid: string, file: File): Promise<void> => {
+    await importTemplate(name, ontologyFileUuid, file);
+
+    await refreshTemplates();
+    closeImportModal();
+};
 </script>
 
 <template>
@@ -49,6 +62,9 @@ const editModal = async (template: Template): Promise<void> => {
                     <button @click='openCreateModal' class='btn btn-primary mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
                         New template
                     </button>
+                    <button @click='openImportModal' class='btn btn-secondary ml-4 mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
+                        Import template
+                    </button>
                 </div>
             </div>
             <AlertInform v-if='exist' class='mb-6 mt-4'>No templates found! Go ahead and create one.</AlertInform>
@@ -60,7 +76,7 @@ const editModal = async (template: Template): Promise<void> => {
                             <p>{{ template.ontologyFile.name }}</p>
                             <div class='card-actions justify-end'>
                                 <NuxtLink @click.prevent='editModal(template)'>
-                                    <button class='btn btn-sm'>Edit</button>
+                                    <button class='btn btn-secondary btn-sm'>Edit</button>
                                 </NuxtLink>
                             </div>
                         </div>
@@ -75,6 +91,10 @@ const editModal = async (template: Template): Promise<void> => {
         <Modal v-model='editModalState' v-if='editModalState'>
             <h3 class='text-lg font-bold'>Edit template</h3>
             <FormTemplate @form-sent='edit' :ontology-files='ontologyFiles' :template='templateToEdit' />
+        </Modal>
+        <Modal v-model='importModalState'>
+            <h3 class='text-lg font-bold'>Import template</h3>
+            <FormTemplate @form-sent='importTemplateSubmit' :ontology-files='ontologyFiles' :is-import='true' />
         </Modal>
     </div>
 </template>

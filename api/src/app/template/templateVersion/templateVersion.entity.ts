@@ -75,13 +75,14 @@ export class TemplateVersion {
         );
     }
 
-    public static async createWithBlankFile(
+    public static async create(
         templateFileService: TemplateFileService,
         template: Template,
+        file: Buffer,
     ): Promise<TemplateVersion> {
         const uuid = Uuid.createV4();
 
-        const fileData = templateFileService.createBlankTemplateBpmnFile(uuid);
+        const fileData = templateFileService.writeTemplateFile(uuid, file);
 
         return await TemplateVersion.createWithUuid(uuid, template, fileData);
     }

@@ -34,17 +34,29 @@ export class TemplateService {
     public async create(
         user: User,
         ontologyFile: OntologyFile,
+        file: Buffer,
         createTemplateDto: CreateTemplateDto,
     ): Promise<Template> {
         const template = await Template.create(
             this.templateFileService,
             user,
             ontologyFile,
+            file,
             createTemplateDto,
         );
 
         await this.templateRepository.persistAndFlush(template);
         return template;
+    }
+
+    public async createWithBlankFile(
+        user: User,
+        ontologyFile: OntologyFile,
+        createTemplateDto: CreateTemplateDto,
+    ): Promise<Template> {
+        const file = this.templateFileService.getBlankTemplateFileBuffer();
+
+        return this.create(user, ontologyFile, file, createTemplateDto);
     }
 
     public async edit(

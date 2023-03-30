@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { TemplateService } from './template.service';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { CurrentUser } from '../common/decorators/user.decorator';
@@ -13,6 +13,8 @@ import { FileService } from '../common/file/file.service';
 import { FileData } from '../common/file/file.data';
 import { BpmnElementData } from '../bpmn/bpmnElement.data';
 import { TemplateAnalyzeData } from '../ontology/ontologyNode/templateAnalyze.data';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
 
 @Controller('template')
 export class TemplateController {
@@ -35,7 +37,7 @@ export class TemplateController {
             ontologyFileUuid,
         );
 
-        return await this.templateService.create(
+        return await this.templateService.createWithBlankFile(
             currentUser,
             ontologyFile,
             createTemplateDto,
@@ -67,6 +69,26 @@ export class TemplateController {
         await this.templateNodeService.createFromBpmnData(
             allBpmnElements,
             template,
+        );
+    }
+
+    @Post('import')
+    @UseInterceptors(FileInterceptor('file'))
+    public async importFile(
+        @CurrentUser() currentUser: User,
+        @UploadedFile() file: Express.Multer.File,
+        @Body('ontologyFileUuid') ontologyFileUuid: string,
+        @Body() createTemplateDto: CreateTemplateDto,
+    ): Promise<Template> {
+        const ontologyFile = await this.ontologyService.getOneFileByUuid(
+            ontologyFileUuid,
+        );
+
+        return await this.templateService.create(
+            currentUser,
+            ontologyFile,
+            file.buffer,
+            createTemplateDto
         );
     }
 

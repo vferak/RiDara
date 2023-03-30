@@ -5,11 +5,12 @@ const { $z, $veeValidate } = useNuxtApp();
 
 const props = defineProps<{
     ontologyFiles: OntologyFile[],
-    template?: Template
+    template?: Template,
+    isImport?: boolean,
 }>();
 
 const emit = defineEmits<{
-    (event: 'formSent', name: string, ontologyFileUuid: string): void
+    (event: 'formSent', name: string, ontologyFileUuid: string, file?: File): void
 }>();
 
 const ontologySelectOptions = props.ontologyFiles.map((ontologyFile) => {
@@ -29,12 +30,23 @@ const { handleSubmit, resetForm } = $veeValidate.useForm({
             ontologyFileUuid: $z.string().refine((value) => value !== '' && ontologySelectOptions.some(
                 (ontologySelectOption) => ontologySelectOption.value === value
             ), {message: 'Selected invalid ontology file'}),
+            file: $z
+                .any()
+                .refine(
+                    () => !isImport || fileData.value?.name.split('.').pop() === "bpmn",
+                    "Only .bpmn file is supported."
+                )
         })
     ),
 });
 
+const fileData = useState<File>();
+const isImport = props.isImport !== undefined && props.isImport;
+
 const name = $veeValidate.useField<string>('name');
 const ontologyFileUuid = $veeValidate.useField<string>('ontologyFileUuid');
+const file = $veeValidate.useField<string>('file');
+
 ontologyFileUuid.setValue('');
 
 if (props.template !== undefined) {
@@ -42,8 +54,15 @@ if (props.template !== undefined) {
     ontologyFileUuid.setValue(props.template.ontologyFile.uuid);
 }
 
+const onChangeFile = (event: any) => {
+    const eventFiles = event.target.files;
+    if (eventFiles.length !== 0) {
+        fileData.value = eventFiles[0];
+    }
+}
+
 const onSubmit = handleSubmit(async (): Promise<void> => {
-    emit('formSent', name.value.value, ontologyFileUuid.value.value);
+    emit('formSent', name.value.value, ontologyFileUuid.value.value, fileData.value);
     resetForm();
     ontologyFileUuid.setValue('');
 });
@@ -58,6 +77,7 @@ const onSubmit = handleSubmit(async (): Promise<void> => {
             :field='ontologyFileUuid'
             :options='ontologySelectOptions'
         />
+        <FormInputBase v-if='isImport' @change='onChangeFile($event)' :name='"Template file"' :type='"file"' :field='file'/>
         <input type='submit' value='Submit' class='btn btn-sm mt-4'/>
     </form>
 </template>

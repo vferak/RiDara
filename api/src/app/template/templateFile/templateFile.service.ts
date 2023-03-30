@@ -19,13 +19,16 @@ export class TemplateFileService {
 
     constructor(private readonly fileService: FileService) {}
 
-    public createBlankTemplateBpmnFile(fileName: UuidInterface): FileData {
-        return this.fileService.copyFile(
-            FileData.createFromFilePathWithName(BPMN_BLANK_FILE_PATH),
+    public writeTemplateFile(
+        templateVersionUuid: UuidInterface,
+        file: Buffer,
+    ): FileData {
+        return this.fileService.writeFile(
             FileData.create(
                 TemplateFileService.BPMN_TEMPLATES_PATH,
-                `${fileName.asString()}${BPMN_FILE_EXTENSION}`,
+                `${templateVersionUuid.asString()}${BPMN_FILE_EXTENSION}`,
             ),
+            file,
         );
     }
 
@@ -40,6 +43,12 @@ export class TemplateFileService {
             originalFileData.setFileName(
                 `${newTemplateUuid.asString()}${BPMN_FILE_EXTENSION}`,
             ),
+        );
+    }
+
+    public getBlankTemplateFileBuffer(): Buffer {
+        return this.fileService.readFile(
+            FileData.createFromFilePathWithName(BPMN_BLANK_FILE_PATH),
         );
     }
 }

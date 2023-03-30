@@ -16,6 +16,12 @@ import { TemplateFileService } from './templateFile/templateFile.service';
 import { Uuid } from '../common/uuid/uuid';
 import { TemplateVersionState } from './templateVersion/templateVersionState.enum';
 import { EditTemplateDto } from './dto/edit-template.dto';
+import { Body, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateProjectDto } from '../project/dto/create-project.dto';
+import { CurrentUser } from '../common/decorators/user.decorator';
+import { Express } from 'express';
+import { Project } from '../project/project.entity';
 
 @Entity({ customRepository: () => TemplateRepository })
 export class Template {
@@ -59,6 +65,7 @@ export class Template {
         templateFileService: TemplateFileService,
         user: User,
         ontologyFile: OntologyFile,
+        file: Buffer,
         createTemplateDto: CreateTemplateDto,
     ): Promise<Template> {
         const date = new Date();
@@ -72,9 +79,10 @@ export class Template {
             ontologyFile,
         );
 
-        const publishedVersion = await TemplateVersion.createWithBlankFile(
+        const publishedVersion = await TemplateVersion.create(
             templateFileService,
             template,
+            file,
         );
 
         await TemplateVersion.duplicate(templateFileService, publishedVersion);

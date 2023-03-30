@@ -73,6 +73,25 @@ export const useTemplate = () => {
         );
     }
 
+    const importTemplate = async (
+        name: string,
+        ontologyFileUuid: string,
+        file: File
+    ): Promise<AsyncData<Template, any>> => {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('ontologyFileUuid', ontologyFileUuid);
+        formData.append('file', file);
+
+        return useApiFetch<Template>(
+            `${templateUrlPrefix}/import`,
+            {
+                method: 'POST',
+                body: formData,
+            }
+        );
+    }
+
     return {
         createTemplate: createTemplate,
         getTemplates: getTemplates,
@@ -82,5 +101,6 @@ export const useTemplate = () => {
         publishTemplate: publishTemplate,
         editTemplate: editTemplate,
         analyze: analyze,
+        importTemplate: importTemplate,
     };
 }
