@@ -75,7 +75,7 @@ export class ProjectController {
     }
 
     @Get('workspace/:uuid')
-    public async displayUsersProjects(
+    public async getProjectsByWorkspace(
         @Param('uuid') workspaceUuid: string,
     ): Promise<Project[]> {
         const workspace = await this.workspaceService.getOneByUuid(

@@ -2,8 +2,10 @@
 import { Workspace } from '~/composables/types';
 
 const { setCurrentWorkspace } = useCurrentWorkspace();
+const { getProjects} = useProject();
 
 const { workspace } = defineProps<{ workspace: Workspace }>();
+const { data: projects } = await getProjects(workspace.uuid);
 
 const setWorkspace = (): void => {
     setCurrentWorkspace(workspace.uuid);
@@ -17,7 +19,7 @@ const setWorkspace = (): void => {
                 <div class='card-body'>
                     <h2 class='card-title'>{{ workspace.name }}</h2>
                     <p>{{ workspace.owner.firstName }} {{ workspace.owner.lastName }}</p>
-                    <p>Projects: 8</p>
+                    <p>Projects: {{ projects.length }}</p>
 <!--                    <div class='card-actions justify-end'>-->
 <!--                        <button class='btn btn-primary'>Open</button>-->
 <!--                    </div>-->
