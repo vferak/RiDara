@@ -90,7 +90,6 @@ export class User {
     }
 
     public update(updateUserDto: UpdateUserDto): void {
-        this.email = updateUserDto.email;
         this.firstName = updateUserDto.firstName;
         this.lastName = updateUserDto.lastName;
     }

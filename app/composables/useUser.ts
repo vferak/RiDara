@@ -13,8 +13,8 @@ export const useUser = () => {
         });
     };
 
-    const updateUser = (email: string, firstName: string, lastName: string) => {
-        const body = { email: email, firstName: firstName, lastName: lastName };
+    const updateUser = (firstName: string, lastName: string) => {
+        const body = {firstName: firstName, lastName: lastName };
 
         return useApiFetch(userUrlPrefix, {
             method: 'PATCH',
