@@ -15,7 +15,9 @@ const currentWorkspace = await getCurrentWorkspace();
 const { data: projects, refresh: refreshProject } = await getProjects(currentWorkspace!.value!.uuid);
 const { data: templates } = await getTemplates();
 
-const { data: workspace } = await getWorkspace(currentWorkspace!.value!.uuid)
+const { data: workspace } = await getWorkspace(currentWorkspace!.value!.uuid);
+
+const exist = computed(() => projects.value !== null && projects.value?.length === 0);
 
 const projectToEdit = useState<Project>();
 
@@ -60,7 +62,7 @@ const emitValueEdit = async (project: Project): Promise<void> => {
                     </button>
                 </div>
             </div>
-
+            <AlertInform v-if='exist' class='mb-6 mt-4'>You do not have any projects. Please create new project!</AlertInform>
             <div class='grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5'>
                 <CardsProjectCard v-for='project in projects' :key='project.uuid' :project='project' @edit-project='emitValueEdit'/>
             </div>

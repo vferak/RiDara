@@ -14,9 +14,8 @@ export class UserService {
 
     public async register(createUserDto: CreateUserDto): Promise<boolean> {
         const userExists = await this.findOneByEmail(createUserDto.email);
-
         if (userExists === null) {
-            const user = User.create(this.bcryptService, createUserDto);
+            const user = await User.create(this.bcryptService, createUserDto);
             await this.userRepository.persistAndFlush(user);
             return true;
         } else {
