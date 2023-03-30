@@ -1,4 +1,4 @@
-import type { EntityManager } from '@mikro-orm/core';
+import type { Dictionary, EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import * as path from 'path';
 import { TurtleService } from '../app/shared/turtle/turtle.service';
@@ -15,17 +15,24 @@ export class OntologySeeder extends Seeder {
         'UnifiedProcessMetaModel.ttl',
     );
 
-    async run(entityManager: EntityManager): Promise<void> {
+    async run(
+        entityManager: EntityManager,
+        context: Dictionary,
+    ): Promise<void> {
         const turtleService = new TurtleService();
 
         const file = fs.readFileSync(OntologySeeder.UPMM_TTL_FILE);
         const turtleData = turtleService.parseTurtleFile(file);
 
-        const ontologyFile = OntologyFile.create(
+        const upmmOntology = OntologyFile.create(
             turtleData,
             new CreateFileOntologyDto('Unified Process Meta Model'),
         );
 
-        await entityManager.persistAndFlush(ontologyFile);
+        await entityManager.persistAndFlush(upmmOntology);
+
+        context.ontology = {
+            upmm: upmmOntology,
+        };
     }
 }

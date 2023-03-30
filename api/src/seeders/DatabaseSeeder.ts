@@ -3,6 +3,7 @@ import { Seeder } from '@mikro-orm/seeder';
 import { UserSeeder } from './UserSeeder';
 import { WorkspaceSeeder } from './WorkspaceSeeder';
 import { OntologySeeder } from './OntologySeeder';
+import { TemplateSeeder } from './TemplateSeeder';
 
 export class DatabaseSeeder extends Seeder {
     async run(entityManager: EntityManager): Promise<void> {
@@ -10,6 +11,7 @@ export class DatabaseSeeder extends Seeder {
             UserSeeder,
             WorkspaceSeeder,
             OntologySeeder,
+            TemplateSeeder,
         ]);
     }
 }
