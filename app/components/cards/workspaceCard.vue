@@ -20,9 +20,11 @@ const setWorkspace = (): void => {
                     <h2 class='card-title'>{{ workspace.name }}</h2>
                     <p>{{ workspace.owner.firstName }} {{ workspace.owner.lastName }}</p>
                     <p>Projects: {{ projects.length }}</p>
-<!--                    <div class='card-actions justify-end'>-->
-<!--                        <button class='btn btn-primary'>Open</button>-->
-<!--                    </div>-->
+                    <div class='card-actions justify-end'>
+                        <NuxtLink :to="{ name: 'workspaces-uuid-settings', params: { uuid: workspace.uuid }}">
+                            <button class='btn btn-sm'>Edit</button>
+                        </NuxtLink>
+                    </div>
                 </div>
             </div>
         </NuxtLink>

@@ -91,7 +91,7 @@ const deleteUser = async () => {
                         <tbody>
                         <tr v-for="useWorkspace in userWorkspaces" :key="useWorkspace.user.uuid">
                             <td>
-                                <div class="flex items-center space-x-3">
+                                <div class="items-center space-x-3">
                                     <div class="font-bold">{{ useWorkspace.user.firstName }} {{ useWorkspace.user.lastName }}</div>
                                 </div>
                             </td>
