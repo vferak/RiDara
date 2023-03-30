@@ -106,7 +106,13 @@ export class ProjectController {
         const projectVersion = await project
             .getTemplate()
             .getVersionPublished();
-        return await projectVersion.getOntologyNodes();
+        const nodes = await projectVersion.getOntologyNodes();
+        return nodes.sort((a, b) => {
+            const aName = a.getName().toUpperCase();
+            const bName = b.getName().toUpperCase();
+
+            return aName > bName ? 1 : bName > aName ? -1 : 0;
+        });
     }
 
     @Get(':uuid/file')
