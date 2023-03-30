@@ -50,7 +50,7 @@ watch(currentWorkspace, () => {
         (link) => link.name === 'Workspace settings'
     );
 
-    settingsLink!.route = `workspaces/${currentWorkspace.value?.uuid}/settings`;
+    settingsLink!.route = `/workspaces/${currentWorkspace.value?.uuid}/settings`;
 })
 </script>
 <template>
