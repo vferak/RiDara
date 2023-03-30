@@ -11,7 +11,7 @@ const { data: workspaces } = await getWorkspaces();
 const firstName = user.value?.firstName;
 const lastName = user.value?.lastName;
 
-const showEmptyWorkspacesMessage = useState<boolean>(() => workspaces.value!.length === 0);
+const exist = computed(() => workspaces.value !== null && workspaces.value?.length === 0);
 </script>
 <template>
     <div class="container mx-auto my-6">
@@ -21,7 +21,7 @@ const showEmptyWorkspacesMessage = useState<boolean>(() => workspaces.value!.len
         <Alert class='my-4'>
             Welcome back {{ firstName }} {{ lastName }}, today is {{ date }} and it's {{ time }}.
         </Alert>
-        <AlertInform v-if='showEmptyWorkspacesMessage'>
+        <AlertInform v-if='exist'>
             <div class="flex-1">
                 <span>Hi, it looks like you haven't created a workspace yet. You can create one by clicking the following button.</span>
             </div>

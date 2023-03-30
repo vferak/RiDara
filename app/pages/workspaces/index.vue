@@ -26,7 +26,7 @@ const create = async (name: string): Promise<void> => {
 
                 </div>
             </div>
-            <AlertInform v-if='exist' class='mb-6 mt-4'>Please create workspace!</AlertInform>
+            <AlertInform v-if='exist' class='mb-6 mt-4'>Hi, it looks like you haven't created a workspace yet. You can create one here.</AlertInform>
             <div class='grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5'>
                 <CardsWorkspaceCard v-for='workspace in workspaces' :key='workspace.uuid' :workspace='workspace' />
             </div>
