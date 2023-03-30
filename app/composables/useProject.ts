@@ -36,8 +36,8 @@ export const useProject = () => {
         return useApiFetch<Project[]>(`${projectUrlPrefix}/workspace/${uuid}`);
     }
 
-    const updateProject = (uuid: string, name: string, templateUuid: string) => {
-        const body = { name: name, templateUuid: templateUuid };
+    const updateProject = (uuid: string, name: string, workspace: string, templateUuid: string) => {
+        const body = { name: name, workspace: workspace,templateUuid: templateUuid };
         return useApiFetch(
             `${projectUrlPrefix}/update/${uuid}`, {
                 method: 'PATCH',

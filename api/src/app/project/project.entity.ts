@@ -81,10 +81,12 @@ export class Project {
 
     public update(
         updateProjectDto: UpdateProjectDto,
+        workspace: Workspace,
         template: Template,
     ): void {
         this.name = updateProjectDto.name;
         this.template = template;
+        this.workspace = workspace;
     }
 
     public getPath(): string {

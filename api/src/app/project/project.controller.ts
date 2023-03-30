@@ -71,7 +71,15 @@ export class ProjectController {
         @Body('templateUuid') templateUuid: string,
     ): Promise<Project> {
         const template = await this.templateService.getOneByUuid(templateUuid);
-        return this.projectService.update(project, updateProjectDto, template);
+        const workspace = await this.workspaceService.getOneByUuid(
+            updateProjectDto.workspace,
+        );
+        return this.projectService.update(
+            project,
+            updateProjectDto,
+            workspace,
+            template,
+        );
     }
 
     @Get('workspace/:uuid')

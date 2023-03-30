@@ -5,6 +5,7 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { User } from '../shared/user/user.entity';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Template } from '../template/template.entity';
+import { Workspace } from '../workspace/workspace.entity';
 
 @Injectable()
 export class ProjectService {
@@ -29,9 +30,10 @@ export class ProjectService {
     public async update(
         project: Project,
         updateProjectDto: UpdateProjectDto,
+        workspace: Workspace,
         template: Template,
     ): Promise<Project> {
-        project.update(updateProjectDto, template);
+        project.update(updateProjectDto, workspace, template);
         await this.projectRepository.flush();
         return project;
     }

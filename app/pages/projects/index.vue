@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { Project } from '~/composables/types';
 
-const { getWorkspace } = useWorkspace();
+const { getWorkspace, getWorkspaces } = useWorkspace();
 const { getCurrentWorkspace } = useCurrentWorkspace();
 const { getTemplates } = useTemplate();
 const { getProjects, createProject, importProject, updateProject } = useProject();
@@ -16,7 +16,7 @@ const { data: projects, refresh: refreshProject } = await getProjects(currentWor
 const { data: templates } = await getTemplates();
 
 const { data: workspace } = await getWorkspace(currentWorkspace!.value!.uuid);
-
+const { data: workspaces } = await getWorkspaces();
 const exist = computed(() => projects.value !== null && projects.value?.length === 0);
 
 const projectToEdit = useState<Project>();
@@ -33,8 +33,8 @@ const upload = async (name: string, file: File, templateUuid: string): Promise<v
     importClose();
 };
 
-const editProject = async (name: string, templateUuid: string): Promise<void> => {
-    await updateProject(projectToEdit.value.uuid, name, templateUuid);
+const editProject = async (name: string, workspace: string, templateUuid: string): Promise<void> => {
+    await updateProject(projectToEdit.value.uuid, name, workspace, templateUuid);
     await refreshProject();
     editClose();
 };
@@ -79,7 +79,7 @@ const emitValueEdit = async (project: Project): Promise<void> => {
 
         <Modal v-model='editState' v-if='editState'>
             <h3 class='text-lg font-bold'>Edit project</h3>
-            <FormEditProject @form-sent='editProject' :templates='templates' :name='projectToEdit.name' :template-name='projectToEdit.template.name' :template-uuid='projectToEdit.template.uuid' />
+            <FormEditProject @form-sent='editProject' :workspaces='workspaces' :workspace-uuid='projectToEdit.workspace.uuid' :templates='templates' :name='projectToEdit.name' :template-name='projectToEdit.template.name' :template-uuid='projectToEdit.template.uuid' />
         </Modal>
 
     </div>

@@ -49,6 +49,6 @@ export const useUser = () => {
         getUserProfile: getUserProfile,
         registerUser: registerUser,
         updateUserPassword: updateUserPassword,
-        getUsers: getUsers
+        getUsers: getUsers,
     };
 };
