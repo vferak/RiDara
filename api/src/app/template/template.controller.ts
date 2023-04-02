@@ -5,11 +5,12 @@ import { CurrentUser } from '../common/decorators/user.decorator';
 import { User } from '../shared/user/user.entity';
 import { OntologyService } from '../ontology/ontology.service';
 import { Template } from './template.entity';
-import * as fs from 'fs';
 import { BpmnService } from '../bpmn/bpmn.service';
 import { TemplateNodeService } from './templateNode/templateNode.service';
 import { UserRole } from '../shared/user/role/userRole.enum';
 import { UserRoles } from '../shared/user/role/userRole.decorator';
+import { FileService } from '../common/file/file.service';
+import { FileData } from '../common/file/file.data';
 
 @Controller('template')
 export class TemplateController {
@@ -18,6 +19,7 @@ export class TemplateController {
         private readonly ontologyService: OntologyService,
         private readonly bpmnService: BpmnService,
         private readonly templateNodeService: TemplateNodeService,
+        private readonly fileService: FileService,
     ) {}
 
     @Post()
@@ -48,7 +50,10 @@ export class TemplateController {
 
         const draftFileName = await template.getDraftFileName();
 
-        fs.writeFileSync(draftFileName, bpmnFileData);
+        this.fileService.writeFile(
+            FileData.createFromFilePathWithName(draftFileName),
+            bpmnFileData,
+        );
 
         const bpmnData = await this.bpmnService.parseBpmnFile(draftFileName);
 
@@ -72,7 +77,13 @@ export class TemplateController {
     ): Promise<string> {
         const template = await this.templateService.getOneByUuid(templateUuid);
 
-        return fs.readFileSync(await template.getDraftFileName()).toString();
+        return this.fileService
+            .readFile(
+                FileData.createFromFilePathWithName(
+                    await template.getDraftFileName(),
+                ),
+            )
+            .toString();
     }
 
     @Get(':templateUuid')

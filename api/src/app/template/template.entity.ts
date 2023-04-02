@@ -56,6 +56,7 @@ export class Template {
     }
 
     public static async create(
+        templateFileService: TemplateFileService,
         user: User,
         ontologyFile: OntologyFile,
         createTemplateDto: CreateTemplateDto,
@@ -63,13 +64,22 @@ export class Template {
         const date = new Date();
         const uuid = Uuid.createV4();
 
-        return new Template(
+        const template = new Template(
             uuid.asString(),
             createTemplateDto.name,
             user,
             date,
             ontologyFile,
         );
+
+        const publishedVersion = await TemplateVersion.createWithBlankFile(
+            templateFileService,
+            template,
+        );
+
+        await TemplateVersion.duplicate(templateFileService, publishedVersion);
+
+        return template;
     }
 
     public edit(editTemplateDto: EditTemplateDto): Template {
@@ -94,9 +104,7 @@ export class Template {
     }
 
     public async getVersionDraft(): Promise<TemplateVersion | undefined> {
-        await this.templateVersions.init();
-        return this.templateVersions
-            .getItems()
+        return (await this.templateVersions.loadItems())
             .filter(
                 (templateVersion: TemplateVersion) =>
                     templateVersion.getState() === TemplateVersionState.DRAFT,
@@ -105,9 +113,7 @@ export class Template {
     }
 
     public async getVersionPublished(): Promise<TemplateVersion | undefined> {
-        await this.templateVersions.init();
-        return this.templateVersions
-            .getItems()
+        return (await this.templateVersions.loadItems())
             .filter(
                 (templateVersion: TemplateVersion) =>
                     templateVersion.getState() ===

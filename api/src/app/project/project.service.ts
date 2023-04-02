@@ -6,10 +6,14 @@ import { User } from '../shared/user/user.entity';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Template } from '../template/template.entity';
 import { Workspace } from '../workspace/workspace.entity';
+import { ProjectFileService } from './projectFile/projectFile.service';
 
 @Injectable()
 export class ProjectService {
-    public constructor(private readonly projectRepository: ProjectRepository) {}
+    public constructor(
+        private readonly projectRepository: ProjectRepository,
+        private readonly projectFileService: ProjectFileService,
+    ) {}
 
     public async getOneByUuid(uuid: string): Promise<Project> {
         return await this.projectRepository.findOneOrFail({ uuid: uuid });
@@ -19,8 +23,16 @@ export class ProjectService {
         createProjectDto: CreateProjectDto,
         user: User,
         template: Template,
+        file: Buffer,
     ): Promise<Project> {
-        const project = Project.create(createProjectDto, user, template);
+        const project = Project.create(
+            this.projectFileService,
+            createProjectDto,
+            user,
+            template,
+            file,
+        );
+
         this.projectRepository.persist(project);
         await this.projectRepository.flush();
 

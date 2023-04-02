@@ -13,6 +13,9 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Template } from '../template/template.entity';
 import { EntityManager } from '@mikro-orm/mariadb';
+import { Uuid } from '../common/uuid/uuid';
+import { ProjectFileService } from './projectFile/projectFile.service';
+import { UuidInterface } from '../common/uuid/uuid.interface';
 
 @Entity({ customRepository: () => ProjectRepository })
 export class Project {
@@ -40,7 +43,7 @@ export class Project {
     private template!: Template;
 
     private constructor(
-        uuid: string,
+        uuid: UuidInterface,
         name: string,
         path: string,
         owner: User,
@@ -48,7 +51,7 @@ export class Project {
         createDate: Date,
         template: Template,
     ) {
-        this.uuid = uuid;
+        this.uuid = uuid.asString();
         this.name = name;
         this.path = path;
         this.owner = owner;
@@ -58,16 +61,21 @@ export class Project {
     }
 
     public static create(
+        projectFileService: ProjectFileService,
         createProjectDto: CreateProjectDto,
         user: User,
         template: Template,
+        file: Buffer,
     ): Project {
-        const uuid = v4();
+        const uuid = Uuid.createV4();
+
+        const projectFile = projectFileService.writeProjectFile(uuid, file);
+
         const date = new Date();
         return new Project(
             uuid,
             createProjectDto.name,
-            createProjectDto.path,
+            projectFile.getFilePathWithName(),
             user,
             createProjectDto.workspace,
             date,

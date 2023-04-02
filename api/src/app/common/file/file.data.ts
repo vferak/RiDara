@@ -2,8 +2,8 @@ import * as path from 'path';
 
 export class FileData {
     private constructor(
-        private readonly filePath: string,
-        private readonly fileName: string,
+        public readonly filePath: string,
+        public readonly fileName: string,
     ) {}
 
     public static create(filePath: string, fileName: string): FileData {
@@ -20,15 +20,7 @@ export class FileData {
     }
 
     public setFileName(fileName: string): FileData {
-        return FileData.create(this.getFilePath(), fileName);
-    }
-
-    public getFilePath(): string {
-        return this.filePath;
-    }
-
-    public getFileName(): string {
-        return this.fileName;
+        return FileData.create(this.filePath, fileName);
     }
 
     public getFilePathWithName(): string {

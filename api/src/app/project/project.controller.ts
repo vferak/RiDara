@@ -13,21 +13,21 @@ import { CurrentUser } from '../common/decorators/user.decorator';
 import { User } from '../shared/user/user.entity';
 import { Project } from './project.entity';
 import { ProjectByUuidPipe } from './pipes/project-by-uuid.pipe';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { Express } from 'express';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import * as fs from 'fs';
 import { AnalyzeService } from '../shared/analyze/analyze.service';
 import { BpmnService } from '../bpmn/bpmn.service';
 import { OntologyService } from '../ontology/ontology.service';
 import { TemplateService } from '../template/template.service';
-import * as path from 'path';
 import { OntologyNode } from '../ontology/ontologyNode/ontologyNode.entity';
 import { WorkspaceService } from '../workspace/workspace.service';
 import { AnalyzedJsonData } from '../shared/analyze/analyzedJson.data';
 import { AnalyzeData } from '../shared/analyze/analyze.data';
+import { FileService } from '../common/file/file.service';
+import { FileData } from '../common/file/file.data';
+import { BPMN_BLANK_FILE_PATH } from '../common/file/file.constants';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('project')
 export class ProjectController {
@@ -38,6 +38,7 @@ export class ProjectController {
         private readonly templateService: TemplateService,
         private readonly ontologyService: OntologyService,
         private readonly workspaceService: WorkspaceService,
+        private readonly fileService: FileService,
     ) {}
 
     @Post('')
@@ -47,21 +48,22 @@ export class ProjectController {
         @Body('templateUuid') templateUuid: string,
         @Body('blankFile') blank: boolean,
     ): Promise<Project> {
-        let templateFile;
         const template = await this.templateService.getOneByUuid(templateUuid);
-        const bpmnResourcesPath = path.join(process.cwd(), 'resources', 'bpmn');
 
-        if (blank) {
-            templateFile = path.join(bpmnResourcesPath, 'blank.bpmn');
-        } else {
-            templateFile = template.getPublishedFileName();
-        }
-        const fileName = createProjectDto.name + Date.now() + '.bpmn';
-        const pathToFile = path.join(bpmnResourcesPath, 'project', fileName);
+        const fileName = blank
+            ? BPMN_BLANK_FILE_PATH
+            : await template.getPublishedFileName();
 
-        fs.copyFileSync(templateFile, pathToFile);
-        createProjectDto.path = pathToFile;
-        return this.projectService.create(createProjectDto, user, template);
+        const file = this.fileService.readFile(
+            FileData.createFromFilePathWithName(fileName),
+        );
+
+        return this.projectService.create(
+            createProjectDto,
+            user,
+            template,
+            file,
+        );
     }
 
     @Patch('update/:uuid')
@@ -120,7 +122,9 @@ export class ProjectController {
         @Param('uuid') projectUuid: string,
     ): Promise<string> {
         const project = await this.projectService.getOneByUuid(projectUuid);
-        return fs.readFileSync(project.getPath()).toString();
+        return this.fileService
+            .readFile(FileData.createFromFilePathWithName(project.getPath()))
+            .toString();
     }
 
     @Patch('saveFile')
@@ -129,38 +133,28 @@ export class ProjectController {
         @Body('bpmnFileData') bpmnFileData: string,
     ): Promise<void> {
         const project = await this.projectService.getOneByUuid(projectUuid);
-        fs.writeFileSync(project.getPath(), bpmnFileData);
+        this.fileService.writeFile(
+            FileData.createFromFilePathWithName(project.getPath()),
+            bpmnFileData,
+        );
     }
 
     @Post('import')
-    @UseInterceptors(
-        FileInterceptor('file', {
-            storage: diskStorage({
-                destination: function (req, file, cb) {
-                    cb(null, './resources/bpmn/project/');
-                },
-                filename: function (req, file, cb) {
-                    const name = req.body.name;
-                    const fileName = name + Date.now() + '.bpmn';
-                    cb(null, fileName);
-                },
-            }),
-        }),
-    )
-    async importFile(
+    @UseInterceptors(FileInterceptor('file'))
+    public async importFile(
         @Body() createProjectDto: CreateProjectDto,
         @CurrentUser() user: User,
         @UploadedFile() file: Express.Multer.File,
         @Body('templateUuid') templateUuid: string,
-    ) {
-        createProjectDto.path = path.join(process.cwd(), file.path);
+    ): Promise<Project> {
         const template = await this.templateService.getOneByUuid(templateUuid);
-        const project = await this.projectService.create(
+
+        return await this.projectService.create(
             createProjectDto,
             user,
             template,
+            file.buffer,
         );
-        return project;
     }
 
     @Get(':uuid/analyze')

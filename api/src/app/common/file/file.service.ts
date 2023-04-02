@@ -12,4 +12,13 @@ export class FileService {
 
         return destination;
     }
+
+    public readFile(source: FileData): Buffer {
+        return fs.readFileSync(source.getFilePathWithName());
+    }
+
+    public writeFile(source: FileData, file: Buffer | string): FileData {
+        fs.writeFileSync(source.getFilePathWithName(), file);
+        return source;
+    }
 }

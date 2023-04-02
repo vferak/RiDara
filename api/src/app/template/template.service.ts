@@ -6,7 +6,6 @@ import { OntologyFile } from '../ontology/ontologyFile/ontologyFile.entity';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { TemplateVersionRepository } from './templateVersion/templateVersion.repository';
 import { TemplateFileService } from './templateFile/templateFile.service';
-import { TemplateVersion } from './templateVersion/templateVersion.entity';
 import { TemplateNode } from './templateNode/templateNode.entity';
 import { EditTemplateDto } from './dto/edit-template.dto';
 
@@ -32,28 +31,13 @@ export class TemplateService {
         createTemplateDto: CreateTemplateDto,
     ): Promise<Template> {
         const template = await Template.create(
+            this.templateFileService,
             user,
             ontologyFile,
             createTemplateDto,
         );
 
         await this.templateRepository.persistAndFlush(template);
-
-        const publishedVersion = await TemplateVersion.createWithBlankFile(
-            this.templateFileService,
-            template,
-        );
-
-        const draftVersion = await TemplateVersion.duplicate(
-            this.templateFileService,
-            publishedVersion,
-        );
-
-        await this.templateRepository.persistAndFlush([
-            publishedVersion,
-            draftVersion,
-        ]);
-
         return template;
     }
 
