@@ -4,6 +4,7 @@ import { UserSeeder } from './UserSeeder';
 import { WorkspaceSeeder } from './WorkspaceSeeder';
 import { OntologySeeder } from './OntologySeeder';
 import { TemplateSeeder } from './TemplateSeeder';
+import { ProjectSeeder } from './ProjectSeeder';
 
 export class DatabaseSeeder extends Seeder {
     async run(entityManager: EntityManager): Promise<void> {
@@ -12,6 +13,7 @@ export class DatabaseSeeder extends Seeder {
             WorkspaceSeeder,
             OntologySeeder,
             TemplateSeeder,
+            ProjectSeeder,
         ]);
     }
 }
