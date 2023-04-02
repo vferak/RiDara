@@ -8,6 +8,7 @@ import { BpmnModule } from '../bpmn/bpmn.module';
 import { OntologyModule } from '../ontology/ontology.module';
 import { TemplateModule } from '../template/template.module';
 import { WorkspaceModule } from '../workspace/workspace.module';
+import { ProjectFileModule } from './projectFile/projectFile.module';
 
 @Module({
     imports: [
@@ -17,6 +18,7 @@ import { WorkspaceModule } from '../workspace/workspace.module';
         OntologyModule,
         TemplateModule,
         WorkspaceModule,
+        ProjectFileModule,
     ],
     controllers: [ProjectController],
     providers: [ProjectService],

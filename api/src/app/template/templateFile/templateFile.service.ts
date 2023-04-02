@@ -4,20 +4,26 @@ import { FileData } from '../../common/file/file.data';
 import {
     BPMN_BLANK_FILE_PATH,
     BPMN_FILE_EXTENSION,
-    BPMN_TEMPLATES_PATH,
+    BPMN_RESOURCE_PATH,
 } from '../../common/file/file.constants';
 import { UuidInterface } from '../../common/uuid/uuid.interface';
 import { TemplateVersion } from '../templateVersion/templateVersion.entity';
+import * as path from 'path';
 
 @Injectable()
 export class TemplateFileService {
+    private static BPMN_TEMPLATES_PATH = path.join(
+        BPMN_RESOURCE_PATH,
+        'template',
+    );
+
     constructor(private readonly fileService: FileService) {}
 
     public createBlankTemplateBpmnFile(fileName: UuidInterface): FileData {
         return this.fileService.copyFile(
             FileData.createFromFilePathWithName(BPMN_BLANK_FILE_PATH),
             FileData.create(
-                BPMN_TEMPLATES_PATH,
+                TemplateFileService.BPMN_TEMPLATES_PATH,
                 `${fileName.asString()}${BPMN_FILE_EXTENSION}`,
             ),
         );
