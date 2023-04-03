@@ -154,26 +154,22 @@ export class ProjectController {
     ): Promise<AnalyzedJsonData> {
         let analyzedData: AnalyzeData;
 
-        const bpmnData = await this.bpmnService.parseBpmnFile(
+        const bpmnProjectData = await this.bpmnService.parseBpmnFile(
             project.getPath(),
         );
 
         const templateBpmnData = await this.bpmnService.parseBpmnFile(
             await project.getTemplate().getPublishedFileName(),
         );
-        const secondLevelBpmnData = bpmnData.getElements();
 
-        const publishedTemplateVersion = await project
-            .getTemplate()
-            .getVersionPublished();
+        const secondLevelBpmnData = bpmnProjectData.getElements();
 
-        const templateNodes = await publishedTemplateVersion.getOntologyNodes();
-        const templateNodesMap = await this.ontologyService.parseOntologyNodes(
-            templateNodes,
+        const templateNodesMap = await this.ontologyService.getNodesByBPMNData(
+            templateBpmnData,
         );
 
-        const projectNodesMap = await this.ontologyService.getProjectNodes(
-            bpmnData,
+        const projectNodesMap = await this.ontologyService.getNodesByBPMNData(
+            bpmnProjectData,
         );
 
         analyzedData = await this.analyzeService.firstLevelAnalyze(
@@ -189,7 +185,7 @@ export class ProjectController {
                 analyzedData,
             );
 
-            const secondLevelPercent = analyzedData.getPercentArray()[0];
+            const secondLevelPercent = analyzedData.getPercentArray()[1];
 
             if (secondLevelPercent === 100) {
                 analyzedData = await this.analyzeService.thirdLevelAnalyze(

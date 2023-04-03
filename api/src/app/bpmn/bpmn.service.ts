@@ -53,13 +53,31 @@ export class BpmnService {
             elementsById: elementsById,
             references: references,
         } = await moddle.fromXML(bpmnFile);
+        const objects = [];
+        for (const object of rootElement.get('rootElements')) {
+            const type = object.$type.toString().split(':')[1];
+            if (type === 'Process') {
+                objects.push(object);
+            }
+        }
 
-        const objects = rootElement.get('rootElements')[0].flowElements;
-        const bpmnElementsData = this.createBpmnElementDataFromBaseObjects(
-            objects,
-            references,
+        const bpmnDatas: BpmnData[] = [];
+        for (const object of objects) {
+            const bpmnElementsData = this.createBpmnElementDataFromBaseObjects(
+                object.flowElements,
+                references,
+            );
+            const bpmnData = new BpmnData(bpmnElementsData);
+            bpmnDatas.push(bpmnData);
+        }
+
+        const bpmnElementsObjects: BpmnData[] = bpmnDatas.reduce(
+            (accumulator, current) => {
+                return accumulator.concat(current);
+            },
+            [],
         );
-        return new BpmnData(bpmnElementsData);
+        return new BpmnData(bpmnElementsObjects[0].getElements());
     }
 
     private createBpmnElementDataFromBaseObjects(
@@ -101,7 +119,6 @@ export class BpmnService {
                             relation.element.upmm === reference.element.upmm &&
                             reference.property.split(':')[1] === 'incoming',
                     );
-
                     outgoing.push(outcom[0].element.upmmId);
                 }
             }
@@ -117,17 +134,18 @@ export class BpmnService {
             );
 
             if (object.hasOwnProperty('flowElements')) {
-                bpmnData.setChildElements(
-                    this.createBpmnElementDataFromBaseObjects(
-                        object.flowElements,
-                        references,
-                    ),
+                const childElements = this.createBpmnElementDataFromBaseObjects(
+                    object.flowElements,
+                    references,
                 );
+                bpmnData.setChildElements(childElements);
+                for (const childElement of childElements) {
+                    bpmnElements.push(childElement);
+                }
             }
 
             bpmnElements.push(bpmnData);
         }
-
         return bpmnElements;
     }
 }

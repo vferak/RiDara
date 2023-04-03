@@ -46,19 +46,7 @@ export class OntologyService {
         await this.ontologyFileRepository.persistAndFlush(ontologyFile);
     }
 
-    public async parseOntologyNodes(
-        ontologyNodes: OntologyNode[],
-    ): Promise<Map<string, number>> {
-        return ontologyNodes
-            .map((templateNode) => templateNode.getName())
-            .sort()
-            .reduce(
-                (acc, e) => acc.set(e, (acc.get(e) || 0) + 1),
-                new Map<string, number>(),
-            );
-    }
-
-    public async getProjectNodes(
+    public async getNodesByBPMNData(
         bpmnData: BpmnData,
     ): Promise<Map<string, number>> {
         const data = await Promise.all(

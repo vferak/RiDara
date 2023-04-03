@@ -59,10 +59,7 @@ export class AnalyzeService {
                             value - templatesNodesMap.get(key),
                         );
                     } else {
-                        notRecognized.set(
-                            key,
-                            value - templatesNodesMap.get(key),
-                        );
+                        missing.set(key, templatesNodesMap.get(key) - value);
                     }
                     badNodes += 1;
                 }
@@ -78,12 +75,6 @@ export class AnalyzeService {
         templatesNodesMap.forEach((value, key) => {
             if (!projectNodesMap.has(key)) {
                 missing.set(key, value);
-            } else {
-                if (!(projectNodesMap.get(key) === value)) {
-                    if (value > projectNodesMap.get(key)) {
-                        missing.set(key, value);
-                    }
-                }
             }
         });
 
@@ -104,17 +95,24 @@ export class AnalyzeService {
         templatesNodes: BpmnElementData[],
         analyzedData: AnalyzeData,
     ): Promise<any> {
-        const rightNodes = [];
-        const missingNodes = [];
+        let rightNodes = [];
         for (const templateElement of templatesNodes) {
-            for (const projectElement of projectNodes) {
-                if (
-                    projectElement.getUpmmUuid() ===
+            const rightNode = projectNodes.filter((projectNode) => {
+                return (
+                    projectNode.getUpmmUuid() ===
                         templateElement.getUpmmUuid() &&
-                    projectElement.getType() === templateElement.getType()
-                ) {
-                    rightNodes.push(projectElement);
-                }
+                    projectNode.getType() === templateElement.getType()
+                );
+            });
+            if (rightNode.length !== 0) {
+                const filteredNewPeople = rightNode.filter((newNode) => {
+                    return !rightNodes.some(
+                        (oldNode: BpmnElementData) =>
+                            oldNode.getId() === newNode.getId(),
+                    );
+                });
+
+                rightNodes = rightNodes.concat(filteredNewPeople);
             }
         }
 
@@ -157,13 +155,93 @@ export class AnalyzeService {
         templatesNodes: BpmnElementData[],
         analyzedData: AnalyzeData,
     ): Promise<any> {
-        const relationErrorsData: RelationErrorData[] = [];
+        const removeObjectsByValues = (
+            projectNodesFiltered: BpmnElementData[],
+            values: string[],
+        ): BpmnElementData[] => {
+            return projectNodesFiltered.filter(
+                (project) => !values.includes(project.getId()),
+            );
+        };
 
+        const relationErrorsData: RelationErrorData[] = [];
+        const fixedID = [];
+        const solvedIds = [];
+        let equalIncoming = false;
+        let equalOutgoing = false;
+
+        // check when 2 elements with same UPMM have same number of incoming and outgoing..
+        for (const templateElement of templatesNodes) {
+            let projectNodesFiltered = projectNodes.filter((projectNode) => {
+                return (
+                    projectNode.getUpmmUuid() ===
+                        templateElement.getUpmmUuid() &&
+                    projectNode.getType() === templateElement.getType() &&
+                    projectNode.getIncoming().length ===
+                        templateElement.getIncoming().length &&
+                    projectNode.getOutgoing().length ===
+                        templateElement.getOutgoing().length
+                );
+            });
+
+            if (projectNodesFiltered.length >= 2) {
+                projectNodesFiltered = removeObjectsByValues(
+                    projectNodesFiltered,
+                    fixedID,
+                );
+                for (const project of projectNodesFiltered) {
+                    const templateIncoming = templateElement
+                        .getIncoming()
+                        .sort();
+                    const projectIncoming = project.getIncoming().sort();
+                    const projectOutgoing = project.getOutgoing().sort();
+                    const templateOutgoing = templateElement
+                        .getOutgoing()
+                        .sort();
+
+                    equalIncoming = projectIncoming.every((val) =>
+                        templateIncoming.includes(val),
+                    );
+
+                    equalOutgoing = projectOutgoing.every((val) =>
+                        templateOutgoing.includes(val),
+                    );
+                    if (equalIncoming && equalOutgoing) {
+                        fixedID.push(project.getId());
+                        solvedIds.push(project.getId());
+                        break;
+                    }
+                }
+            }
+        }
+
+        //compare elements with same UPMM but different outgoin and incomming
+        for (const templateElement of templatesNodes) {
+            const projectNodesFiltered = projectNodes.filter((projectNode) => {
+                return (
+                    projectNode.getUpmmUuid() ===
+                        templateElement.getUpmmUuid() &&
+                    projectNode.getType() === templateElement.getType() &&
+                    projectNode.getIncoming().length ===
+                        templateElement.getIncoming().length &&
+                    projectNode.getOutgoing().length ===
+                        templateElement.getOutgoing().length
+                );
+            });
+            console.log(projectNodesFiltered);
+        }
+
+        //BASE LINE relation checks
         for (const templateElement of templatesNodes) {
             for (const projectElement of projectNodes) {
+                if (solvedIds.includes(projectElement.getId())) {
+                    continue;
+                }
+
                 if (
                     projectElement.getUpmmUuid() ===
-                    templateElement.getUpmmUuid()
+                        templateElement.getUpmmUuid() &&
+                    projectElement.getType() === templateElement.getType()
                 ) {
                     const projectIncoming = projectElement.getIncoming().sort();
                     const templateIncoming = templateElement
@@ -212,6 +290,7 @@ export class AnalyzeService {
                             projectIncoming,
                             templateIncoming,
                             projectNodes,
+                            templatesNodes,
                             projectElement,
                             templateElement,
                         );
@@ -223,6 +302,7 @@ export class AnalyzeService {
                             projectOutgoing,
                             templateOutgoing,
                             projectNodes,
+                            templatesNodes,
                             projectElement,
                             templateElement,
                         );
@@ -323,6 +403,7 @@ export class AnalyzeService {
         projectIncoming: string[],
         templateIncoming: string[],
         projectNodes: BpmnElementData[],
+        templatesNodes: BpmnElementData[],
         projectElement: BpmnElementData,
         templateElement: BpmnElementData,
     ): Promise<RelationErrorData> {
@@ -336,7 +417,7 @@ export class AnalyzeService {
                     projectIncoming,
                     templateIncoming,
                     projectNodes,
-                    projectElement,
+                    templatesNodes,
                     templateElement,
                     errorsRelations,
                     missingMap,
@@ -349,7 +430,7 @@ export class AnalyzeService {
                     projectIncoming,
                     templateIncoming,
                     projectNodes,
-                    projectElement,
+                    templatesNodes,
                     templateElement,
                     errorsRelations,
                     overExtendsMap,
@@ -370,6 +451,7 @@ export class AnalyzeService {
         projectOutgoing: string[],
         templateOutgoing: string[],
         projectNodes: BpmnElementData[],
+        templatesNodes: BpmnElementData[],
         projectElement: BpmnElementData,
         templateElement: BpmnElementData,
     ): Promise<RelationErrorData> {
@@ -383,7 +465,7 @@ export class AnalyzeService {
                     projectOutgoing,
                     templateOutgoing,
                     projectNodes,
-                    projectElement,
+                    templatesNodes,
                     templateElement,
                     errorsRelations,
                     missingMap,
@@ -396,7 +478,7 @@ export class AnalyzeService {
                     projectOutgoing,
                     templateOutgoing,
                     projectNodes,
-                    projectElement,
+                    templatesNodes,
                     templateElement,
                     errorsRelations,
                     overExtendsMap,
@@ -418,11 +500,14 @@ export class AnalyzeService {
         projectUuids: string[],
         templateUuids: string[],
         projectNodes: BpmnElementData[],
-        projectElement: BpmnElementData,
+        templatesNodes: BpmnElementData[],
         templateElement: BpmnElementData,
         errorsRelations: string[],
         missingMap: Map<string, string>,
     ): Promise<any> {
+        console.log(projectUuids);
+        console.log(templateUuids);
+
         const differences = templateUuids.filter(
             (x) => !projectUuids.includes(x),
         );
@@ -452,7 +537,7 @@ export class AnalyzeService {
         projectUuids: string[],
         templateUuids: string[],
         projectNodes: BpmnElementData[],
-        projectElement: BpmnElementData,
+        projectElement: BpmnElementData[],
         templateElement: BpmnElementData,
         errorsRelations: string[],
         overExtendsMap: Map<string, string>,
@@ -460,10 +545,10 @@ export class AnalyzeService {
         const differences = projectUuids.filter(
             (x) => !templateUuids.includes(x),
         );
+
         if (differences.length === 0 && projectUuids.length >= 2) {
             differences.push(projectUuids[0]);
         }
-
         for (const diff of differences) {
             const nodeFrom = await this.ontologyService.getOneNodeByUuid(diff);
             const nodeTo = await this.ontologyService.getOneNodeByUuid(
@@ -485,7 +570,7 @@ export class AnalyzeService {
         projectUuids: string[],
         templateUuids: string[],
         projectNodes: BpmnElementData[],
-        projectElement: BpmnElementData,
+        templatesNodes: BpmnElementData[],
         templateElement: BpmnElementData,
         errorsRelations: string[],
         overExtendsMap: Map<string, string>,
@@ -519,7 +604,7 @@ export class AnalyzeService {
         projectUuids: string[],
         templateUuids: string[],
         projectNodes: BpmnElementData[],
-        projectElement: BpmnElementData,
+        templatesNodes: BpmnElementData[],
         templateElement: BpmnElementData,
         errorsRelations: string[],
         missingMap: Map<string, string>,
