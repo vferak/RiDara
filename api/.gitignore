@@ -20,3 +20,4 @@ lerna-debug.log*
 
 # Config
 config/config.yaml
+config/config-test.yaml

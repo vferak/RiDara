@@ -1,4 +1,5 @@
 import configuration from '../../config/configuration';
+import createConfigMicroOrm from "../../mikro-orm.config";
 
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
@@ -14,17 +15,25 @@ import { ProjectModule } from './project/project.module';
 import { UserModule } from './shared/user/user.module';
 import { TemplateModule } from './template/template.module';
 import { AnalyzeModule } from './shared/analyze/analyze.module';
+import {ApiConfigService} from "./common/providers/api-config.service";
+import {MikroOrmModuleOptions} from "@mikro-orm/nestjs/typings";
 
 const configModuleOptions: ConfigModuleOptions = {
     load: [configuration],
     cache: true,
+    isGlobal: true,
 };
 
 @Module({
     imports: [
         ConfigModule.forRoot(configModuleOptions),
-        MikroOrmModule.forRoot(),
         CommonModule,
+        MikroOrmModule.forRootAsync({
+            inject: [ApiConfigService],
+            useFactory: (apiConfigService: ApiConfigService): MikroOrmModuleOptions => {
+                return createConfigMicroOrm(apiConfigService);
+            }
+        }),
         AuthModule,
         UserModule,
         WorkspaceModule,
