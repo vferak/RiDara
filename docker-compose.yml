@@ -5,14 +5,12 @@ services:
     image: mariadb:10.7.1
     restart: always
     volumes:
-      - type: bind
-        source: ./.database
-        target: /var/lib/mysql
+      - ./.database:/var/lib/mysql
+      - ./create-databases.sql:/docker-entrypoint-initdb.d/create-databases.sql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: user
       MYSQL_PASSWORD: password
-      MYSQL_DATABASE: ridara
     ports:
       - "33306:3306"
   api:
