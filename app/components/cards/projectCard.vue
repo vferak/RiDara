@@ -6,12 +6,17 @@ const { project } = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (event: 'editProject', project: Project): void
+    (event: 'editProject', project: Project): void;
+    (event: 'deleteProject', project: Project): void;
 }>();
 
 const editOpen = async (project: Project): Promise<void> => {
     emit('editProject', project);
 };
+
+const projectDelete = async (project: Project): Promise<void> => {
+    emit('deleteProject', project);
+}
 
 </script>
 
@@ -26,6 +31,10 @@ const editOpen = async (project: Project): Promise<void> => {
                     <div class='card-actions justify-end'>
                         <NuxtLink @click.prevent='editOpen(project)'>
                             <button class='btn btn-sm'>Edit</button>
+                        </NuxtLink>
+
+                        <NuxtLink @click.prevent='projectDelete(project)'>
+                            <button class='btn btn-sm'>Delete</button>
                         </NuxtLink>
                     </div>
                 </div>

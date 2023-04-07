@@ -4,7 +4,7 @@ import { Project } from '~/composables/types';
 const { getWorkspace, getWorkspaces } = useWorkspace();
 const { getCurrentWorkspace } = useCurrentWorkspace();
 const { getTemplates } = useTemplate();
-const { getProjects, createProject, importProject, updateProject } = useProject();
+const { getProjects, createProject, importProject, updateProject, deleteProject } = useProject();
 
 const { modalState: createState, openModal: createOpen, closeModal: createClose } = useModal('project-create');
 const { modalState: importState , openModal: importOpen, closeModal: importClose } = useModal('project-import');
@@ -44,6 +44,14 @@ const emitValueEdit = async (project: Project): Promise<void> => {
     projectToEdit.value = project;
 }
 
+const emitValueDelete = async (project: Project): Promise<void> => {
+    const confirmed = confirm('Are you sure you want to delete this project? Project will be permanently deleted.');
+    if (confirmed) {
+        await deleteProject(project.uuid);
+        await refreshProject();
+    }
+}
+
 </script>
 
 <template>
@@ -64,7 +72,7 @@ const emitValueEdit = async (project: Project): Promise<void> => {
             </div>
             <AlertInform v-if='exist' class='mb-6 mt-4'>You do not have any projects. Please create new project!</AlertInform>
             <div class='grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5'>
-                <CardsProjectCard v-for='project in projects' :key='project.uuid' :project='project' @edit-project='emitValueEdit'/>
+                <CardsProjectCard v-for='project in projects' :key='project.uuid' :project='project' @delete-project='emitValueDelete' @edit-project='emitValueEdit'/>
             </div>
         </div>
         <Modal v-model='createState'>

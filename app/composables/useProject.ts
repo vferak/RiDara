@@ -31,6 +31,16 @@ export const useProject = () => {
         );
     }
 
+    const deleteProject = async (projectUuid: string): Promise<AsyncData<void, any>> => {
+        const body = { projectUuid: projectUuid };
+        return useApiFetch<void>(
+            `${projectUrlPrefix}/delete`,
+            {
+                method: 'DELETE',
+                body: body,
+            }
+        );
+    }
 
     const getProjects = async (uuid: string): Promise<AsyncData<Project[], any>> => {
         return useApiFetch<Project[]>(`${projectUrlPrefix}/workspace/${uuid}`);
@@ -110,5 +120,6 @@ export const useProject = () => {
         analyzeSecondLevel: analyzeSecondLevel,
         analyzeThirdLevel: analyzeThirdLevel,
         analyze: analyze,
+        deleteProject: deleteProject,
     };
 }

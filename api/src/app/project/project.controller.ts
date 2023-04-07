@@ -1,6 +1,6 @@
 import {
     Body,
-    Controller,
+    Controller, Delete,
     Get,
     Param,
     Patch,
@@ -28,6 +28,7 @@ import { FileService } from '../common/file/file.service';
 import { FileData } from '../common/file/file.data';
 import { BPMN_BLANK_FILE_PATH } from '../common/file/file.constants';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {EntityManager} from "@mikro-orm/mariadb";
 
 @Controller('project')
 export class ProjectController {
@@ -39,6 +40,7 @@ export class ProjectController {
         private readonly ontologyService: OntologyService,
         private readonly workspaceService: WorkspaceService,
         private readonly fileService: FileService,
+        private readonly entityManager: EntityManager,
     ) {}
 
     @Post('')
@@ -94,12 +96,15 @@ export class ProjectController {
         return workspace.getProjects();
     }
 
-    /*@Get(':uuid')
-    public async projectDetail(
-        @Param('uuid', ProjectByUuidPipe) project: Project,
-    ): Promise<Project> {
-        return project;
-    }*/
+    @Delete('/delete')
+    public async deleteProject(
+        @Body('projectUuid') projectUuid: string,
+    ): Promise<void> {
+        const project = await this.projectService.getOneByUuid(
+            projectUuid,
+        )
+        await project.remove(this.entityManager);
+    }
 
     @Get(':uuid/nodes')
     public async getNodesByProject(
