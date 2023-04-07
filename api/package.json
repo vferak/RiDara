@@ -18,7 +18,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:e2e": "MIKRO_ORM_CLI=$PWD/test/e2e/mikro-orm.config.ts npx mikro-orm migration:fresh --seed && jest --config test/e2e/jest-e2e.json",
     "database:fresh": "npx mikro-orm migration:fresh",
     "database:fresh:seeded": "npx mikro-orm migration:fresh --seed",
     "database:diff": "npx mikro-orm migration:create",
@@ -26,6 +26,7 @@
     "database:seeder:create": "npx mikro-orm seeder:create"
   },
   "dependencies": {
+    "@golevelup/ts-jest": "^0.3.5",
     "@mikro-orm/cli": "^5.5.3",
     "@mikro-orm/core": "^5.5.3",
     "@mikro-orm/mariadb": "^5.5.3",
