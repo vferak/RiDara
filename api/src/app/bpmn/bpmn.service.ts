@@ -63,6 +63,13 @@ export class BpmnService {
 
         const bpmnDatas: BpmnData[] = [];
 
+        if(objects.length === 1) {
+            if (objects[0].get('flowElements') === undefined) {
+                return new BpmnData([]);
+
+            }
+        }
+
         for (const object of objects) {
             const bpmnElementsData = this.createBpmnElementDataFromBaseObjects(
                 object.flowElements,

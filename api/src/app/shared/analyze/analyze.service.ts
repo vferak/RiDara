@@ -228,7 +228,6 @@ export class AnalyzeService {
                         templateElement.getOutgoing().length
                 );
             });
-            console.log(projectNodesFiltered);
         }
 
         //BASE LINE relation checks
@@ -505,9 +504,6 @@ export class AnalyzeService {
         errorsRelations: string[],
         missingMap: Map<string, string>,
     ): Promise<any> {
-        console.log(projectUuids);
-        console.log(templateUuids);
-
         const differences = templateUuids.filter(
             (x) => !projectUuids.includes(x),
         );
