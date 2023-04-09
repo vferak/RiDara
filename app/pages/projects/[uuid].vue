@@ -22,7 +22,7 @@ const upmmOptions = ontologyNodes.value!.map((ontologyNode) => {
 
 const { data: xml } = await getProjectFile(projectUuid);
 
-const successToast = useState<boolean>();
+const successToast = useState<boolean>(() => false);
 
 onBeforeRouteLeave((to, from, next) => {
     const confirmed = confirm('Are you sure you want to leave? All unsaved progress will be lost.');

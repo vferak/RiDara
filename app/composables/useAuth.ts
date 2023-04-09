@@ -31,6 +31,7 @@ export const useAuth = () => {
         jwtCookie.value = undefined;
         clearCurrentUser();
         clearCurrentWorkspace();
+        clearNuxtData();
     }
 
     const getJWT = (): string|undefined => {

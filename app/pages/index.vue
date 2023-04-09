@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 const route = useRoute();
-const success = useState<boolean>();
-const fail = useState<boolean>();
+const success = useState<boolean>(() => false);
+const fail = useState<boolean>(() => false);
 
 watchEffect(() => {
     if (route.query.registration_successful === '1')

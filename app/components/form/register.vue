@@ -3,7 +3,7 @@
 const router = useRouter();
 const { registerUser } = useUser();
 const { $z, $veeValidate } = useNuxtApp();
-const fail = useState<boolean>();
+const fail = useState<boolean>(() => false);
 
 const { handleSubmit } = $veeValidate.useForm({
     validationSchema: $veeValidate.toFormValidator(
