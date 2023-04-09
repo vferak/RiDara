@@ -514,6 +514,15 @@
           "primary": false,
           "nullable": false,
           "mappedType": "string"
+        },
+        "element_id": {
+          "name": "element_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
         }
       },
       "name": "template_node",

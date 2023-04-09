@@ -104,17 +104,8 @@ export class ProjectController {
     @Get(':uuid/nodes')
     public async getNodesByProject(
         @Param('uuid', ProjectByUuidPipe) project: Project,
-    ): Promise<OntologyNode[]> {
-        const projectVersion = await project
-            .getTemplate()
-            .getVersionPublished();
-        const nodes = await projectVersion.getOntologyNodes();
-        return nodes.sort((a, b) => {
-            const aName = a.getName().toUpperCase();
-            const bName = b.getName().toUpperCase();
-
-            return aName > bName ? 1 : bName > aName ? -1 : 0;
-        });
+    ): Promise<object[]> {
+        return await project.getNodesForBpmnDropdown();
     }
 
     @Get(':uuid/file')

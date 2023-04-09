@@ -26,6 +26,16 @@ export class BpmnService {
                                 isAttr: true,
                                 type: 'String',
                             },
+                            {
+                                "name": "upmmName",
+                                "isAttr": true,
+                                "type": "String"
+                            },
+                            {
+                                "name": "elementId",
+                                "isAttr": true,
+                                "type": "String"
+                            }
                         ],
                     },
                 ],
@@ -90,6 +100,8 @@ export class BpmnService {
                     object.upmmId,
                     outgoing,
                     incoming,
+                    object.upmmName,
+                    object.elementId,
                 );
                 bpmnElements.push(bpmnData);
             }

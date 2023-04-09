@@ -104,7 +104,7 @@ export class TemplateVersion {
         );
     }
 
-    private getTemplate(): Template {
+    public getTemplate(): Template {
         return this.template;
     }
 
@@ -117,8 +117,17 @@ export class TemplateVersion {
     }
 
     public async getNodes(): Promise<TemplateNode[]> {
-        await this.templateNodes.init();
-        return this.templateNodes.getItems();
+        return this.templateNodes.loadItems();
+    }
+
+    public async getNodesSortedByName(): Promise<TemplateNode[]> {
+    return (await this.getNodes())
+        .sort((a: TemplateNode, b: TemplateNode): number => {
+            const aName = a.getElementId();
+            const bName = b.getElementId();
+
+            return aName > bName ? 1 : bName > aName ? -1 : 0;
+        })
     }
 
     public async getOntologyNodes(): Promise<OntologyNode[]> {

@@ -139,7 +139,7 @@ const saveProjectFile = async (xml: string): Promise<void> => {
         <Toast v-model='successToast'>
             <AlertSuccess>Diagram saved!</AlertSuccess>
         </Toast>
-        <BpmnModeler :xml='xml' :upmm-options='upmmOptions' @save-bpmn='saveProjectFile' />
+        <BpmnModeler :xml='xml' :upmm-options='upmmOptions' @save-bpmn='saveProjectFile' :is-template='false'/>
     </div>
     <Modal v-if='modalState' v-model='modalState'>
         <CardsAnalyzeCard :missing-map='missingMapFirstLevel' :not-recognized-map='notRecognizedMapFirstLevel'

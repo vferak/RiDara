@@ -55,6 +55,10 @@ export class OntologyNode {
         return new OntologyNode(uuid, createNodeOntologyDto.name, ontologyFile);
     }
 
+    public getUuid(): string {
+        return this.uuid;
+    }
+
     public getName(): string {
         return this.name;
     }

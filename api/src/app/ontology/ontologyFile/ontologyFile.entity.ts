@@ -73,7 +73,16 @@ export class OntologyFile {
     }
 
     public async getNodes(): Promise<OntologyNode[]> {
-        await this.ontologyNodes.init();
-        return this.ontologyNodes.getItems();
+        return this.ontologyNodes.loadItems();
+    }
+
+    public async getNodesSortedByName(): Promise<OntologyNode[]> {
+        return (await this.getNodes())
+            .sort((a: OntologyNode, b: OntologyNode): number => {
+                const aName = a.getName();
+                const bName = b.getName();
+
+                return aName > bName ? 1 : bName > aName ? -1 : 0;
+            });
     }
 }

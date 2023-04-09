@@ -4,7 +4,8 @@ const { $bpmnModeler } = useNuxtApp();
 
 const props = defineProps<{
     xml: string,
-    upmmOptions: SelectOption[]
+    upmmOptions: SelectOption[],
+    isTemplate: boolean
 }>();
 
 const emit = defineEmits<{
@@ -21,7 +22,7 @@ const saveKeyListener = (event: { ctrlKey: any; metaKey: any; code: string; prev
 };
 
 onMounted(async () => {
-    $bpmnModeler.init('#canvas', '#properties', props.upmmOptions);
+    $bpmnModeler.init('#canvas', '#properties', props.upmmOptions, props.isTemplate);
 
     try {
         await $bpmnModeler.get().importXML(props.xml);

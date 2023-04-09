@@ -30,6 +30,7 @@ export class TemplateNodeService {
             const templateNode = TemplateNode.create(
                 templateDraft,
                 ontologyNode,
+                element.getElementId(),
             );
             await this.templateNodeRepository.persist(templateNode);
         }

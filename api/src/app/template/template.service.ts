@@ -63,6 +63,7 @@ export class TemplateService {
             const newTemplateNode = TemplateNode.create(
                 newDraftVersion,
                 templateNode.getOntologyNode(),
+                templateNode.getElementId(),
             );
 
             this.templateRepository.persist(newTemplateNode);

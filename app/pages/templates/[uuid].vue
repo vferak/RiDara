@@ -53,7 +53,7 @@ const publish = async (): Promise<void> => {
         <Toast v-model='successPublishToast'>
             <AlertSuccess>Template published!</AlertSuccess>
         </Toast>
-        <BpmnModeler :xml='xml' :upmm-options='upmmOptions' @save-bpmn='saveTemplateFile'/>
+        <BpmnModeler :xml='xml' :upmm-options='upmmOptions' @save-bpmn='saveTemplateFile' :is-template='true'/>
         <div class='flex justify-between fixed bottom-32 items-center ml-2'>
             <button @click='publish' class='btn btn-primary mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
                 Publish

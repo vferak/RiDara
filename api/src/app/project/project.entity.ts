@@ -104,4 +104,26 @@ export class Project {
     public getTemplate(): Template {
         return this.template;
     }
+
+    public async getNodesForBpmnDropdown(): Promise<object[]> {
+        const templateVersion = await this.getTemplate().getVersionPublished();
+
+        const templateNodes = (await templateVersion.getNodesSortedByName())
+            .map((templateNode) => {
+                return {
+                    uuid: templateNode.getUuid(),
+                    name: templateNode.getElementId(),
+                }
+            });
+
+        const ontologyNodes = (await this.getTemplate().getOntologyFile().getNodesSortedByName())
+            .map((ontologyNode) => {
+                return {
+                    uuid: ontologyNode.getUuid(),
+                    name: ontologyNode.getName(),
+                }
+            });
+
+        return templateNodes.concat(ontologyNodes);
+    }
 }

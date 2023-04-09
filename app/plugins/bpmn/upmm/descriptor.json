@@ -20,6 +20,11 @@
                     "name": "upmmName",
                     "isAttr": true,
                     "type": "String"
+                },
+                {
+                    "name": "elementId",
+                    "isAttr": true,
+                    "type": "String"
                 }
             ]
         }

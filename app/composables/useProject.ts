@@ -98,7 +98,6 @@ export const useProject = () => {
         );
     }
 
-
     return {
         getProjects: getProjects,
         createProject: createProject,

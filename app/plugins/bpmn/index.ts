@@ -14,9 +14,16 @@ export type SelectOption = {
 export default defineNuxtPlugin(() => {
     let modeler: Modeler;
 
-    const init = (container: string, propertiesPanel: string, upmmElements: SelectOption[]): Modeler => {
+    const init = (
+        container: string,
+        propertiesPanel: string,
+        upmmElements: SelectOption[],
+        isTemplateModeler: boolean = false
+    ): Modeler => {
         // @ts-ignore
         window['upmmElements'] = upmmElements;
+        // @ts-ignore
+        window['isTemplateModeler'] = isTemplateModeler;
 
         if (modeler === undefined) {
             modeler = new Modeler({
