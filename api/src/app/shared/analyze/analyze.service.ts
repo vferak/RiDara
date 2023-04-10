@@ -70,57 +70,37 @@ export class AnalyzeService {
         return analyzeData;
     }
     public async secondLevelAnalyze(
-        projectNodes: BpmnElementData[],
-        templatesNodes: BpmnElementData[],
+        projectElements: BpmnElementData[],
+        templatesElements: BpmnElementData[],
         analyzedData: AnalyzeData,
     ): Promise<any> {
-        let rightNodes = [];
-        for (const templateElement of templatesNodes) {
-            const rightNode = projectNodes.filter((projectNode) => {
+        const errorMap = new Map<string, string>();
+        for (const templateElement of templatesElements) {
+            const projectElement = projectElements.find((projectElement) => {
                 return (
-                    projectNode.getUpmmUuid() ===
-                        templateElement.getUpmmUuid() &&
-                    projectNode.getType() === templateElement.getType()
+                    projectElement.getUpmmName() ===
+                    templateElement.getElementId()
                 );
             });
-            if (rightNode.length !== 0) {
-                const filteredNewPeople = rightNode.filter((newNode) => {
-                    return !rightNodes.some(
-                        (oldNode: BpmnElementData) =>
-                            oldNode.getId() === newNode.getId(),
-                    );
-                });
 
-                rightNodes = rightNodes.concat(filteredNewPeople);
+            if (projectElement.getType() !== templateElement.getType()) {
+                errorMap.set(
+                    projectElement.getUpmmName(),
+                    templateElement.getType().split(':')[1],
+                );
             }
         }
 
-        const errorsObjects = projectNodes.filter(
-            (elem) => !rightNodes.find(({ id }) => elem.getId() === id),
-        );
-
-        const errorMap = new Map<string, string>();
-        if (errorsObjects.length === 0) {
+        if (errorMap.size === 0) {
             const percents = analyzedData.getPercentArray();
             percents.push(100);
 
             analyzedData.setPercentArray(percents);
-            analyzedData.setShapeMap(errorMap);
+            analyzedData.setShapeMap(new Map<string, string>());
             return analyzedData;
         }
 
-        for (const errorObj of errorsObjects) {
-            for (const templateNode of templatesNodes) {
-                if (errorObj.getUpmmUuid() === templateNode.getUpmmUuid()) {
-                    errorMap.set(
-                        errorObj.getId(),
-                        templateNode.getType().split(':')[1],
-                    );
-                }
-            }
-        }
-
-        const percent = (1 - errorMap.size / templatesNodes.length) * 100;
+        const percent = (1 - errorMap.size / templatesElements.length) * 100;
         const percents = analyzedData.getPercentArray();
         percents.push(percent);
         analyzedData.setPercentArray(percents);

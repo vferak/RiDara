@@ -3,7 +3,6 @@ import { RelationErrorDeserializedData } from '~/composables/types';
 
 const props = defineProps<{
     missingMap: Map<string, number>,
-    notRecognizedMap: Map<string, number>,
     overExtendsMap: Map<string, number>,
     shapeMap: Map<string, string>,
     relationErrorData: RelationErrorDeserializedData[],
@@ -24,7 +23,7 @@ const colorClassLevel2 = useState<string>(() => 'step step-error');
 const colorClassLevel3 = useState<string>(() => 'step step-error');
 
 
-if (props.missingMap.size === 0 && props.notRecognizedMap.size === 0 && props.overExtendsMap.size === 0) {
+if (props.missingMap.size === 0 && props.overExtendsMap.size === 0) {
     firstLevel.value = '✓';
     firstLevelPercent.value = props.percentValueFirst.toString();
     colorClassLevel1.value = 'step step-accent';
@@ -34,7 +33,7 @@ if (props.missingMap.size === 0 && props.notRecognizedMap.size === 0 && props.ov
     colorClassLevel1.value = 'step step-error';
 }
 
-if (props.missingMap.size === 0 && props.notRecognizedMap.size === 0 && props.overExtendsMap.size === 0 && props.shapeMap.size === 0) {
+if (props.missingMap.size === 0 && props.overExtendsMap.size === 0 && props.shapeMap.size === 0) {
     secondLevel.value = '✓';
     secondLevelPercent.value = props.percentValueSecond.toString();
     colorClassLevel2.value = 'step step-accent';
@@ -44,7 +43,7 @@ if (props.missingMap.size === 0 && props.notRecognizedMap.size === 0 && props.ov
     colorClassLevel2.value = 'step step-error';
 }
 
-if (props.missingMap.size === 0 && props.notRecognizedMap.size === 0 && props.overExtendsMap.size === 0 && props.shapeMap.size === 0 && props.relationErrorData.length === 0) {
+if (props.missingMap.size === 0 && props.overExtendsMap.size === 0 && props.shapeMap.size === 0 && props.relationErrorData.length === 0) {
     thirdLevel.value = '✓';
     thirdLevelPercent.value = props.percentValueThird.toString();
     colorClassLevel3.value = 'step step-accent';
@@ -59,7 +58,7 @@ if (props.missingMap.size === 0 && props.notRecognizedMap.size === 0 && props.ov
 <template>
     <div>
         <div class=''
-             v-if='missingMap.size === 0 && notRecognizedMap.size === 0 && overExtendsMap.size === 0 && shapeMap.size === 0 && props.relationErrorData.length === 0'>
+             v-if='missingMap.size === 0 && overExtendsMap.size === 0 && shapeMap.size === 0 && props.relationErrorData.length === 0'>
             <AlertSuccess>Analyze successfull</AlertSuccess>
             <ul class='steps w-full justify-center mt-4'>
                 <li :data-content='firstLevel' :class='colorClassLevel1'>Level 1 - {{ firstLevelPercent }}%</li>
@@ -90,14 +89,6 @@ if (props.missingMap.size === 0 && props.notRecognizedMap.size === 0 && props.ov
                 </div>
             </div>
 
-            <div v-if='notRecognizedMap.size !== 0'>
-                <h1 class='text-2xl font-bold mt-3 text-center mb-2'>Not recognized elements</h1>
-                <div v-for='(value, key) in props.notRecognizedMap' :key='key'>
-                    <p class='text-lg text-center'>{{ value[0] }} - {{ value[1] }} time(s)</p>
-                </div>
-
-            </div>
-
             <div v-if='overExtendsMap.size !== 0'>
                 <h1 class='text-2xl font-bold mt-3 text-center mb-2'>Extra elements</h1>
                 <div v-for='(value, key) in props.overExtendsMap' :key='key'>
@@ -108,7 +99,7 @@ if (props.missingMap.size === 0 && props.notRecognizedMap.size === 0 && props.ov
             <div v-if='shapeMap.size !== 0'>
                 <h1 class='text-2xl font-bold mt-3 text-center mb-3'>Shape elements</h1>
                 <div v-for='(value, key) in props.shapeMap' :key='key'>
-                    <p class='text-lg text-center'>ID: <span class='font-bold'>{{ value[0] }}</span> should be: <span
+                    <p class='text-lg text-center'>UPMM ID: <span class='font-bold'>{{ value[0] }}</span> should be: <span
                         class='font-bold'>{{ value[1] }}</span> shape</p>
                 </div>
             </div>

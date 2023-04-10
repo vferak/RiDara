@@ -34,7 +34,6 @@ onBeforeRouteLeave((to, from, next) => {
 });
 
 let missingMapFirstLevel = useState<Map<string, number>>(() => new Map<string, number>());
-let notRecognizedMapFirstLevel = useState<Map<string, number>>(() => new Map<string, number>());
 let overExtendsMapFirstLevel = useState<Map<string, number>>(() => new Map<string, number>());
 let errorsShapeMapSecondLevel = useState<Map<string, string>>(() => new Map<string, string>());
 let relationErrorDeserializedData = ref<RelationErrorDeserializedData[]>([]);
@@ -64,7 +63,6 @@ const analyzeProject = async (): Promise<void> => {
     }
 
     let missingJsonFirstLevel = analyzedJsonData?.missingMap!;
-    let notRecognizedJsonFirstLevel = analyzedJsonData?.notRecognizedMap!;
     let overExtendsJsonFirstLevel = analyzedJsonData?.overExtendsMap!;
 
     if (missingJsonFirstLevel === '') {
@@ -74,11 +72,6 @@ const analyzeProject = async (): Promise<void> => {
         missingMapFirstLevel.value = new Map<string, number>(JSON.parse(missingJsonFirstLevel));
     }
 
-    if (notRecognizedJsonFirstLevel === '') {
-        notRecognizedMapFirstLevel.value = new Map<string, number>();
-    } else {
-        notRecognizedMapFirstLevel.value = new Map<string, number>(JSON.parse(notRecognizedJsonFirstLevel));
-    }
 
     if (overExtendsJsonFirstLevel === '') {
         overExtendsMapFirstLevel.value = new Map<string, number>();
@@ -86,7 +79,7 @@ const analyzeProject = async (): Promise<void> => {
         overExtendsMapFirstLevel.value = new Map<string, number>(JSON.parse(overExtendsJsonFirstLevel));
     }
 
-    if (missingMapFirstLevel.value.size === 0 && notRecognizedMapFirstLevel.value.size === 0 && overExtendsMapFirstLevel.value.size === 0) {
+    if (missingMapFirstLevel.value.size === 0 && overExtendsMapFirstLevel.value.size === 0) {
         let errorsShapeJsonSecondLevel = analyzedJsonData?.shapeMap!;
 
         if (errorsShapeJsonSecondLevel === '') {
@@ -142,9 +135,8 @@ const saveProjectFile = async (xml: string): Promise<void> => {
         <BpmnModeler :xml='xml' :upmm-options='upmmOptions' @save-bpmn='saveProjectFile' :is-template='false'/>
     </div>
     <Modal v-if='modalState' v-model='modalState'>
-        <CardsAnalyzeCard :missing-map='missingMapFirstLevel' :not-recognized-map='notRecognizedMapFirstLevel'
-                          :over-extends-map='overExtendsMapFirstLevel' :percent-value-first='percentValueFirstLevel'
-                          :shape-map='errorsShapeMapSecondLevel'
+        <CardsAnalyzeCard :missing-map='missingMapFirstLevel' :over-extends-map='overExtendsMapFirstLevel'
+                          :percent-value-first='percentValueFirstLevel' :shape-map='errorsShapeMapSecondLevel'
                           :percent-value-second='percentValueSecondLevel' :percent-value-third='percentValueThirdLevel'
                           :relation-error-data='relationErrorDeserializedData'/>
     </Modal>
