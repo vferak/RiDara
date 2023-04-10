@@ -27,15 +27,15 @@ export class BpmnService {
                                 type: 'String',
                             },
                             {
-                                "name": "upmmName",
-                                "isAttr": true,
-                                "type": "String"
+                                name: 'upmmName',
+                                isAttr: true,
+                                type: 'String',
                             },
                             {
-                                "name": "elementId",
-                                "isAttr": true,
-                                "type": "String"
-                            }
+                                name: 'elementId',
+                                isAttr: true,
+                                type: 'String',
+                            },
                         ],
                     },
                 ],
@@ -62,11 +62,9 @@ export class BpmnService {
         }
 
         const bpmnDatas: BpmnData[] = [];
-
-        if(objects.length === 1) {
+        if (objects.length === 1) {
             if (objects[0].get('flowElements') === undefined) {
                 return new BpmnData([]);
-
             }
         }
 

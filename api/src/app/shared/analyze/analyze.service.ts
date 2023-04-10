@@ -9,27 +9,15 @@ export class AnalyzeService {
     constructor(private readonly ontologyService: OntologyService) {}
 
     public async firstLevelAnalyze(
-        projectNodesMap: Map<string, number>,
-        templatesNodesMap: Map<string, number>,
+        projectNodesNames: string[],
+        templatesNodesNames: string[],
     ): Promise<AnalyzeData> {
-        let successfullNodes = 0;
-        let badNodes = 0;
         const percentArray = [];
-
-        const fullSuccess = templatesNodesMap.size;
-        let areEqual: boolean;
-        if (templatesNodesMap.size === projectNodesMap.size) {
-            areEqual = [...templatesNodesMap.entries()].every(
-                ([key, value], index) => {
-                    return (
-                        [key, value].toString() ===
-                        [...projectNodesMap.entries()][index].toString()
-                    );
-                },
-            );
-        } else {
-            areEqual = false;
-        }
+        const fullSuccess = templatesNodesNames.length;
+        const areEqual = await this.eaqualArrays(
+            projectNodesNames,
+            templatesNodesNames,
+        );
 
         if (areEqual) {
             percentArray.push(100);
@@ -40,51 +28,42 @@ export class AnalyzeService {
                 new Map(),
                 new Map(),
             );
-
             return analyzeData;
         }
 
-        const missing = new Map();
-        const overExtends = new Map();
-        const notRecognized = new Map();
-        projectNodesMap.forEach((value, key) => {
-            if (!templatesNodesMap.has(key)) {
-                notRecognized.set(key, value);
-                badNodes += 1;
-            } else {
-                if (!(templatesNodesMap.get(key) === value)) {
-                    if (value > templatesNodesMap.get(key)) {
-                        overExtends.set(
-                            key,
-                            value - templatesNodesMap.get(key),
-                        );
-                    } else {
-                        missing.set(key, templatesNodesMap.get(key) - value);
-                    }
-                    badNodes += 1;
-                }
-            }
-            if (
-                templatesNodesMap.has(key) &&
-                templatesNodesMap.get(key) === value
-            ) {
-                successfullNodes += 1;
-            }
-        });
+        //missing elements
+        const missingElements = templatesNodesNames.filter(
+            (value) => !projectNodesNames.includes(value),
+        );
+        const missing = await this.createMapOccurrences(missingElements);
 
-        templatesNodesMap.forEach((value, key) => {
-            if (!projectNodesMap.has(key)) {
-                missing.set(key, value);
-            }
-        });
+        //overExtends elements
+        const occurrencesOfProject = await this.createMapOccurrences(
+            projectNodesNames,
+        );
 
+        const occurrencesOfTemplate = await this.createMapOccurrences(
+            templatesNodesNames,
+        );
+
+        const overExtends = new Map<string, number>();
+        for (const [name, projectOccurences] of occurrencesOfProject) {
+            const templateOccurencesByName = occurrencesOfTemplate.get(name);
+            const value = projectOccurences - templateOccurencesByName;
+            if (value >= 1) {
+                overExtends.set(name, value);
+            }
+        }
+
+        const successfullNodes =
+            fullSuccess - (missingElements.length + overExtends.size);
         const percentMatch = (successfullNodes / fullSuccess) * 100;
         percentArray.push(percentMatch);
 
         const analyzeData = new AnalyzeData(
             percentArray,
             missing,
-            notRecognized,
+            new Map<string, number>(),
             overExtends,
         );
 
@@ -629,5 +608,24 @@ export class AnalyzeService {
         }
 
         return [errorsRelations, missingMap];
+    }
+
+    public async eaqualArrays(
+        firstArray: string[],
+        secondArray: string[],
+    ): Promise<boolean> {
+        return (
+            firstArray.length === secondArray.length &&
+            firstArray.every((value, index) => value === secondArray[index])
+        );
+    }
+
+    public async createMapOccurrences(
+        items: string[],
+    ): Promise<Map<string, number>> {
+        return items.reduce((count, name) => {
+            count.set(name, (count.get(name) || 0) + 1);
+            return count;
+        }, new Map<string, number>());
     }
 }

@@ -5,7 +5,6 @@ import { OntologyNodeRepository } from './ontologyNode/ontologyNode.repository';
 import { OntologyFile } from './ontologyFile/ontologyFile.entity';
 import { OntologyNode } from './ontologyNode/ontologyNode.entity';
 import { BpmnData } from '../bpmn/bpmn.data';
-import { OntologyRelationRepository } from './ontologyRelation/ontologyRelation.repository';
 import { TurtleData } from '../shared/turtle/turtle.data';
 
 @Injectable()
@@ -13,7 +12,6 @@ export class OntologyService {
     public constructor(
         private readonly ontologyFileRepository: OntologyFileRepository,
         private readonly ontologyNodeRepository: OntologyNodeRepository,
-        private readonly ontologyRelationRepository: OntologyRelationRepository,
     ) {}
 
     public async getOneFileByUuid(uuid: string): Promise<OntologyFile> {
@@ -46,30 +44,15 @@ export class OntologyService {
         await this.ontologyFileRepository.persistAndFlush(ontologyFile);
     }
 
-    public async getNodesByBPMNData(
-        bpmnData: BpmnData,
-    ): Promise<Map<string, number>> {
-        const data = await Promise.all(
-            bpmnData.getElements().map(async (object) => {
-                return await this.ontologyNodeRepository.findOneOrFail(
-                    object.getUpmmUuid().toString(),
-                );
-            }),
-        );
-        const map = data
-            .sort((a, b) =>
-                a.getName() > b.getName()
-                    ? 1
-                    : b.getName() > a.getName()
-                    ? -1
-                    : 0,
-            )
-            .reduce(
-                (acc, e) =>
-                    acc.set(e.getName(), (acc.get(e.getName()) || 0) + 1),
-                new Map<string, number>(),
-            );
-
-        return map;
+    public async getNodesByBPMNData(bpmnData: BpmnData): Promise<string[]> {
+        const elements: string[] = [];
+        for (const element of bpmnData.getElements()) {
+            if (element.getElementId() === undefined) {
+                elements.push(element.getUpmmName());
+            } else {
+                elements.push(element.getElementId());
+            }
+        }
+        return elements.sort();
     }
 }
