@@ -95,10 +95,6 @@ export class TemplateService {
             const outgoing: string[] = [];
 
             for (const sourceRelation of sourcesRefRelations) {
-                const ontologyNodeSource =
-                    await this.ontologyNodeRepository.findOneOrFail(
-                        sourceRelation.getSourceRef().getUuid(),
-                    );
                 const ontologyNodeTarget =
                     await this.ontologyNodeRepository.findOneOrFail(
                         sourceRelation.getTargetRef().getUuid(),

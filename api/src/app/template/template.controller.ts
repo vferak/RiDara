@@ -12,7 +12,7 @@ import { UserRoles } from '../shared/user/role/userRole.decorator';
 import { FileService } from '../common/file/file.service';
 import { FileData } from '../common/file/file.data';
 import { TemplateAnalyzeData } from '../ontology/ontologyNode/templateAnalyze.data';
-import {BpmnElementData} from "../bpmn/bpmnElement.data";
+import { BpmnElementData } from '../bpmn/bpmnElement.data';
 
 @Controller('template')
 export class TemplateController {
@@ -125,16 +125,6 @@ export class TemplateController {
         const ontologyFile = await template.getOntologyFile();
         const ontologyNodesByFile = await ontologyFile.getNodes();
 
-        const ontologyNodesByFileFiltered = ontologyNodesByFile.filter(
-            (ontologyNode) => {
-                return templateBpmnElements.some(
-                    (templateElement) =>
-                        templateElement.getUpmmUuid() ===
-                        ontologyNode.getUuid(),
-                );
-            },
-        );
-
         //GROUP processes by id of parrent
         const groupedArray = templateBpmnElements.reduce((obj, item) => {
             if (!obj[item.getParentId()]) {
@@ -148,6 +138,15 @@ export class TemplateController {
 
         const relationAnalyzedArray = [];
         for (const templateElement of resultArray) {
+            const ontologyNodesByFileFiltered = ontologyNodesByFile.filter(
+                (ontologyNode) => {
+                    return templateElement.some(
+                        (template) =>
+                            template.getUpmmUuid() === ontologyNode.getUuid(),
+                    );
+                },
+            );
+
             const relationAnalyzed =
                 await this.templateService.analyzeTemplateByUPMM(
                     templateElement,
@@ -157,7 +156,9 @@ export class TemplateController {
             relationAnalyzedArray.push(relationAnalyzed);
         }
         // formating data inside array of objects
-        let mergedRelationAnalyzedData = relationAnalyzedArray.flatMap(innerArray => [...innerArray]);
+        const mergedRelationAnalyzedData = relationAnalyzedArray.flatMap(
+            (innerArray) => [...innerArray],
+        );
         return mergedRelationAnalyzedData;
     }
 }
