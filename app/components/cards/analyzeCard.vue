@@ -105,27 +105,22 @@ if (props.missingMap.size === 0 && props.overExtendsMap.size === 0 && props.shap
             </div>
 
             <div v-if='props.relationErrorData.length !== 0'>
-                <h1 class='text-2xl font-bold mt-3 text-center mb-3'>Bad relations</h1>
+                <h1 class='text-4xl font-bold mt-3 text-center mb-3'>Bad relations</h1>
                 <div v-for='(value, key) in props.relationErrorData' :key='key'>
 
                     <div>
-                        <p class='font-bold text-start text-xl'>{{ value.elementId }}</p>
+                        <p class='font-bold text-2xl mt-4 underline underline-offset-4'>{{ value.upmmId }}</p>
                     </div>
 
-                    <p class='text-lg'>Conflicts with ID(s):
-                        <span v-for='(value_error_id, key_error_id) in value.errorsRelations' :key='key_error_id'
-                              class='font-bold'> {{ value_error_id }}</span>
-                    </p>
+                    <p v-if='value.missingRelations.size !== 0' class='text-xl mt-2 font-bold'>Missing relation(s):</p>
+                        <p v-for='[key, value] of value.missingRelations' class='text-xl'>From: <span class='font-bold'> {{ key
+                            }} </span> to: <span class='font-bold'> {{ value }} </span></p>
 
-                    <p v-if='value.missingRelations.size !== 0' class='text-lg'>Missing relation(s):
-                        <span v-for='[key, value] of value.missingRelations'>From: <span class='font-bold'> {{ key
-                            }} </span> to: <span class='font-bold'> {{ value }} </span></span>
-                    </p>
 
-                    <p v-if='value.overExtendsRelations.size !== 0' class='text-lg'>Extra relation(s):
-                        <span v-for='[key, value] of value.overExtendsRelations'>From: <span class='font-bold'> {{ key
-                            }} </span> to: <span class='font-bold'> {{ value }} </span></span>
-                    </p>
+                    <p v-if='value.overExtendsRelations.size !== 0' class='text-xl mt-2 font-bold'>Extra relation(s):</p>
+                        <p v-for='[key, value] of value.overExtendsRelations' class='text-xl'>From: <span class='font-bold'> {{ key
+                            }} </span> to: <span class='font-bold'> {{ value }} </span></p>
+
                 </div>
             </div>
         </div>

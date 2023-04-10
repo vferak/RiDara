@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { BpmnElementData } from '../../bpmn/bpmnElement.data';
 import { AnalyzeData } from './analyze.data';
-import { OntologyService } from '../../ontology/ontology.service';
 import { RelationErrorData } from './relationError.data';
+import { TemplateNodeService } from '../../template/templateNode/templateNode.service';
+import { Template } from '../../template/template.entity';
 
 @Injectable()
 export class AnalyzeService {
-    constructor(private readonly ontologyService: OntologyService) {}
+    constructor(private readonly templateNodeService: TemplateNodeService) {}
 
     public async firstLevelAnalyze(
         projectNodesNames: string[],
@@ -110,166 +111,306 @@ export class AnalyzeService {
     }
 
     public async thirdLevelAnalyze(
+        projectElements: BpmnElementData[],
+        templatesElements: BpmnElementData[],
+        analyzedData: AnalyzeData,
+        template: Template,
+    ): Promise<any> {
+        const relationErrorsData: RelationErrorData[] = [];
+
+        const allUniqueElementIdUsedInTemplate =
+            await this.templateNodeService.getAllByTemplateVersion(template);
+
+        const allIdNamesFromTemplate = allUniqueElementIdUsedInTemplate.map(
+            (obj) => obj.getElementId(),
+        );
+
+        for (const templateElement of templatesElements) {
+            const projectElement = projectElements.find((projectElement) => {
+                return (
+                    projectElement.getUpmmName() ===
+                    templateElement.getElementId()
+                );
+            });
+            const templateIncoming = templateElement.getIncoming().sort();
+            const templateOutgoing = templateElement.getOutgoing().sort();
+            const projectIncoming = projectElement.getIncoming().sort();
+            const projectOutgoing = projectElement.getOutgoing().sort();
+
+            const areEqualIncoming = await this.eaqualArrays(
+                templateIncoming,
+                projectIncoming,
+            );
+
+            const areEqualOutgoing = await this.eaqualArrays(
+                templateOutgoing,
+                projectOutgoing,
+            );
+
+            if (!areEqualIncoming) {
+                const data = await this.checkIncomingRelations(
+                    projectIncoming,
+                    templateIncoming,
+                    projectElements,
+                    templatesElements,
+                    projectElement,
+                    templateElement,
+                    allIdNamesFromTemplate,
+                );
+                relationErrorsData.push(data);
+            }
+            if (!areEqualOutgoing) {
+                const data = await this.checkOutgoingRelations(
+                    projectOutgoing,
+                    templateOutgoing,
+                    projectElements,
+                    templatesElements,
+                    projectElement,
+                    templateElement,
+                    allIdNamesFromTemplate,
+                );
+                relationErrorsData.push(data);
+            }
+        }
+
+        analyzedData = await this.parsingErrorDataToFrontendStructure(
+            analyzedData,
+            relationErrorsData,
+            templatesElements.length,
+        );
+
+        return analyzedData;
+    }
+
+    public async checkIncomingRelations(
+        projectIncoming: string[],
+        templateIncoming: string[],
         projectNodes: BpmnElementData[],
         templatesNodes: BpmnElementData[],
-        analyzedData: AnalyzeData,
+        projectElement: BpmnElementData,
+        templateElement: BpmnElementData,
+        allIdNamesFromTemplate: any[],
+    ): Promise<RelationErrorData> {
+        let missingMap = new Map<string, string>();
+        let overExtendsMap = new Map<string, string>();
+        let errorsRelations: string[] = [];
+
+        if (projectIncoming.length <= templateIncoming.length) {
+            [errorsRelations, missingMap] =
+                await this.checkMissingIncomingRelations(
+                    projectIncoming,
+                    templateIncoming,
+                    projectNodes,
+                    templatesNodes,
+                    templateElement,
+                    errorsRelations,
+                    missingMap,
+                    allIdNamesFromTemplate,
+                );
+        }
+
+        if (projectIncoming.length >= templateIncoming.length) {
+            [errorsRelations, overExtendsMap] =
+                await this.checkOverExtendsIngoingRelations(
+                    projectIncoming,
+                    templateIncoming,
+                    projectNodes,
+                    templatesNodes,
+                    templateElement,
+                    errorsRelations,
+                    overExtendsMap,
+                    allIdNamesFromTemplate,
+                );
+        }
+
+        const relationsError = new RelationErrorData(
+            projectElement.getUpmmName(),
+            projectElement.getId(),
+            errorsRelations,
+            missingMap,
+            overExtendsMap,
+        );
+        return relationsError;
+    }
+
+    public async checkOutgoingRelations(
+        projectOutgoing: string[],
+        templateOutgoing: string[],
+        projectNodes: BpmnElementData[],
+        templatesNodes: BpmnElementData[],
+        projectElement: BpmnElementData,
+        templateElement: BpmnElementData,
+        allIdNamesFromTemplate: any[],
+    ): Promise<RelationErrorData> {
+        let missingMap = new Map<string, string>();
+        let overExtendsMap = new Map<string, string>();
+        let errorsRelations: string[] = [];
+
+        if (projectOutgoing.length <= templateOutgoing.length) {
+            [errorsRelations, missingMap] =
+                await this.checkMissingOutgoingRelations(
+                    projectOutgoing,
+                    templateOutgoing,
+                    projectNodes,
+                    templatesNodes,
+                    templateElement,
+                    errorsRelations,
+                    missingMap,
+                    allIdNamesFromTemplate,
+                );
+        }
+
+        if (projectOutgoing.length >= templateOutgoing.length) {
+            [errorsRelations, overExtendsMap] =
+                await this.checkOverExtendsOutgoingRelations(
+                    projectOutgoing,
+                    templateOutgoing,
+                    projectNodes,
+                    templatesNodes,
+                    templateElement,
+                    errorsRelations,
+                    overExtendsMap,
+                    allIdNamesFromTemplate,
+                );
+        }
+
+        const relationsError = new RelationErrorData(
+            projectElement.getUpmmName(),
+            projectElement.getId(),
+            errorsRelations,
+            missingMap,
+            overExtendsMap,
+        );
+
+        return relationsError;
+    }
+
+    public async checkMissingIncomingRelations(
+        projectUuids: string[],
+        templateUuids: string[],
+        projectNodes: BpmnElementData[],
+        templatesNodes: BpmnElementData[],
+        templateElement: BpmnElementData,
+        errorsRelations: string[],
+        missingMap: Map<string, string>,
+        allIdNamesFromTemplate: string[],
     ): Promise<any> {
-        const removeObjectsByValues = (
-            projectNodesFiltered: BpmnElementData[],
-            values: string[],
-        ): BpmnElementData[] => {
-            return projectNodesFiltered.filter(
-                (project) => !values.includes(project.getId()),
-            );
-        };
+        const differences = templateUuids.filter(
+            (x) => !projectUuids.includes(x),
+        );
 
-        const relationErrorsData: RelationErrorData[] = [];
-        const fixedID = [];
-        const solvedIds = [];
-        let equalIncoming = false;
-        let equalOutgoing = false;
-
-        // check when 2 elements with same UPMM have same number of incoming and outgoing..
-        for (const templateElement of templatesNodes) {
-            let projectNodesFiltered = projectNodes.filter((projectNode) => {
-                return (
-                    projectNode.getUpmmUuid() ===
-                        templateElement.getUpmmUuid() &&
-                    projectNode.getType() === templateElement.getType() &&
-                    projectNode.getIncoming().length ===
-                        templateElement.getIncoming().length &&
-                    projectNode.getOutgoing().length ===
-                        templateElement.getOutgoing().length
-                );
-            });
-
-            if (projectNodesFiltered.length >= 2) {
-                projectNodesFiltered = removeObjectsByValues(
-                    projectNodesFiltered,
-                    fixedID,
-                );
-                for (const project of projectNodesFiltered) {
-                    const templateIncoming = templateElement
-                        .getIncoming()
-                        .sort();
-                    const projectIncoming = project.getIncoming().sort();
-                    const projectOutgoing = project.getOutgoing().sort();
-                    const templateOutgoing = templateElement
-                        .getOutgoing()
-                        .sort();
-
-                    equalIncoming = projectIncoming.every((val) =>
-                        templateIncoming.includes(val),
-                    );
-
-                    equalOutgoing = projectOutgoing.every((val) =>
-                        templateOutgoing.includes(val),
-                    );
-                    if (equalIncoming && equalOutgoing) {
-                        fixedID.push(project.getId());
-                        solvedIds.push(project.getId());
-                        break;
-                    }
-                }
+        for (const diff of differences) {
+            if (!allIdNamesFromTemplate.includes(diff)) {
+                continue;
             }
+            const nodeFrom = diff;
+            const nodeTo = templateElement.getElementId();
+            missingMap.set(nodeFrom, nodeTo);
         }
 
-        //compare elements with same UPMM but different outgoin and incomming
-        for (const templateElement of templatesNodes) {
-            const projectNodesFiltered = projectNodes.filter((projectNode) => {
-                return (
-                    projectNode.getUpmmUuid() ===
-                        templateElement.getUpmmUuid() &&
-                    projectNode.getType() === templateElement.getType() &&
-                    projectNode.getIncoming().length ===
-                        templateElement.getIncoming().length &&
-                    projectNode.getOutgoing().length ===
-                        templateElement.getOutgoing().length
-                );
-            });
-        }
+        return [errorsRelations, missingMap];
+    }
 
-        //BASE LINE relation checks
-        for (const templateElement of templatesNodes) {
-            for (const projectElement of projectNodes) {
-                if (solvedIds.includes(projectElement.getId())) {
-                    continue;
-                }
+    public async checkOverExtendsIngoingRelations(
+        projectUuids: string[],
+        templateUuids: string[],
+        projectNodes: BpmnElementData[],
+        projectElement: BpmnElementData[],
+        templateElement: BpmnElementData,
+        errorsRelations: string[],
+        overExtendsMap: Map<string, string>,
+        allIdNamesFromTemplate: string[],
+    ): Promise<any> {
+        const differences = projectUuids.filter(
+            (x) => !templateUuids.includes(x),
+        );
 
-                if (
-                    projectElement.getUpmmUuid() ===
-                        templateElement.getUpmmUuid() &&
-                    projectElement.getType() === templateElement.getType()
-                ) {
-                    const projectIncoming = projectElement.getIncoming().sort();
-                    const templateIncoming = templateElement
-                        .getIncoming()
-                        .sort();
-
-                    const projectOutgoing = projectElement.getOutgoing().sort();
-                    const templateOutgoing = templateElement
-                        .getOutgoing()
-                        .sort();
-
-                    let isEqualIncoming;
-                    let isEqualOutgoing;
-                    if (
-                        templateIncoming.length === 0 &&
-                        projectIncoming.length === 0
-                    ) {
-                        isEqualIncoming = true;
-                    } else {
-                        isEqualIncoming =
-                            projectIncoming.length ===
-                                templateIncoming.length &&
-                            templateIncoming.length !== 0 &&
-                            projectIncoming.every((val) =>
-                                templateIncoming.includes(val),
-                            );
-                    }
-
-                    if (
-                        templateOutgoing.length === 0 &&
-                        projectOutgoing.length === 0
-                    ) {
-                        isEqualOutgoing = true;
-                    } else {
-                        isEqualOutgoing =
-                            projectOutgoing.length ===
-                                templateOutgoing.length &&
-                            templateOutgoing.length !== 0 &&
-                            projectOutgoing.every((val) =>
-                                templateOutgoing.includes(val),
-                            );
-                    }
-
-                    if (!isEqualIncoming) {
-                        const data = await this.checkIncomingRelations(
-                            projectIncoming,
-                            templateIncoming,
-                            projectNodes,
-                            templatesNodes,
-                            projectElement,
-                            templateElement,
-                        );
-                        relationErrorsData.push(data);
-                    }
-
-                    if (!isEqualOutgoing) {
-                        const data = await this.checkOutgoingRelations(
-                            projectOutgoing,
-                            templateOutgoing,
-                            projectNodes,
-                            templatesNodes,
-                            projectElement,
-                            templateElement,
-                        );
-                        relationErrorsData.push(data);
-                    }
-                }
+        for (const diff of differences) {
+            if (!allIdNamesFromTemplate.includes(diff)) {
+                continue;
             }
+            const nodeFrom = diff;
+            const nodeTo = templateElement.getElementId();
+            overExtendsMap.set(nodeFrom, nodeTo);
+        }
+        return [errorsRelations, overExtendsMap];
+    }
+
+    public async checkOverExtendsOutgoingRelations(
+        projectUuids: string[],
+        templateUuids: string[],
+        projectNodes: BpmnElementData[],
+        templatesNodes: BpmnElementData[],
+        templateElement: BpmnElementData,
+        errorsRelations: string[],
+        overExtendsMap: Map<string, string>,
+        allIdNamesFromTemplate: string[],
+    ): Promise<any> {
+        const differences = projectUuids.filter(
+            (x) => !templateUuids.includes(x),
+        );
+
+        for (const diff of differences) {
+            if (!allIdNamesFromTemplate.includes(diff)) {
+                continue;
+            }
+            const nodeFrom = templateElement.getElementId();
+            const nodeTo = diff;
+            overExtendsMap.set(nodeFrom, nodeTo);
+        }
+        return [errorsRelations, overExtendsMap];
+    }
+
+    public async checkMissingOutgoingRelations(
+        projectUuids: string[],
+        templateUuids: string[],
+        projectNodes: BpmnElementData[],
+        templatesNodes: BpmnElementData[],
+        templateElement: BpmnElementData,
+        errorsRelations: string[],
+        missingMap: Map<string, string>,
+        allIdNamesFromTemplate: string[],
+    ): Promise<any> {
+        const differences = templateUuids.filter(
+            (x) => !projectUuids.includes(x),
+        );
+
+        for (const diff of differences) {
+            if (!allIdNamesFromTemplate.includes(diff)) {
+                continue;
+            }
+            const nodeFrom = templateElement.getElementId();
+            const nodeTo = diff;
+            missingMap.set(nodeFrom, nodeTo);
         }
 
+        return [errorsRelations, missingMap];
+    }
+
+    public async eaqualArrays(
+        firstArray: string[],
+        secondArray: string[],
+    ): Promise<boolean> {
+        return (
+            firstArray.length === secondArray.length &&
+            firstArray.every((value, index) => value === secondArray[index])
+        );
+    }
+
+    public async createMapOccurrences(
+        items: string[],
+    ): Promise<Map<string, number>> {
+        return items.reduce((count, name) => {
+            count.set(name, (count.get(name) || 0) + 1);
+            return count;
+        }, new Map<string, number>());
+    }
+
+    public async parsingErrorDataToFrontendStructure(
+        analyzedData: AnalyzeData,
+        relationErrorsData: RelationErrorData[],
+        numberOfTemplateElements: number,
+    ): Promise<AnalyzeData> {
         const finalrelationErrorsData = [];
         const duplicatesMap = relationErrorsData.reduce((acc, item) => {
             if (!acc.has(item.getUpmmId())) {
@@ -346,7 +487,9 @@ export class AnalyzeService {
             ...finalrelationErrorsData,
         ];
         const percent =
-            (1 - mergeFinalRelationErrorsData.length / templatesNodes.length) *
+            (1 -
+                mergeFinalRelationErrorsData.length /
+                    numberOfTemplateElements) *
             100;
 
         const percents = analyzedData.getPercentArray();
@@ -355,257 +498,5 @@ export class AnalyzeService {
         analyzedData.setRelationErrorData(mergeFinalRelationErrorsData);
 
         return analyzedData;
-    }
-
-    public async checkIncomingRelations(
-        projectIncoming: string[],
-        templateIncoming: string[],
-        projectNodes: BpmnElementData[],
-        templatesNodes: BpmnElementData[],
-        projectElement: BpmnElementData,
-        templateElement: BpmnElementData,
-    ): Promise<RelationErrorData> {
-        let missingMap = new Map<string, string>();
-        let overExtendsMap = new Map<string, string>();
-        let errorsRelations: string[] = [];
-
-        if (projectIncoming.length < templateIncoming.length) {
-            [errorsRelations, missingMap] =
-                await this.checkMissingIncomingRelations(
-                    projectIncoming,
-                    templateIncoming,
-                    projectNodes,
-                    templatesNodes,
-                    templateElement,
-                    errorsRelations,
-                    missingMap,
-                );
-        }
-
-        if (projectIncoming.length > templateIncoming.length) {
-            [errorsRelations, overExtendsMap] =
-                await this.checkOverExtendsIngoingRelations(
-                    projectIncoming,
-                    templateIncoming,
-                    projectNodes,
-                    templatesNodes,
-                    templateElement,
-                    errorsRelations,
-                    overExtendsMap,
-                );
-        }
-
-        const relationsError = new RelationErrorData(
-            projectElement.getUpmmUuid(),
-            projectElement.getId(),
-            errorsRelations,
-            missingMap,
-            overExtendsMap,
-        );
-        return relationsError;
-    }
-
-    public async checkOutgoingRelations(
-        projectOutgoing: string[],
-        templateOutgoing: string[],
-        projectNodes: BpmnElementData[],
-        templatesNodes: BpmnElementData[],
-        projectElement: BpmnElementData,
-        templateElement: BpmnElementData,
-    ): Promise<RelationErrorData> {
-        let missingMap = new Map<string, string>();
-        let overExtendsMap = new Map<string, string>();
-        let errorsRelations: string[] = [];
-
-        if (projectOutgoing.length <= templateOutgoing.length) {
-            [errorsRelations, missingMap] =
-                await this.checkMissingOutgoingRelations(
-                    projectOutgoing,
-                    templateOutgoing,
-                    projectNodes,
-                    templatesNodes,
-                    templateElement,
-                    errorsRelations,
-                    missingMap,
-                );
-        }
-
-        if (projectOutgoing.length > templateOutgoing.length) {
-            [errorsRelations, overExtendsMap] =
-                await this.checkOverExtendsOutgoingRelations(
-                    projectOutgoing,
-                    templateOutgoing,
-                    projectNodes,
-                    templatesNodes,
-                    templateElement,
-                    errorsRelations,
-                    overExtendsMap,
-                );
-        }
-
-        const relationsError = new RelationErrorData(
-            projectElement.getUpmmUuid(),
-            projectElement.getId(),
-            errorsRelations,
-            missingMap,
-            overExtendsMap,
-        );
-
-        return relationsError;
-    }
-
-    public async checkMissingIncomingRelations(
-        projectUuids: string[],
-        templateUuids: string[],
-        projectNodes: BpmnElementData[],
-        templatesNodes: BpmnElementData[],
-        templateElement: BpmnElementData,
-        errorsRelations: string[],
-        missingMap: Map<string, string>,
-    ): Promise<any> {
-        const differences = templateUuids.filter(
-            (x) => !projectUuids.includes(x),
-        );
-
-        if (differences.length === 0 && projectUuids.length >= 2) {
-            differences.push(projectUuids[0]);
-        }
-
-        for (const diff of differences) {
-            const nodeFrom = await this.ontologyService.getOneNodeByUuid(diff);
-            const nodeTo = await this.ontologyService.getOneNodeByUuid(
-                templateElement.getUpmmUuid(),
-            );
-            const fromElement = projectNodes.filter(
-                (x) => x.getUpmmUuid() === diff,
-            );
-
-            //errorsRelations.push(projectElement.getId());
-            errorsRelations.push(fromElement[0].getId());
-            missingMap.set(nodeFrom.getName(), nodeTo.getName());
-        }
-
-        return [errorsRelations, missingMap];
-    }
-
-    public async checkOverExtendsIngoingRelations(
-        projectUuids: string[],
-        templateUuids: string[],
-        projectNodes: BpmnElementData[],
-        projectElement: BpmnElementData[],
-        templateElement: BpmnElementData,
-        errorsRelations: string[],
-        overExtendsMap: Map<string, string>,
-    ): Promise<any> {
-        const differences = projectUuids.filter(
-            (x) => !templateUuids.includes(x),
-        );
-
-        if (differences.length === 0 && projectUuids.length >= 2) {
-            differences.push(projectUuids[0]);
-        }
-        for (const diff of differences) {
-            const nodeFrom = await this.ontologyService.getOneNodeByUuid(diff);
-            const nodeTo = await this.ontologyService.getOneNodeByUuid(
-                templateElement.getUpmmUuid(),
-            );
-
-            const fromElement = projectNodes.filter(
-                (x) => x.getUpmmUuid() === diff,
-            );
-
-            //errorsRelations.push(projectElement.getId());
-            errorsRelations.push(fromElement[0].getId());
-            overExtendsMap.set(nodeFrom.getName(), nodeTo.getName());
-        }
-        return [errorsRelations, overExtendsMap];
-    }
-
-    public async checkOverExtendsOutgoingRelations(
-        projectUuids: string[],
-        templateUuids: string[],
-        projectNodes: BpmnElementData[],
-        templatesNodes: BpmnElementData[],
-        templateElement: BpmnElementData,
-        errorsRelations: string[],
-        overExtendsMap: Map<string, string>,
-    ): Promise<any> {
-        const differences = projectUuids.filter(
-            (x) => !templateUuids.includes(x),
-        );
-
-        if (differences.length === 0 && projectUuids.length >= 2) {
-            differences.push(projectUuids[0]);
-        }
-
-        for (const diff of differences) {
-            const nodeFrom = await this.ontologyService.getOneNodeByUuid(
-                templateElement.getUpmmUuid(),
-            );
-            const nodeTo = await this.ontologyService.getOneNodeByUuid(diff);
-
-            const fromElement = projectNodes.filter(
-                (x) => x.getUpmmUuid() === diff,
-            );
-
-            //errorsRelations.push(projectElement.getId());
-            errorsRelations.push(fromElement[0].getId());
-            overExtendsMap.set(nodeFrom.getName(), nodeTo.getName());
-        }
-        return [errorsRelations, overExtendsMap];
-    }
-
-    public async checkMissingOutgoingRelations(
-        projectUuids: string[],
-        templateUuids: string[],
-        projectNodes: BpmnElementData[],
-        templatesNodes: BpmnElementData[],
-        templateElement: BpmnElementData,
-        errorsRelations: string[],
-        missingMap: Map<string, string>,
-    ): Promise<any> {
-        const differences = templateUuids.filter(
-            (x) => !projectUuids.includes(x),
-        );
-
-        if (differences.length === 0 && projectUuids.length >= 2) {
-            differences.push(projectUuids[0]);
-        }
-
-        for (const diff of differences) {
-            const nodeFrom = await this.ontologyService.getOneNodeByUuid(
-                templateElement.getUpmmUuid(),
-            );
-            const nodeTo = await this.ontologyService.getOneNodeByUuid(diff);
-
-            const fromElement = projectNodes.filter(
-                (x) => x.getUpmmUuid() === diff,
-            );
-
-            //errorsRelations.push(projectElement.getId());
-            errorsRelations.push(fromElement[0].getId());
-            missingMap.set(nodeFrom.getName(), nodeTo.getName());
-        }
-
-        return [errorsRelations, missingMap];
-    }
-
-    public async eaqualArrays(
-        firstArray: string[],
-        secondArray: string[],
-    ): Promise<boolean> {
-        return (
-            firstArray.length === secondArray.length &&
-            firstArray.every((value, index) => value === secondArray[index])
-        );
-    }
-
-    public async createMapOccurrences(
-        items: string[],
-    ): Promise<Map<string, number>> {
-        return items.reduce((count, name) => {
-            count.set(name, (count.get(name) || 0) + 1);
-            return count;
-        }, new Map<string, number>());
     }
 }

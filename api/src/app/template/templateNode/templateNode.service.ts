@@ -38,6 +38,13 @@ export class TemplateNodeService {
         await this.templateNodeRepository.flush();
     }
 
+    public async getAllByTemplateVersion(
+        template: Template,
+    ): Promise<TemplateNode[]> {
+        const templateDraft = await template.getVersionDraft();
+        return await this.templateNodeRepository.find({templateVersion: templateDraft});
+    }
+
     private async dropNodesForTemplateVersion(
         templateVersion: TemplateVersion,
     ): Promise<void> {

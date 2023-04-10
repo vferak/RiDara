@@ -156,6 +156,7 @@ export class ProjectController {
         @Param('uuid', ProjectByUuidPipe) project: Project,
     ): Promise<AnalyzedJsonData> {
         let analyzedData: AnalyzeData;
+        const template = await project.getTemplate();
 
         const bpmnProjectData = await this.bpmnService.parseBpmnFile(
             project.getPath(),
@@ -189,13 +190,14 @@ export class ProjectController {
 
             const secondLevelPercent = analyzedData.getPercentArray()[1];
 
-            /*if (secondLevelPercent === 100) {
+            if (secondLevelPercent === 100) {
                 analyzedData = await this.analyzeService.thirdLevelAnalyze(
                     secondLevelBpmnData,
                     templateBpmnData.getElements(),
                     analyzedData,
+                    template,
                 );
-            }*/
+            }
         }
 
         const percentArray = analyzedData.getPercentArray();
