@@ -162,14 +162,13 @@ export class TemplateService {
                     const differences = relationOutgoing.filter(
                         (value) => !templateOutgoing.includes(value),
                     );
-                    const result: TemplateAnalyzeData =
+                    const existingElement: TemplateAnalyzeData =
                         templateAnalyzeDatas.find(
                             (element: TemplateAnalyzeData) =>
                                 element.getUpmmUuid() ===
                                 templateNode.getUpmmUuid(),
                         );
-
-                    if (result === undefined) {
+                    if (existingElement === undefined) {
                         const templateAnalyzeData: TemplateAnalyzeData =
                             new TemplateAnalyzeData(
                                 templateNode.getUpmmUuid(),
@@ -178,7 +177,10 @@ export class TemplateService {
                             );
                         templateAnalyzeDatas.push(templateAnalyzeData);
                     } else {
-                        result.setMissing(differences);
+                        const existingMissing = existingElement
+                            .getMissing()
+                            .concat(differences);
+                        existingElement.setMissing(existingMissing);
                     }
                 }
             }

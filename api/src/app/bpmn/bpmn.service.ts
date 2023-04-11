@@ -121,7 +121,7 @@ export class BpmnService {
                     if (incom.element.elementId === undefined) {
                         incoming.push(incom.element.upmmName);
                     } else {
-                        incoming.push(incom.element.elementId);
+                        incoming.push(incom.element.upmmId);
                     }
                 }
                 if (propertyValue === 'outgoing') {
@@ -134,7 +134,7 @@ export class BpmnService {
                     if (outcom.element.elementId === undefined) {
                         outgoing.push(outcom.element.upmmName);
                     } else {
-                        outgoing.push(outcom.element.elementId);
+                        outgoing.push(outcom.element.upmmId);
                     }
                 }
             }

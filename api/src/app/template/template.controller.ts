@@ -11,8 +11,8 @@ import { UserRole } from '../shared/user/role/userRole.enum';
 import { UserRoles } from '../shared/user/role/userRole.decorator';
 import { FileService } from '../common/file/file.service';
 import { FileData } from '../common/file/file.data';
-import { TemplateAnalyzeData } from '../ontology/ontologyNode/templateAnalyze.data';
 import { BpmnElementData } from '../bpmn/bpmnElement.data';
+import { TemplateAnalyzeData } from '../ontology/ontologyNode/templateAnalyze.data';
 
 @Controller('template')
 export class TemplateController {
