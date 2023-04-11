@@ -4,7 +4,7 @@ import { OntologyFileRepository } from './ontologyFile/ontologyFIle.repository';
 import { OntologyNodeRepository } from './ontologyNode/ontologyNode.repository';
 import { OntologyFile } from './ontologyFile/ontologyFile.entity';
 import { OntologyNode } from './ontologyNode/ontologyNode.entity';
-import { BpmnData } from '../bpmn/bpmn.data';
+import { BpmnElementData } from '../bpmn/bpmnElement.data';
 import { TurtleData } from '../shared/turtle/turtle.data';
 
 @Injectable()
@@ -44,9 +44,11 @@ export class OntologyService {
         await this.ontologyFileRepository.persistAndFlush(ontologyFile);
     }
 
-    public async getNodesByBPMNData(bpmnData: BpmnData): Promise<string[]> {
+    public async getNodesByBPMNData(
+        bpmnElementData: BpmnElementData[],
+    ): Promise<string[]> {
         const elements: string[] = [];
-        for (const element of bpmnData.getElements()) {
+        for (const element of bpmnElementData) {
             if (element.getElementId() === undefined) {
                 elements.push(element.getUpmmName());
             } else {

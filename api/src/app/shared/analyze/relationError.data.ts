@@ -36,4 +36,8 @@ export class RelationErrorData {
     public getOverExtendsRelations(): Map<string, string> {
         return this.overExtendsRelations;
     }
+
+    public setMissingRelations(values: Map<string, string>): void  {
+        this.missingRelations = values;
+    }
 }

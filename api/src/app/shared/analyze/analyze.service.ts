@@ -11,13 +11,13 @@ export class AnalyzeService {
 
     public async firstLevelAnalyze(
         projectNodesNames: string[],
-        templatesNodesNames: string[],
+        templateNodesNames: string[],
     ): Promise<AnalyzeData> {
         const percentArray = [];
-        const fullSuccess = templatesNodesNames.length;
+        const fullSuccess = templateNodesNames.length;
         const areEqual = await this.eaqualArrays(
             projectNodesNames,
-            templatesNodesNames,
+            templateNodesNames,
         );
 
         if (areEqual) {
@@ -33,7 +33,7 @@ export class AnalyzeService {
         }
 
         //missing elements
-        const missingElements = templatesNodesNames.filter(
+        const missingElements = templateNodesNames.filter(
             (value) => !projectNodesNames.includes(value),
         );
         const missing = await this.createMapOccurrences(missingElements);
@@ -44,7 +44,7 @@ export class AnalyzeService {
         );
 
         const occurrencesOfTemplate = await this.createMapOccurrences(
-            templatesNodesNames,
+            templateNodesNames,
         );
 
         const overExtends = new Map<string, number>();
@@ -72,11 +72,11 @@ export class AnalyzeService {
     }
     public async secondLevelAnalyze(
         projectElements: BpmnElementData[],
-        templatesElements: BpmnElementData[],
+        templateElements: BpmnElementData[],
         analyzedData: AnalyzeData,
     ): Promise<any> {
         const errorMap = new Map<string, string>();
-        for (const templateElement of templatesElements) {
+        for (const templateElement of templateElements) {
             const projectElement = projectElements.find((projectElement) => {
                 return (
                     projectElement.getUpmmName() ===
@@ -101,7 +101,7 @@ export class AnalyzeService {
             return analyzedData;
         }
 
-        const percent = (1 - errorMap.size / templatesElements.length) * 100;
+        const percent = (1 - errorMap.size / templateElements.length) * 100;
         const percents = analyzedData.getPercentArray();
         percents.push(percent);
         analyzedData.setPercentArray(percents);
@@ -112,7 +112,7 @@ export class AnalyzeService {
 
     public async thirdLevelAnalyze(
         projectElements: BpmnElementData[],
-        templatesElements: BpmnElementData[],
+        templateElements: BpmnElementData[],
         analyzedData: AnalyzeData,
         template: Template,
     ): Promise<any> {
@@ -125,7 +125,7 @@ export class AnalyzeService {
             (obj) => obj.getElementId(),
         );
 
-        for (const templateElement of templatesElements) {
+        for (const templateElement of templateElements) {
             const projectElement = projectElements.find((projectElement) => {
                 return (
                     projectElement.getUpmmName() ===
@@ -152,7 +152,7 @@ export class AnalyzeService {
                     projectIncoming,
                     templateIncoming,
                     projectElements,
-                    templatesElements,
+                    templateElements,
                     projectElement,
                     templateElement,
                     allIdNamesFromTemplate,
@@ -164,7 +164,7 @@ export class AnalyzeService {
                     projectOutgoing,
                     templateOutgoing,
                     projectElements,
-                    templatesElements,
+                    templateElements,
                     projectElement,
                     templateElement,
                     allIdNamesFromTemplate,
@@ -176,10 +176,60 @@ export class AnalyzeService {
         analyzedData = await this.parsingErrorDataToFrontendStructure(
             analyzedData,
             relationErrorsData,
-            templatesElements.length,
+            templateElements.length,
         );
 
         return analyzedData;
+    }
+
+    public async fourthLevelAnalyze(
+        projectElements: BpmnElementData[],
+        analyzedData: AnalyzeData,
+    ): Promise<any> {
+        let missingRelations: Map<string, string> = new Map<string, string>();
+        for (const relationData of analyzedData.getRelationErrorData()) {
+            missingRelations = new Map([
+                ...Array.from(missingRelations.entries()),
+                ...Array.from(relationData.getMissingRelations().entries()),
+            ]);
+        }
+        let newAnalyzedData = analyzedData;
+        let allOutgoingElements: string[] = [];
+        for (const [key, value] of missingRelations) {
+            const toElement = projectElements.find((projectElement) => {
+                return projectElement.getUpmmName() === value;
+            });
+            const fromElement = projectElements.find((projectElement) => {
+                return projectElement.getUpmmName() === key;
+            });
+            const outgoingElements = fromElement.getOutgoing();
+            allOutgoingElements = [...allOutgoingElements, ...outgoingElements];
+
+            while (allOutgoingElements.length !== 0) {
+                const outgoingValue = allOutgoingElements.shift();
+                const outgoingElement = projectElements.find(
+                    (projectElement) => {
+                        return projectElement.getId() === outgoingValue;
+                    },
+                );
+
+                if (outgoingElement.getId() === toElement.getId()) {
+                    newAnalyzedData = await this.changeAnalyzedData(
+                        newAnalyzedData,
+                        fromElement,
+                        toElement,
+                    );
+                    break;
+                } else {
+                    allOutgoingElements = [
+                        ...allOutgoingElements,
+                        ...outgoingElement.getOutgoing(),
+                    ];
+                }
+            }
+        }
+
+        return newAnalyzedData;
     }
 
     public async checkIncomingRelations(
@@ -497,6 +547,47 @@ export class AnalyzeService {
         analyzedData.setPercentArray(percents);
         analyzedData.setRelationErrorData(mergeFinalRelationErrorsData);
 
+        return analyzedData;
+    }
+
+    public async changeAnalyzedData(
+        analyzedData: AnalyzeData,
+        fromElement: BpmnElementData,
+        toElement: BpmnElementData,
+    ): Promise<AnalyzeData> {
+        const relationObjectsError = analyzedData
+            .getRelationErrorData()
+            .filter(
+                (relationObject) =>
+                    relationObject.getElementId() === toElement.getId() ||
+                    relationObject.getElementId() === fromElement.getId(),
+            );
+
+        const firstRelationErrorObject = relationObjectsError[0];
+        const secondRelationErrorObject = relationObjectsError[1];
+        const firstMapOfObject = firstRelationErrorObject.getMissingRelations();
+        const secondMapOfObject =
+            secondRelationErrorObject.getMissingRelations();
+
+        firstMapOfObject.delete(fromElement.getUpmmName());
+        secondMapOfObject.delete(fromElement.getUpmmName());
+        firstRelationErrorObject.setMissingRelations(firstMapOfObject);
+        secondRelationErrorObject.setMissingRelations(secondMapOfObject);
+
+        return analyzedData;
+    }
+
+    public async removeEmptyErrorData(
+        analyzedData: AnalyzeData,
+    ): Promise<AnalyzeData> {
+        const relationObjectsError = analyzedData
+            .getRelationErrorData()
+            .filter(
+                (relationObject) =>
+                    relationObject.getMissingRelations().size !== 0 ||
+                    relationObject.getOverExtendsRelations().size !== 0,
+            );
+        analyzedData.setRelationErrorData(relationObjectsError);
         return analyzedData;
     }
 }

@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import { BpmnData } from './bpmn.data';
 import { BpmnElementData } from './bpmnElement.data';
+import { TemplateVersion } from '../template/templateVersion/templateVersion.entity';
+import { TemplateNode } from '../template/templateNode/templateNode.entity';
 
 @Injectable()
 export class BpmnService {
@@ -43,7 +45,11 @@ export class BpmnService {
         });
     }
 
-    public async parseBpmnFile(pathToBpmn: string): Promise<BpmnData> {
+    public async parseBpmnFile(
+        pathToBpmn: string,
+        analyzeTemplate = false,
+        fourthLevel = false,
+    ): Promise<BpmnData[]> {
         const moddle = this.createModdle();
 
         const bpmnFile = fs.readFileSync(pathToBpmn, 'utf8');
@@ -56,15 +62,16 @@ export class BpmnService {
         const objects = [];
         for (const object of rootElement.get('rootElements')) {
             const type = object.$type.toString().split(':')[1];
-            if (type === 'Process') {
+            if (type === 'Process' && object.flowElements !== undefined) {
                 objects.push(object);
+            } else {
             }
         }
 
         const bpmnDatas: BpmnData[] = [];
         if (objects.length === 1) {
             if (objects[0].get('flowElements') === undefined) {
-                return new BpmnData([]);
+                return [new BpmnData([])];
             }
         }
 
@@ -72,25 +79,23 @@ export class BpmnService {
             const bpmnElementsData = this.createBpmnElementDataFromBaseObjects(
                 object.flowElements,
                 references,
+                '',
+                analyzeTemplate,
+                fourthLevel,
             );
             const bpmnData = new BpmnData(bpmnElementsData);
             bpmnDatas.push(bpmnData);
         }
 
-        const bpmnElementsObjects: BpmnData[] = bpmnDatas.reduce(
-            (accumulator, current) => {
-                return accumulator.concat(current);
-            },
-            [],
-        );
-
-        return new BpmnData(bpmnElementsObjects[0].getElements());
+        return bpmnDatas;
     }
 
     private createBpmnElementDataFromBaseObjects(
         objects: any,
         references: any[],
         parentProcessId?: string,
+        analyzeTemplate?: boolean,
+        fourthLevel?: boolean,
     ): BpmnElementData[] {
         const bpmnElements = [];
         for (const object of objects) {
@@ -118,10 +123,18 @@ export class BpmnService {
                             reference.property.split(':')[1] === 'outgoing',
                     );
 
-                    if (incom.element.elementId === undefined) {
-                        incoming.push(incom.element.upmmName);
-                    } else {
+                    if (analyzeTemplate) {
                         incoming.push(incom.element.upmmId);
+                    } else {
+                        if (fourthLevel) {
+                            incoming.push(incom.element.id);
+                        } else {
+                            if (incom.element.elementId === undefined) {
+                                incoming.push(incom.element.upmmName);
+                            } else {
+                                incoming.push(incom.element.elementId);
+                            }
+                        }
                     }
                 }
                 if (propertyValue === 'outgoing') {
@@ -131,10 +144,18 @@ export class BpmnService {
                             relation.element.upmm === reference.element.upmm &&
                             reference.property.split(':')[1] === 'incoming',
                     );
-                    if (outcom.element.elementId === undefined) {
-                        outgoing.push(outcom.element.upmmName);
-                    } else {
+                    if (analyzeTemplate) {
                         outgoing.push(outcom.element.upmmId);
+                    } else {
+                        if (fourthLevel) {
+                            outgoing.push(outcom.element.id);
+                        } else {
+                            if (outcom.element.elementId === undefined) {
+                                outgoing.push(outcom.element.upmmName);
+                            } else {
+                                outgoing.push(outcom.element.elementId);
+                            }
+                        }
                     }
                 }
             }
@@ -158,6 +179,7 @@ export class BpmnService {
                     object.flowElements,
                     references,
                     object.id,
+                    analyzeTemplate,
                 );
                 bpmnData.setChildElements(childElements);
 
@@ -173,5 +195,55 @@ export class BpmnService {
         }
 
         return bpmnElements;
+    }
+
+    public async reverseParseBpmnFile(
+        pathToBpmn: string,
+        templateVersion: TemplateVersion,
+    ): Promise<string> {
+        const moddle = this.createModdle();
+        const bpmnFile = fs.readFileSync(pathToBpmn, 'utf8');
+
+        const {
+            rootElement: rootElement,
+            elementsById: elementsById,
+            references: references,
+        } = await moddle.fromXML(bpmnFile);
+        const allNodes = await templateVersion.getNodes();
+        for (const object of rootElement.get('rootElements')) {
+            if (object.hasOwnProperty('flowElements')) {
+                this.changeAttributesValues(
+                    object.get('flowElements'),
+                    allNodes,
+                );
+            }
+        }
+        const { xml: xmlStrUpdated } = await moddle.toXML(rootElement);
+
+        return xmlStrUpdated;
+    }
+
+    private changeAttributesValues(
+        objects: any,
+        allNodes: TemplateNode[],
+    ): void {
+        for (const element of objects) {
+            if (!element.hasOwnProperty('upmmId')) {
+                continue;
+            }
+            const searchedTemplateNode = allNodes.find((templateNode) => {
+                return templateNode.getElementId() === element.get('elementId');
+            });
+            element.set('upmmId', searchedTemplateNode.getUuid());
+            element.set('upmmName', element.get('elementId'));
+            element.set('elementId', undefined);
+
+            if (element.hasOwnProperty('flowElements')) {
+                this.changeAttributesValues(
+                    element.get('flowElements'),
+                    allNodes,
+                );
+            }
+        }
     }
 }

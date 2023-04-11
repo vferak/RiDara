@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { TemplateNodeRepository } from './templateNode.repository';
 import { Template } from '../template.entity';
 import { TemplateNode } from './templateNode.entity';
-import { BpmnData } from '../../bpmn/bpmn.data';
+import { BpmnElementData } from '../../bpmn/bpmnElement.data';
 import { OntologyNodeRepository } from '../../ontology/ontologyNode/ontologyNode.repository';
 import { TemplateVersion } from '../templateVersion/templateVersion.entity';
 
@@ -14,14 +14,14 @@ export class TemplateNodeService {
     ) {}
 
     public async createFromBpmnData(
-        bpmnData: BpmnData,
+        bpmnElementData: BpmnElementData[],
         template: Template,
     ): Promise<void> {
         const templateDraft = await template.getVersionDraft();
 
         await this.dropNodesForTemplateVersion(templateDraft);
 
-        for (const element of bpmnData.getElements()) {
+        for (const element of bpmnElementData) {
             const ontologyNode =
                 await this.ontologyNodeRepository.findOneOrFail(
                     element.getUpmmUuid(),

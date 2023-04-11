@@ -29,6 +29,7 @@ import { FileData } from '../common/file/file.data';
 import { BPMN_BLANK_FILE_PATH } from '../common/file/file.constants';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { EntityManager } from '@mikro-orm/mariadb';
+import { BpmnElementData } from '../bpmn/bpmnElement.data';
 
 @Controller('project')
 export class ProjectController {
@@ -51,14 +52,22 @@ export class ProjectController {
         @Body('blankFile') blank: boolean,
     ): Promise<Project> {
         const template = await this.templateService.getOneByUuid(templateUuid);
-
+        let file: Buffer;
         const fileName = blank
             ? BPMN_BLANK_FILE_PATH
             : await template.getPublishedFileName();
 
-        const file = this.fileService.readFile(
-            FileData.createFromFilePathWithName(fileName),
-        );
+        if (!blank) {
+            const bpmnFileData = await this.bpmnService.reverseParseBpmnFile(
+                fileName,
+                await template.getVersionPublished(),
+            );
+            file = Buffer.from(bpmnFileData);
+        } else {
+            file = this.fileService.readFile(
+                FileData.createFromFilePathWithName(fileName),
+            );
+        }
 
         return this.projectService.create(
             createProjectDto,
@@ -160,19 +169,29 @@ export class ProjectController {
 
         const bpmnProjectData = await this.bpmnService.parseBpmnFile(
             project.getPath(),
+            false,
+            false,
         );
+        const allBpmnProjectElementData: BpmnElementData[] =
+            bpmnProjectData.flatMap((obj) => obj.getElements());
 
         const templateBpmnData = await this.bpmnService.parseBpmnFile(
             await project.getTemplate().getPublishedFileName(),
+            false,
+            false,
         );
+        const allBpmnTemplateElementData: BpmnElementData[] =
+            templateBpmnData.flatMap((obj) => obj.getElements());
 
-        const secondLevelBpmnData = bpmnProjectData.getElements();
+        const secondLevelBpmnData = allBpmnProjectElementData;
 
         const templateNodesNames =
-            await this.ontologyService.getNodesByBPMNData(templateBpmnData);
+            await this.ontologyService.getNodesByBPMNData(
+                allBpmnTemplateElementData,
+            );
 
         const projectNodesNames = await this.ontologyService.getNodesByBPMNData(
-            bpmnProjectData,
+            allBpmnProjectElementData,
         );
 
         analyzedData = await this.analyzeService.firstLevelAnalyze(
@@ -184,7 +203,7 @@ export class ProjectController {
         if (firstLevelPercent === 100) {
             analyzedData = await this.analyzeService.secondLevelAnalyze(
                 secondLevelBpmnData,
-                templateBpmnData.getElements(),
+                allBpmnTemplateElementData,
                 analyzedData,
             );
 
@@ -193,10 +212,38 @@ export class ProjectController {
             if (secondLevelPercent === 100) {
                 analyzedData = await this.analyzeService.thirdLevelAnalyze(
                     secondLevelBpmnData,
-                    templateBpmnData.getElements(),
+                    allBpmnTemplateElementData,
                     analyzedData,
                     template,
                 );
+                if (analyzedData.getRelationErrorData().length >= 1) {
+                    const specialProjectBpmnData =
+                        await this.bpmnService.parseBpmnFile(
+                            project.getPath(),
+                            false,
+                            true,
+                        );
+
+                    const fourthLevelBpmnProjectData: BpmnElementData[] =
+                        specialProjectBpmnData.flatMap((obj) =>
+                            obj.getElements(),
+                        );
+                    analyzedData = await this.analyzeService.fourthLevelAnalyze(
+                        fourthLevelBpmnProjectData,
+                        analyzedData,
+                    );
+
+                    analyzedData =
+                        await this.analyzeService.removeEmptyErrorData(
+                            analyzedData,
+                        );
+                    const percent =
+                        (1 -
+                            analyzedData.getRelationErrorData().length /
+                                allBpmnTemplateElementData.length) *
+                        100;
+                    analyzedData.setPercentArray([100, 100, percent]);
+                }
             }
         }
 

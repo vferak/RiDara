@@ -51,15 +51,23 @@ export class TemplateController {
         const template = await this.templateService.getOneByUuid(templateUuid);
 
         const draftFileName = await template.getDraftFileName();
-
         this.fileService.writeFile(
             FileData.createFromFilePathWithName(draftFileName),
             bpmnFileData,
         );
 
-        const bpmnData = await this.bpmnService.parseBpmnFile(draftFileName);
-
-        await this.templateNodeService.createFromBpmnData(bpmnData, template);
+        const bpmnDatas = await this.bpmnService.parseBpmnFile(
+            draftFileName,
+            false,
+            false,
+        );
+        const allBpmnElements: BpmnElementData[] = bpmnDatas.flatMap((obj) =>
+            obj.getElements(),
+        );
+        await this.templateNodeService.createFromBpmnData(
+            allBpmnElements,
+            template,
+        );
     }
 
     @Patch(':templateUuid')
@@ -116,12 +124,15 @@ export class TemplateController {
         @Param('templateUuid') templateUuid: string,
     ): Promise<TemplateAnalyzeData[]> {
         const template = await this.templateService.getOneByUuid(templateUuid);
-
         const templateBpmnData = await this.bpmnService.parseBpmnFile(
             await template.getDraftFileName(),
+            true,
+            false,
         );
 
-        const templateBpmnElements = templateBpmnData.getElements();
+        const allBpmnTemplateElementData: BpmnElementData[] =
+            templateBpmnData.flatMap((obj) => obj.getElements());
+        const templateBpmnElements = allBpmnTemplateElementData;
         const ontologyFile = await template.getOntologyFile();
         const ontologyNodesByFile = await ontologyFile.getNodes();
 
