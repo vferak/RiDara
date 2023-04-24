@@ -376,9 +376,9 @@ export class AnalyzeService {
         );
 
         for (const diff of differences) {
-            if (!allIdNamesFromTemplate.includes(diff)) {
+            /*if (!allIdNamesFromTemplate.includes(diff)) {
                 continue;
-            }
+            }*/
             const nodeFrom = diff;
             const nodeTo = templateElement.getElementId();
             overExtendsMap.set(nodeFrom, nodeTo);
@@ -401,9 +401,9 @@ export class AnalyzeService {
         );
 
         for (const diff of differences) {
-            if (!allIdNamesFromTemplate.includes(diff)) {
+            /*if (!allIdNamesFromTemplate.includes(diff)) {
                 continue;
-            }
+            }*/
             const nodeFrom = templateElement.getElementId();
             const nodeTo = diff;
             overExtendsMap.set(nodeFrom, nodeTo);
@@ -563,16 +563,36 @@ export class AnalyzeService {
                     relationObject.getElementId() === fromElement.getId(),
             );
 
-        const firstRelationErrorObject = relationObjectsError[0];
-        const secondRelationErrorObject = relationObjectsError[1];
+        const firstRelationErrorObject = relationObjectsError.find(
+            (relationError) =>
+                relationError.getUpmmId() === fromElement.getUpmmName(),
+        );
+        const secondRelationErrorObject = relationObjectsError.find(
+            (relationError) =>
+                relationError.getUpmmId() === toElement.getUpmmName(),
+        );
+
         const firstMapOfObject = firstRelationErrorObject.getMissingRelations();
         const secondMapOfObject =
             secondRelationErrorObject.getMissingRelations();
+
+        const firstMapOverExtendsOfObject =
+            firstRelationErrorObject.getOverExtendsRelations();
+        const secondMapOverExtendsOfObject =
+            secondRelationErrorObject.getOverExtendsRelations();
 
         firstMapOfObject.delete(fromElement.getUpmmName());
         secondMapOfObject.delete(fromElement.getUpmmName());
         firstRelationErrorObject.setMissingRelations(firstMapOfObject);
         secondRelationErrorObject.setMissingRelations(secondMapOfObject);
+
+        firstMapOverExtendsOfObject.delete(fromElement.getUpmmName());
+
+        secondMapOverExtendsOfObject.forEach((value, key) => {
+            if (value === toElement.getUpmmName()) {
+                secondMapOverExtendsOfObject.delete(key);
+            }
+        });
 
         return analyzedData;
     }
