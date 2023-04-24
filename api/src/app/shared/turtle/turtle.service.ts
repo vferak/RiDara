@@ -10,50 +10,79 @@ export class TurtleService {
         const parser: N3.Parser = new N3.Parser({ format: 'Turtle' });
         const quads: N3.Quad[] = parser.parse(fileBuffer.toString());
 
-        const classes = quads
-            .filter(
-                (quad) =>
-                    quad._predicate.id.includes('#type') &&
-                    quad._object.id.includes('#Class') &&
-                    quad._subject.constructor.name !== 'BlankNode',
-            )
-            .map(function (quad): string {
-                return quad._subject.id.toString().split('#')[1];
-            });
+        const ontologyNodesMap =
+            this.createOntologyNodesMap(quads);
 
-        const uniqueClasses = [...new Set(classes)];
+        const ontologyNodesRelations =
+            this.createOntologyNodesRelations(quads, ontologyNodesMap);
 
-        const relations = quads
-            .filter((quad) => quad._predicate.id.includes('#seeAlso'))
-            .map(function (quad): { sourceRef: string; targetRef: string } {
-                return {
-                    sourceRef: quad._subject.id.toString().split('#')[1],
-                    targetRef: quad._object.id.toString().split('#')[1],
-                };
-            });
+        const ontologyNodes = [...ontologyNodesMap].map(
+            ([, ontologyNodeDto]) => ontologyNodeDto,
+        );
 
-        const ontologyNodes: CreateNodeOntologyDto[] = [];
-        for (const className of uniqueClasses) {
-            ontologyNodes.push(new CreateNodeOntologyDto(className));
-        }
+        return new TurtleData(ontologyNodes, ontologyNodesRelations);
+    }
 
-        const ontologyRelations: CreateRelationOntologyDto[] = [];
-        for (const relation of relations) {
-            if (
-                !uniqueClasses.includes(relation.sourceRef) ||
-                !uniqueClasses.includes(relation.targetRef)
-            ) {
+    private createOntologyNodesMap(
+        quads: N3.Quad[],
+    ): Map<string, CreateNodeOntologyDto> {
+        const ontologyNodes = new Map<string, CreateNodeOntologyDto>();
+
+        for (const quad of quads) {
+            const isValidClassQuad =
+                quad._predicate.id.includes('#type') &&
+                quad._object.id.includes('#Class') &&
+                quad._subject.constructor.name !== 'BlankNode';
+
+            if (!isValidClassQuad) {
                 continue;
             }
 
-            ontologyRelations.push(
-                new CreateRelationOntologyDto(
-                    relation.sourceRef,
-                    relation.targetRef,
-                ),
+            const ontologyNodeName = quad._subject.id.toString().split('#')[1];
+
+            const isNodeAlreadyCreated = !!ontologyNodes.get(ontologyNodeName);
+
+            if (isNodeAlreadyCreated) {
+                continue;
+            }
+
+            ontologyNodes.set(
+                ontologyNodeName,
+                new CreateNodeOntologyDto(ontologyNodeName),
             );
         }
 
-        return new TurtleData(ontologyNodes, ontologyRelations);
+        return ontologyNodes;
+    }
+
+    private createOntologyNodesRelations(
+        quads: N3.Quad[],
+        ontologyNodesMap: Map<string, CreateNodeOntologyDto>,
+    ): CreateRelationOntologyDto[] {
+        const ontologyNodesRelations: CreateRelationOntologyDto[] = [];
+
+        for (const quad of quads) {
+            const isPossibleRelation = quad._predicate.id.includes('#seeAlso');
+
+            if (!isPossibleRelation) {
+                continue;
+            }
+
+            const sourceRef = quad._subject.id.toString().split('#')[1];
+            const targetRef = quad._object.id.toString().split('#')[1];
+
+            const isSourceRefNodeDefined = !!ontologyNodesMap.get(sourceRef);
+            const isTargetRefNodeDefined = !!ontologyNodesMap.get(targetRef);
+
+            if (!isSourceRefNodeDefined || !isTargetRefNodeDefined) {
+                continue;
+            }
+
+            ontologyNodesRelations.push(
+                new CreateRelationOntologyDto(sourceRef, targetRef),
+            );
+        }
+
+        return ontologyNodesRelations;
     }
 }
