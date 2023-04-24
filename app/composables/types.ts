@@ -77,4 +77,5 @@ export type ErrorTemplate = {
     outgoing?: string[] | undefined;
     missing?: string[] | undefined;
     overExtends?: string[] | undefined;
+    id?: string | undefined;
 }

@@ -134,6 +134,7 @@ export class TemplateService {
                                 bpmnData.getUpmmUuid(),
                                 [],
                                 differences,
+                                templateNode.getId(),
                             );
                         templateAnalyzeDatas.push(templateAnalyzeData);
                     }
@@ -174,6 +175,7 @@ export class TemplateService {
                                 templateNode.getUpmmUuid(),
                                 differences,
                                 [],
+                                templateNode.getId(),
                             );
                         templateAnalyzeDatas.push(templateAnalyzeData);
                     } else {

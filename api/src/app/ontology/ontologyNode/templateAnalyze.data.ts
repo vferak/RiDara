@@ -2,15 +2,18 @@ export class TemplateAnalyzeData {
     private upmmUuid?: string;
     private missing?: string[];
     private overExtends?: string[];
+    private id?: string;
 
     public constructor(
         upmmUuid?: string,
         missing?: string[],
         overExtends?: string[],
+        id?: string,
     ) {
         this.upmmUuid = upmmUuid;
         this.missing = missing;
         this.overExtends = overExtends;
+        this.id = id;
     }
     public getUpmmUuid(): string {
         return this.upmmUuid;
@@ -34,5 +37,8 @@ export class TemplateAnalyzeData {
 
     public setUpmmUuid(value: string): void {
         this.upmmUuid = value;
+    }
+    public setId(value: string): void {
+        this.id = value;
     }
 }
