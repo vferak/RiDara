@@ -27,15 +27,15 @@ export class BpmnService {
                                 type: 'String',
                             },
                             {
-                                "name": "upmmName",
-                                "isAttr": true,
-                                "type": "String"
+                                name: 'upmmName',
+                                isAttr: true,
+                                type: 'String',
                             },
                             {
-                                "name": "elementId",
-                                "isAttr": true,
-                                "type": "String"
-                            }
+                                name: 'elementId',
+                                isAttr: true,
+                                type: 'String',
+                            },
                         ],
                     },
                 ],
@@ -62,6 +62,11 @@ export class BpmnService {
         }
 
         const bpmnDatas: BpmnData[] = [];
+        if (objects.length === 1) {
+            if (objects[0].get('flowElements') === undefined) {
+                return new BpmnData([]);
+            }
+        }
 
         for (const object of objects) {
             const bpmnElementsData = this.createBpmnElementDataFromBaseObjects(
@@ -106,23 +111,31 @@ export class BpmnService {
             for (const relation of relationsOfObject) {
                 const propertyValue = relation.property.split(':')[1];
                 if (propertyValue === 'incoming') {
-                    const incom = references.filter(
+                    const incom = references.find(
                         (reference) =>
                             reference.id === relation.id &&
                             relation.element.upmm === reference.element.upmm &&
                             reference.property.split(':')[1] === 'outgoing',
                     );
 
-                    incoming.push(incom[0].element.upmmId);
+                    if (incom.element.elementId === undefined) {
+                        incoming.push(incom.element.upmmName);
+                    } else {
+                        incoming.push(incom.element.upmmId);
+                    }
                 }
                 if (propertyValue === 'outgoing') {
-                    const outcom = references.filter(
+                    const outcom = references.find(
                         (reference) =>
                             reference.id === relation.id &&
                             relation.element.upmm === reference.element.upmm &&
                             reference.property.split(':')[1] === 'incoming',
                     );
-                    outgoing.push(outcom[0].element.upmmId);
+                    if (outcom.element.elementId === undefined) {
+                        outgoing.push(outcom.element.upmmName);
+                    } else {
+                        outgoing.push(outcom.element.upmmId);
+                    }
                 }
             }
 

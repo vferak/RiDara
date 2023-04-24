@@ -104,6 +104,10 @@ export class TemplateVersion {
         );
     }
 
+    public getUuid(): string {
+        return this.uuid;
+    }
+
     public getTemplate(): Template {
         return this.template;
     }

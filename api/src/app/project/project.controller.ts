@@ -1,6 +1,7 @@
 import {
     Body,
-    Controller, Delete,
+    Controller,
+    Delete,
     Get,
     Param,
     Patch,
@@ -20,7 +21,6 @@ import { AnalyzeService } from '../shared/analyze/analyze.service';
 import { BpmnService } from '../bpmn/bpmn.service';
 import { OntologyService } from '../ontology/ontology.service';
 import { TemplateService } from '../template/template.service';
-import { OntologyNode } from '../ontology/ontologyNode/ontologyNode.entity';
 import { WorkspaceService } from '../workspace/workspace.service';
 import { AnalyzedJsonData } from '../shared/analyze/analyzedJson.data';
 import { AnalyzeData } from '../shared/analyze/analyze.data';
@@ -28,7 +28,7 @@ import { FileService } from '../common/file/file.service';
 import { FileData } from '../common/file/file.data';
 import { BPMN_BLANK_FILE_PATH } from '../common/file/file.constants';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {EntityManager} from "@mikro-orm/mariadb";
+import { EntityManager } from '@mikro-orm/mariadb';
 
 @Controller('project')
 export class ProjectController {
@@ -100,9 +100,7 @@ export class ProjectController {
     public async deleteProject(
         @Body('projectUuid') projectUuid: string,
     ): Promise<void> {
-        const project = await this.projectService.getOneByUuid(
-            projectUuid,
-        )
+        const project = await this.projectService.getOneByUuid(projectUuid);
         await project.remove(this.entityManager);
     }
 
@@ -158,6 +156,7 @@ export class ProjectController {
         @Param('uuid', ProjectByUuidPipe) project: Project,
     ): Promise<AnalyzedJsonData> {
         let analyzedData: AnalyzeData;
+        const template = await project.getTemplate();
 
         const bpmnProjectData = await this.bpmnService.parseBpmnFile(
             project.getPath(),
@@ -169,17 +168,16 @@ export class ProjectController {
 
         const secondLevelBpmnData = bpmnProjectData.getElements();
 
-        const templateNodesMap = await this.ontologyService.getNodesByBPMNData(
-            templateBpmnData,
-        );
+        const templateNodesNames =
+            await this.ontologyService.getNodesByBPMNData(templateBpmnData);
 
-        const projectNodesMap = await this.ontologyService.getNodesByBPMNData(
+        const projectNodesNames = await this.ontologyService.getNodesByBPMNData(
             bpmnProjectData,
         );
 
         analyzedData = await this.analyzeService.firstLevelAnalyze(
-            projectNodesMap,
-            templateNodesMap,
+            projectNodesNames,
+            templateNodesNames,
         );
 
         const firstLevelPercent = analyzedData.getPercentArray()[0];
@@ -197,6 +195,7 @@ export class ProjectController {
                     secondLevelBpmnData,
                     templateBpmnData.getElements(),
                     analyzedData,
+                    template,
                 );
             }
         }
