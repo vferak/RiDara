@@ -98,9 +98,9 @@ const deleteUser = async () => {
                             <td>
                                {{ useWorkspace.user.email }}
                             </td>
-                            <th>
+                            <td>
                                 <button @click='removeUser(useWorkspace.user.uuid)' class="btn btn-ghost btn-xs">Remove</button>
-                            </th>
+                            </td>
                         </tr>
                         </tbody>
                     </table>

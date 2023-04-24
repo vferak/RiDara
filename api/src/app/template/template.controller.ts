@@ -130,6 +130,19 @@ export class TemplateController {
             false,
         );
 
+        if (templateBpmnData.length === 1) {
+            const element = templateBpmnData[0].getElements();
+            if (element[0].getUpmmUuid() === '/12/12/12') {
+                const templateAnalyzeData: TemplateAnalyzeData =
+                    new TemplateAnalyzeData(
+                        '/12/12/12',
+                        element[0].getOutgoing(),
+                        element[0].getOutgoing(),
+                    );
+                return [templateAnalyzeData];
+            }
+        }
+
         const allBpmnTemplateElementData: BpmnElementData[] =
             templateBpmnData.flatMap((obj) => obj.getElements());
         const templateBpmnElements = allBpmnTemplateElementData;

@@ -64,7 +64,6 @@ export class BpmnService {
             const type = object.$type.toString().split(':')[1];
             if (type === 'Process' && object.flowElements !== undefined) {
                 objects.push(object);
-            } else {
             }
         }
 
@@ -85,6 +84,21 @@ export class BpmnService {
             );
             const bpmnData = new BpmnData(bpmnElementsData);
             bpmnDatas.push(bpmnData);
+        }
+
+        if (analyzeTemplate) {
+            const duplicities = this.checkElementIdUnique(bpmnDatas);
+            if (duplicities.length > 0) {
+                const datas: any[] = [];
+                const bpmnElementData: BpmnElementData = new BpmnElementData(
+                    'notValid',
+                    'notValid',
+                    '/12/12/12',
+                    duplicities,
+                );
+                datas.push(bpmnElementData);
+                return [new BpmnData(datas)];
+            }
         }
 
         return bpmnDatas;
@@ -244,6 +258,31 @@ export class BpmnService {
                     allNodes,
                 );
             }
+        }
+    }
+
+    private checkElementIdUnique(templateData: BpmnData[]): any[] {
+        const allBpmnTemplateElementData: BpmnElementData[] =
+            templateData.flatMap((obj) => obj.getElements());
+
+        const allElementId: string[] = allBpmnTemplateElementData.flatMap(
+            (obj) => obj.getElementId(),
+        );
+
+        const uniqueValues = new Set(allElementId);
+        if (uniqueValues.size === allElementId.length) {
+            return [];
+        } else {
+            const duplicates: any[] = [];
+            allElementId.forEach((value, index) => {
+                if (
+                    allElementId.indexOf(value) !== index &&
+                    !duplicates.includes(value)
+                ) {
+                    duplicates.push(value);
+                }
+            });
+            return duplicates;
         }
     }
 }
