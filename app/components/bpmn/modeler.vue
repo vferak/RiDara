@@ -43,33 +43,6 @@ const saveDiagram = async () => {
     const xml = await $bpmnModeler.get().saveXML();
     emit('save-bpmn', xml.xml);
 }
-
-const downloadSVG = async () => {
-    const svg = await $bpmnModeler.get().saveSVG();
-    const blob = new Blob([svg.svg], { type: 'XML' });
-    const objectUrl = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = objectUrl;
-    link.download = 'diagram.svg';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(objectUrl);
-}
-
-const downloadBPMN = async () => {
-    const xml = await $bpmnModeler.get().saveXML();
-    const blob = new Blob([xml.xml], { type: 'XML' });
-    const objectUrl = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = objectUrl;
-    link.download = 'diagram.bpmn';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(objectUrl);
-}
-
 </script>
 
 <template>
@@ -82,8 +55,8 @@ const downloadBPMN = async () => {
             <div class="dropdown dropdown-top m-0">
                 <label tabindex="0" class="btn btn-secondary m-1">Download</label>
                 <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-200 rounded-box w-52">
-                    <li @click='downloadBPMN'><a>BPMN</a></li>
-                    <li @click='downloadSVG'><a>SVG</a></li>
+                    <li @click='$bpmnModeler.downloadBPMN'><a>BPMN</a></li>
+                    <li @click='$bpmnModeler.downloadSVG'><a>SVG</a></li>
                 </ul>
             </div>
             <button @click='saveDiagram' class="btn btn-success">Save</button>

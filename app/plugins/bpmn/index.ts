@@ -68,12 +68,40 @@ export default defineNuxtPlugin(() => {
         return modeler;
     }
 
+    const downloadSVG = async () => {
+        const svg = await modeler.saveSVG();
+        const blob = new Blob([svg.svg], { type: 'XML' });
+        const objectUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = objectUrl;
+        link.download = 'diagram.svg';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(objectUrl);
+    }
+
+    const downloadBPMN = async () => {
+        const xml = await modeler.saveXML();
+        const blob = new Blob([xml.xml], { type: 'XML' });
+        const objectUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = objectUrl;
+        link.download = 'diagram.bpmn';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(objectUrl);
+    }
+
     return {
         provide: {
             bpmnModeler: {
                 init,
                 get,
-                destroy
+                destroy,
+                downloadBPMN,
+                downloadSVG
             }
         }
     };

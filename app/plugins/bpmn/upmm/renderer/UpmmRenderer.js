@@ -1,9 +1,8 @@
 import BaseRenderer from "diagram-js/lib/draw/BaseRenderer";
 
-import { append as svgAppend, classes as svgClasses } from "tiny-svg";
+import { isAny } from 'bpmn-js/lib/util/ModelUtil';
 
 const HIGH_PRIORITY = 1500;
-const BLACK_COLOR = "hsl(225, 10%, 15%)";
 const RED_COLOR = "hsl(0,100%,50%)";
 
 export default class UpmmRenderer extends BaseRenderer {
@@ -12,10 +11,19 @@ export default class UpmmRenderer extends BaseRenderer {
 
         this.bpmnRenderer = bpmnRenderer;
         this.textRenderer = textRenderer;
+        this.isTemplateModeler = window['isTemplateModeler'];
     }
 
     canRender(element) {
-        return !element.labelTarget;
+        return !isAny(
+            element,
+            [
+                'bpmn:Participant',
+                'bpmn:Lane',
+                'bpmn:TextAnnotation',
+                'bpmn:Group'
+            ]
+            ) && !element.labelTarget;
     }
 
     drawShape(parentNode, element) {
@@ -24,9 +32,11 @@ export default class UpmmRenderer extends BaseRenderer {
         const upmmLabel = element.businessObject?.upmmName;
         const elementName = element.businessObject?.elementId;
 
-        if (upmmLabel === undefined || (window['isTemplateModeler'] && elementName === undefined)) {
+        if (
+            upmmLabel === undefined ||
+            (this.isTemplateModeler && elementName === undefined)
+        ) {
             shape.style.stroke = RED_COLOR;
-            return shape;
         }
 
         return shape;
@@ -34,16 +44,6 @@ export default class UpmmRenderer extends BaseRenderer {
 
     getShapePath(shape) {
         return this.bpmnRenderer.getShapePath(shape);
-    }
-
-    renderLabel(parentGfx, label, options) {
-        const text = this.textRenderer.createText(label, options);
-
-        svgClasses(text).add("upmm-label");
-
-        svgAppend(parentGfx, text);
-
-        return text;
     }
 }
 
