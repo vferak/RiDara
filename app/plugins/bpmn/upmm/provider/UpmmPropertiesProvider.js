@@ -1,4 +1,4 @@
-import { is } from "bpmn-js/lib/util/ModelUtil";
+import { isAny } from 'bpmn-js/lib/util/ModelUtil';
 import upmmId from "./UpmmId";
 import elementId from "./ElementId";
 
@@ -7,7 +7,19 @@ const HIGH_PRIORITY = 1500;
 export default function UpmmPropertiesProvider(propertiesPanel, translate) {
     this.getGroups = function (element) {
         return function (groups) {
-            if (!is(element, "bpmn:Process")) {
+            if (
+                !isAny(
+                element,
+                [
+                    'bpmn:Process',
+                    'bpmn:Participant',
+                    'bpmn:Lane',
+                    'bpmn:MessageFlow',
+                    'bpmn:DataOutputAssociation',
+                    'bpmn:DataInputAssociation',
+                    'bpmn:SequenceFlow',
+                ])
+            ) {
                 groups.push(createUpmmGroup(element, translate));
             }
 
