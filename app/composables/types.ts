@@ -76,7 +76,7 @@ export type RelationErrorDeserializedData = {
 export type ErrorTemplate = {
     upmmUuid: string | undefined;
     outgoing?: string[] | undefined;
-    missing?: string[] | undefined;
+    notPossible?: string[] | undefined;
     overExtends?: string[] | undefined;
     id?: string | undefined;
 }

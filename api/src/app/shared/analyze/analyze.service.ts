@@ -196,21 +196,22 @@ export class AnalyzeService {
         let newAnalyzedData = analyzedData;
         let allOutgoingElements: string[] = [];
         for (const [key, value] of missingRelations) {
-            const toElement = projectElements.find((projectElement) => {
-                return projectElement.getUpmmName() === value;
-            });
-            const fromElement = projectElements.find((projectElement) => {
-                return projectElement.getUpmmName() === key;
-            });
-            const outgoingElements = fromElement.getOutgoing();
-            allOutgoingElements = [...allOutgoingElements, ...outgoingElements];
+            const fromElement = projectElements.find(
+                (projectElement) => projectElement.getUpmmName() === key,
+            );
 
+            const toElement = projectElements.find(
+                (projectElement) => projectElement.getUpmmName() === value,
+            );
+
+            const outgoingElements = fromElement.getOutgoing();
+
+            allOutgoingElements = [...allOutgoingElements, ...outgoingElements];
             while (allOutgoingElements.length !== 0) {
                 const outgoingValue = allOutgoingElements.shift();
                 const outgoingElement = projectElements.find(
-                    (projectElement) => {
-                        return projectElement.getId() === outgoingValue;
-                    },
+                    (projectElement) =>
+                        projectElement.getId() === outgoingValue,
                 );
 
                 if (outgoingElement.getId() === toElement.getId()) {

@@ -42,21 +42,19 @@ duplicities.value = objectSize > 0 && props.errorTemplate[0].upmmUuid === '/12/1
                 <div v-else>
                     <h1 class='text-2xl font-bold mt-3 text-center mb-2'>Not possible relations in UPMM:</h1>
                     <div v-for='(items, indexTemplate) in props.errorTemplate' :key='indexTemplate'>
-                        <!--                    <p v-if='items.overExtends?.length === 0' class='text-lg text-center mt-2'>No overExtends items!</p>-->
-                        <div v-for='(itemOverExtends, index) in items.overExtends' :key='index'>
+                            <div v-for='(notPossibleItem, index) in items.notPossible' :key='index'>
 
                             <p class='text-lg text-center mt-2'><b>{{ items.upmmUuid }}</b> ({{items.id}}) connected to
-                                <b>{{ itemOverExtends }}</b> </p>
+                                <b>{{ notPossibleItem }}</b> </p>
                         </div>
                     </div>
 
-                    <h1 class='text-2xl font-bold mt-3 text-center mb-2'>Missing relations:</h1>
+                    <h1 class='text-2xl font-bold mt-3 text-center mb-2'>Extra relations:</h1>
                     <div v-for='(items, indexTemplate) in props.errorTemplate' :key='indexTemplate'>
-                        <!--                    <p v-if='items.missing?.length === 0' class='text-lg text-center mt-2'>No missing items!</p>-->
-                        <div v-for='(itemMissing, indexMissing) in items.missing' :key='indexMissing'>
+                        <div v-for='(extraItem, extraIndex) in items.overExtends' :key='extraIndex'>
 
                             <p class='text-lg text-center mt-2'><b>{{ items.upmmUuid }}</b> ({{items.id}})
-                                connected to <b>{{ itemMissing }}</b></p>
+                                connected to <b>{{ extraItem }}</b></p>
                         </div>
                     </div>
                 </div>

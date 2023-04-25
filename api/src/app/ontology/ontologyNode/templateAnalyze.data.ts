@@ -1,34 +1,38 @@
 export class TemplateAnalyzeData {
     private upmmUuid?: string;
-    private missing?: string[];
+    private notPossible?: string[];
     private overExtends?: string[];
     private id?: string;
 
     public constructor(
         upmmUuid?: string,
-        missing?: string[],
+        notPossible?: string[],
         overExtends?: string[],
         id?: string,
     ) {
         this.upmmUuid = upmmUuid;
-        this.missing = missing;
+        this.notPossible = notPossible;
         this.overExtends = overExtends;
         this.id = id;
+    }
+
+    public getId(): string {
+        return this.id;
     }
     public getUpmmUuid(): string {
         return this.upmmUuid;
     }
 
-    public getMissing(): string[] {
-        return this.missing;
+    public getNotPossible(): string[] {
+        return this.notPossible;
     }
 
     public getOverExtends(): string[] {
         return this.overExtends;
     }
 
-    public setMissing(values: string[]): void {
-        this.missing = values;
+    public setNotPossible(values: string[]): void {
+        this.notPossible = values;
     }
 
     public setOverExtends(values: string[]): void {

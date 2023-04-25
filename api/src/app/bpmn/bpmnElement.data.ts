@@ -3,8 +3,8 @@ export class BpmnElementData {
     private readonly id: string;
     private readonly upmmUuid: string;
 
-    private readonly outgoing?: string[];
-    private readonly incoming?: string[];
+    private outgoing?: string[];
+    private incoming?: string[];
 
     private childElements?: BpmnElementData[];
     private parentId?: string;
@@ -32,6 +32,14 @@ export class BpmnElementData {
     }
     public setChildElements(values: BpmnElementData[]): void {
         this.childElements = values;
+    }
+
+    public setOutgoing(values: string[]): void {
+        this.outgoing = values;
+    }
+
+    public setIncoming(values: string[]): void {
+        this.incoming = values;
     }
 
     public setParentId(value: string): void {

@@ -167,6 +167,7 @@ export class TemplateController {
 
         const allBpmnTemplateElementData: BpmnElementData[] =
             templateBpmnData.flatMap((obj) => obj.getElements());
+
         const templateBpmnElements = allBpmnTemplateElementData;
         const ontologyFile = await template.getOntologyFile();
         const ontologyNodesByFile = await ontologyFile.getNodes();
@@ -192,7 +193,6 @@ export class TemplateController {
                     );
                 },
             );
-
             const relationAnalyzed =
                 await this.templateService.analyzeTemplateByUPMM(
                     templateElement,

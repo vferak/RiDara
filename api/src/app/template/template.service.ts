@@ -123,32 +123,68 @@ export class TemplateService {
             relationsFromDatabase.push(ontologyAnalyzeData);
         }
 
-        // checking not possible connection (overExtends)
+        // checking not possible connection
         const templateAnalyzeDatas: TemplateAnalyzeData[] = [];
         for (const templateNode of templateNodes) {
-            for (const bpmnData of relationsFromDatabase) {
-                if (templateNode.getUpmmUuid() !== bpmnData.getUpmmUuid()) {
-                    continue;
-                }
-                const templateOutgoing = templateNode.getOutgoing().sort();
-                const bpmnOutgoing = bpmnData.getOutgoing().sort();
-                const result = templateOutgoing.every((value) =>
-                    bpmnOutgoing.includes(value),
+            const databaseRelationObject = relationsFromDatabase.find(
+                (databaseRelation) =>
+                    databaseRelation.getUpmmUuid() ===
+                    templateNode.getUpmmUuid(),
+            );
+
+            const templateOutgoing = templateNode.getOutgoing().sort();
+            const databaseOutgoing = databaseRelationObject
+                .getOutgoing()
+                .sort();
+            const result = templateOutgoing.every((value) =>
+                databaseOutgoing.includes(value),
+            );
+
+            if (!result) {
+                const differences = templateOutgoing.filter(
+                    (value) => !databaseOutgoing.includes(value),
                 );
 
-                if (!result) {
-                    const differences = templateOutgoing.filter(
-                        (value) => !bpmnOutgoing.includes(value),
-                    );
-                    if (differences.length !== 0) {
-                        const templateAnalyzeData: TemplateAnalyzeData =
-                            new TemplateAnalyzeData(
-                                bpmnData.getUpmmUuid(),
-                                [],
-                                differences,
-                                templateNode.getId(),
+                if (differences.length !== 0) {
+                    const templateAnalyzeData: TemplateAnalyzeData =
+                        new TemplateAnalyzeData(
+                            databaseRelationObject.getUpmmUuid(),
+                            differences,
+                            [],
+                            templateNode.getId(),
+                        );
+                    templateAnalyzeDatas.push(templateAnalyzeData);
+                }
+            } else {
+                const templateOutgoingMap =
+                    this.createMapWithOccurences(templateOutgoing);
+                const databaseOutgoingMap =
+                    this.createMapWithOccurences(databaseOutgoing);
+
+                for (const [key, firstValue] of templateOutgoingMap) {
+                    const secondValue = databaseOutgoingMap.get(key);
+                    if (firstValue !== secondValue) {
+                        const existingElement: TemplateAnalyzeData =
+                            templateAnalyzeDatas.find(
+                                (element: TemplateAnalyzeData) =>
+                                    element.getId() === templateNode.getId(),
                             );
-                        templateAnalyzeDatas.push(templateAnalyzeData);
+                        if (existingElement === undefined) {
+                            const templateAnalyzeData: TemplateAnalyzeData =
+                                new TemplateAnalyzeData(
+                                    templateNode.getUpmmUuid(),
+                                    [],
+                                    [key],
+                                    templateNode.getId(),
+                                );
+                            templateAnalyzeDatas.push(templateAnalyzeData);
+                        } else {
+                            const existingOverExtends =
+                                existingElement.getOverExtends();
+                            existingOverExtends.push(key);
+
+                            existingElement.setOverExtends(existingOverExtends);
+                        }
                     }
                 }
             }
@@ -163,55 +199,18 @@ export class TemplateService {
             relationFromDatabase.setOutgoing(newOutgoing);
         }
 
-        //checking missing connections
-        for (const relationFromDatabase of relationsFromDatabase) {
-            for (const templateNode of templateNodes) {
-                if (
-                    relationFromDatabase.getUpmmUuid() ===
-                    templateNode.getUpmmUuid()
-                ) {
-                    const relationOutgoing = relationFromDatabase.getOutgoing();
-                    const templateOutgoing = templateNode.getOutgoing();
-                    const differences = relationOutgoing.filter(
-                        (value) => !templateOutgoing.includes(value),
-                    );
-                    const existingElement: TemplateAnalyzeData =
-                        templateAnalyzeDatas.find(
-                            (element: TemplateAnalyzeData) =>
-                                element.getUpmmUuid() ===
-                                templateNode.getUpmmUuid(),
-                        );
-                    if (existingElement === undefined) {
-                        const templateAnalyzeData: TemplateAnalyzeData =
-                            new TemplateAnalyzeData(
-                                templateNode.getUpmmUuid(),
-                                differences,
-                                [],
-                                templateNode.getId(),
-                            );
-                        templateAnalyzeDatas.push(templateAnalyzeData);
-                    } else {
-                        const existingMissing = existingElement
-                            .getMissing()
-                            .concat(differences);
-                        existingElement.setMissing(existingMissing);
-                    }
-                }
-            }
-        }
-
         // remove empty objects
         const filteredTemplateAnalyzeDatas = templateAnalyzeDatas.filter(
             (templateError) =>
                 templateError.getOverExtends().length !== 0 ||
-                templateError.getMissing().length !== 0,
+                templateError.getNotPossible().length !== 0,
         );
 
         // transforming UUIDs to names
         for (const analyzedObject of filteredTemplateAnalyzeDatas) {
             const nameOfUuidsMissing: string[] = [];
             const nameOfUuidsOverExtends: string[] = [];
-            for (const badRelation of analyzedObject.getMissing()) {
+            for (const badRelation of analyzedObject.getNotPossible()) {
                 const nodeObject =
                     await this.ontologyNodeRepository.findOneOrFail(
                         badRelation,
@@ -234,10 +233,24 @@ export class TemplateService {
                 );
 
             analyzedObject.setOverExtends(nameOfUuidsOverExtends);
-            analyzedObject.setMissing(nameOfUuidsMissing);
+            analyzedObject.setNotPossible(nameOfUuidsMissing);
             analyzedObject.setUpmmUuid(nodeObjectUpmm.getName());
         }
 
         return filteredTemplateAnalyzeDatas;
+    }
+
+    private createMapWithOccurences(values: string[]): Map<string, number> {
+        const map = new Map<string, number>();
+
+        values.forEach((str: string) => {
+            if (map.has(str)) {
+                const count = map.get(str) as number;
+                map.set(str, count + 1);
+            } else {
+                map.set(str, 1);
+            }
+        });
+        return map;
     }
 }
