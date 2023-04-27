@@ -15,11 +15,9 @@ export class TemplateNodeService {
 
     public async createFromBpmnData(
         bpmnElementData: BpmnElementData[],
-        template: Template,
+        templateVersion: TemplateVersion,
     ): Promise<void> {
-        const templateDraft = await template.getVersionDraft();
-
-        await this.dropNodesForTemplateVersion(templateDraft);
+        await this.dropNodesForTemplateVersion(templateVersion);
 
         for (const element of bpmnElementData) {
             const ontologyNode =
@@ -28,7 +26,7 @@ export class TemplateNodeService {
                 );
 
             const templateNode = TemplateNode.create(
-                templateDraft,
+                templateVersion,
                 ontologyNode,
                 element.getElementId(),
             );

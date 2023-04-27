@@ -68,7 +68,7 @@ export class TemplateController {
         );
         await this.templateNodeService.createFromBpmnData(
             allBpmnElements,
-            template,
+            await template.getVersionDraft(),
         );
     }
 
