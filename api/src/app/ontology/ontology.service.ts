@@ -6,6 +6,7 @@ import { OntologyFile } from './ontologyFile/ontologyFile.entity';
 import { OntologyNode } from './ontologyNode/ontologyNode.entity';
 import { BpmnElementData } from '../bpmn/bpmnElement.data';
 import { TurtleData } from '../shared/turtle/turtle.data';
+import { EditFileOntologyDto } from './dto/edit-file-ontology.dto';
 
 @Injectable()
 export class OntologyService {
@@ -56,5 +57,15 @@ export class OntologyService {
             }
         }
         return elements.sort();
+    }
+
+    public async editFile(
+        ontologyFile: OntologyFile,
+        editFileOntologyDto: EditFileOntologyDto
+    ): Promise<OntologyFile> {
+        ontologyFile.edit(editFileOntologyDto);
+        await this.ontologyFileRepository.flush();
+
+        return ontologyFile;
     }
 }

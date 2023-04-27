@@ -17,6 +17,7 @@ export type User = {
 export type OntologyFile = {
     uuid: string,
     name: string,
+    createDate: string,
 }
 
 export type Template = {

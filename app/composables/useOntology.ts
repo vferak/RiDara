@@ -23,9 +23,24 @@ export const useOntology = () => {
         return useApiFetch<OntologyNode[]>(`${ontologyUrlPrefix}/${ontologyFileUuid}/nodes`);
     }
 
+    const editOntologyFile = async (
+        uuid: string,
+        name: string
+    ): Promise<AsyncData<OntologyFile, any>> => {
+        const body = { name: name };
+
+        return useApiFetch<OntologyFile>(
+            `${ontologyUrlPrefix}/${uuid}`, {
+                method: 'PATCH',
+                body: body,
+            }
+        );
+    }
+
     return {
         loadOntologyFile: loadOntologyFile,
         getOntologyFiles: getOntologyFiles,
         getOntologyNodes: getOntologyNodes,
+        editOntologyFile: editOntologyFile,
     };
 }

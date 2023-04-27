@@ -92,7 +92,7 @@ const importTemplateSubmit = async (name: string, ontologyFileUuid: string, file
             <h3 class='text-lg font-bold'>Edit template</h3>
             <FormTemplate @form-sent='edit' :ontology-files='ontologyFiles' :template='templateToEdit' />
         </Modal>
-        <Modal v-model='importModalState'>
+        <Modal v-model='importModalState' v-if='importModalState'>
             <h3 class='text-lg font-bold'>Import template</h3>
             <FormTemplate @form-sent='importTemplateSubmit' :ontology-files='ontologyFiles' :is-import='true' />
         </Modal>

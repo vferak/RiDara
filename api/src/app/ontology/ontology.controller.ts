@@ -3,6 +3,7 @@ import {
     Controller,
     Get,
     Param,
+    Patch,
     Post,
     UploadedFile,
     UseInterceptors,
@@ -18,6 +19,7 @@ import { OntlogyFileByUuidPipe } from './pipes/ontlogyFile-by-uuid.pipe';
 import { UserRoles } from '../shared/user/role/userRole.decorator';
 import { UserRole } from '../shared/user/role/userRole.enum';
 import { TurtleService } from '../shared/turtle/turtle.service';
+import { EditFileOntologyDto } from './dto/edit-file-ontology.dto';
 
 @Controller('ontology')
 export class OntologyController {
@@ -39,6 +41,17 @@ export class OntologyController {
             turtleData,
             createFileOntologyDto,
         );
+    }
+
+    @Patch(':ontologyFileUuid')
+    @UserRoles(UserRole.ADMIN)
+    public async edit(
+        @Param('ontologyFileUuid') ontologyFileUuid: string,
+        @Body() editFileOntologyDto: EditFileOntologyDto,
+    ): Promise<OntologyFile> {
+        const ontologyFile = await this.ontologyService.getOneFileByUuid(ontologyFileUuid)
+
+        return await this.ontologyService.editFile(ontologyFile, editFileOntologyDto);
     }
 
     @Get('files')

@@ -14,6 +14,7 @@ import { TurtleData } from '../../shared/turtle/turtle.data';
 import { OntologyRelation } from '../ontologyRelation/ontologyRelation.entity';
 import { Uuid } from '../../common/uuid/uuid';
 import { UuidInterface } from '../../common/uuid/uuid.interface';
+import { EditFileOntologyDto } from '../dto/edit-file-ontology.dto';
 
 @Entity({ customRepository: () => OntologyFileRepository })
 export class OntologyFile {
@@ -70,6 +71,11 @@ export class OntologyFile {
         }
 
         return ontologyFile;
+    }
+
+    public edit(editFileOntologyDto: EditFileOntologyDto): OntologyFile {
+        this.name = editFileOntologyDto.name;
+        return this;
     }
 
     public async getNodes(): Promise<OntologyNode[]> {

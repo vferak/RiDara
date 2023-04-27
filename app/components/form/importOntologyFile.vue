@@ -1,5 +1,11 @@
 <script setup lang='ts'>
+import { OntologyFile } from '~/composables/types';
+
 const { $z, $veeValidate } = useNuxtApp();
+
+const props = defineProps<{
+    ontologyFile?: OntologyFile,
+}>();
 
 const emit = defineEmits<{
     (event: 'formSent', name: string, file: File): void
@@ -12,7 +18,7 @@ const { handleSubmit } = $veeValidate.useForm({
             file: $z
                 .any()
                 .refine(
-                    () => fileData.value?.name.split('.').pop() === "ttl",
+                    () => props.ontologyFile || fileData.value?.name.split('.').pop() === "ttl",
                     "Only .ttl file is supported."
                 )
         })
@@ -21,6 +27,11 @@ const { handleSubmit } = $veeValidate.useForm({
 
 const name = $veeValidate.useField<string>('name');
 const file = $veeValidate.useField<string>('file');
+
+if (props.ontologyFile !== undefined) {
+    console.log(props.ontologyFile);
+    name.setValue(props.ontologyFile.name);
+}
 
 const fileData = useState<File>();
 
@@ -41,7 +52,7 @@ const onSubmit = handleSubmit(async (): Promise<void> => {
 <template>
     <form @submit='onSubmit' class='flex flex-col mb-4' method="post" enctype="multipart/form-data">
         <FormInputBase :name='"Name"' :type='"text"' :field='name'/>
-        <FormInputBase @change='onChangeFile($event)' :name='"Ontology file"' :type='"file"' :field='file'/>
+        <FormInputBase v-if='!props.ontologyFile' @change='onChangeFile($event)' :name='"Ontology file"' :type='"file"' :field='file'/>
         <input type='submit' value='Submit' class='btn btn-sm mt-4'/>
     </form>
 </template>
