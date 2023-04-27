@@ -38,6 +38,10 @@ export class TemplateSeeder extends Seeder {
         TemplateSeeder.SEEDER_RESOURCES_FOLDER,
         'DevelopmentProcessTemplate.bpmn',
     );
+    private static DEVELOPMENT_PROCESS_BAD_TEMPLATE_BPMN_FILE = path.join(
+        TemplateSeeder.SEEDER_RESOURCES_FOLDER,
+        'DevelopmentProcessBadTemplate.bpmn',
+    );
 
     private bpmnService: BpmnService = new BpmnService();
     private fileService: FileService = new FileService();
@@ -72,7 +76,7 @@ export class TemplateSeeder extends Seeder {
             TemplateSeeder.REQUIREMENT_PRIORITIZATION_TEMPLATE_BPMN_FILE,
             adminUser,
             upmmOntology,
-            new CreateTemplateDto('RequirementPrioritization'),
+            new CreateTemplateDto('Requirement prioritization'),
         );
 
         const developmentProcessTemplate = await this.createTemplateWithAllRelations(
@@ -80,13 +84,22 @@ export class TemplateSeeder extends Seeder {
             TemplateSeeder.DEVELOPMENT_PROCESS_TEMPLATE_BPMN_FILE,
             adminUser,
             upmmOntology,
-            new CreateTemplateDto('DevelopmentProcess'),
+            new CreateTemplateDto('Development process no errors'),
+        );
+
+        const developmentProcessBadTemplate = await this.createTemplateWithAllRelations(
+            entityManager,
+            TemplateSeeder.DEVELOPMENT_PROCESS_BAD_TEMPLATE_BPMN_FILE,
+            adminUser,
+            upmmOntology,
+            new CreateTemplateDto('Development process bad template '),
         );
 
         context.template = {
             waterfall: waterFallTemplate,
             requirementPrioritization: requirementPrioritizationTemplate,
             developmentProcessTemplate: developmentProcessTemplate,
+            developmentProcessBadTemplate: developmentProcessBadTemplate,
         };
     }
 
