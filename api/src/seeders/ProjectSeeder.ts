@@ -37,7 +37,7 @@ export class ProjectSeeder extends Seeder {
         const fileService = new FileService();
         const projectFileService = new ProjectFileService(fileService);
 
-        const scrumTemplate = context.template.scrum;
+        const scrumTemplate = context.template.waterfall;
 
         const sharedWorkspace = context.workspace.shared;
         const sharedProjectFile = fileService.readFile(

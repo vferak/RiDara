@@ -13,6 +13,8 @@ import { OntologyNodeRepository } from '../app/ontology/ontologyNode/ontologyNod
 import { TemplateNode } from '../app/template/templateNode/templateNode.entity';
 import { OntologyNode } from '../app/ontology/ontologyNode/ontologyNode.entity';
 import { SqlEntityManager } from '@mikro-orm/mariadb';
+import { OntologyFile } from '../app/ontology/ontologyFile/ontologyFile.entity';
+import { User } from '../app/shared/user/user.entity';
 
 export class TemplateSeeder extends Seeder {
     private static SEEDER_RESOURCES_FOLDER = path.join(
@@ -27,15 +29,29 @@ export class TemplateSeeder extends Seeder {
         'WaterfallTemplate.bpmn',
     );
 
+    private static REQUIREMENT_PRIORITIZATION_TEMPLATE_BPMN_FILE = path.join(
+        TemplateSeeder.SEEDER_RESOURCES_FOLDER,
+        'RequirementPrioritizationTemplate.bpmn',
+    );
+
+    private static DEVELOPMENT_PROCESS_TEMPLATE_BPMN_FILE = path.join(
+        TemplateSeeder.SEEDER_RESOURCES_FOLDER,
+        'DevelopmentProcessTemplate.bpmn',
+    );
+
+    private bpmnService: BpmnService = new BpmnService();
+    private fileService: FileService = new FileService();
+    private templateFileService: TemplateFileService = new TemplateFileService(
+        this.fileService,
+    );
+
+    private templateNodeService: TemplateNodeService;
+
     async run(
         entityManager: SqlEntityManager,
         context: Dictionary,
     ): Promise<void> {
-        const bpmnService = new BpmnService();
-        const fileService = new FileService();
-        const templateFileService = new TemplateFileService(fileService);
-
-        const templateNodeService = new TemplateNodeService(
+        this.templateNodeService = new TemplateNodeService(
             new TemplateNodeRepository(entityManager, TemplateNode),
             new OntologyNodeRepository(entityManager, OntologyNode),
         );
@@ -43,44 +59,83 @@ export class TemplateSeeder extends Seeder {
         const adminUser = context.user.admin;
         const upmmOntology = context.ontology.upmm;
 
-        const waterfallTemplateFile = await bpmnService.changeStructureOfImportedFile(
-            fileService.readFile(
-                FileData.createFromFilePathWithName(
-                    TemplateSeeder.WATERFALL_TEMPLATE_BPMN_FILE,
-                ),
-            ),
-            await upmmOntology.getNodes(),
-            [],
-            true
-        );
-
-        const scrumTemplate = await Template.create(
-            templateFileService,
+        const waterFallTemplate = await this.createTemplateWithAllRelations(
+            entityManager,
+            TemplateSeeder.WATERFALL_TEMPLATE_BPMN_FILE,
             adminUser,
             upmmOntology,
-            waterfallTemplateFile,
-            new CreateTemplateDto('SCRUM'),
+            new CreateTemplateDto('Waterfall'),
         );
 
-        await entityManager.persistAndFlush(scrumTemplate);
+        const requirementPrioritizationTemplate = await this.createTemplateWithAllRelations(
+            entityManager,
+            TemplateSeeder.REQUIREMENT_PRIORITIZATION_TEMPLATE_BPMN_FILE,
+            adminUser,
+            upmmOntology,
+            new CreateTemplateDto('RequirementPrioritization'),
+        );
+
+        const developmentProcessTemplate = await this.createTemplateWithAllRelations(
+            entityManager,
+            TemplateSeeder.DEVELOPMENT_PROCESS_TEMPLATE_BPMN_FILE,
+            adminUser,
+            upmmOntology,
+            new CreateTemplateDto('DevelopmentProcess'),
+        );
+
+        context.template = {
+            waterfall: waterFallTemplate,
+            requirementPrioritization: requirementPrioritizationTemplate,
+            developmentProcessTemplate: developmentProcessTemplate,
+        };
+    }
+
+    private async createTemplateWithAllRelations(
+        entityManager: SqlEntityManager,
+        templateFileName: string,
+        templateUser: User,
+        ontologyFile: OntologyFile,
+        createTemplateDto: CreateTemplateDto,
+    ): Promise<Template> {
+        const waterfallTemplateFile = await this.bpmnService.changeStructureOfImportedFile(
+            this.fileService.readFile(
+                FileData.createFromFilePathWithName(templateFileName),
+            ),
+            await ontologyFile.getNodes(),
+            [],
+            true,
+        );
+
+        const template = await Template.create(
+            this.templateFileService,
+            templateUser,
+            ontologyFile,
+            waterfallTemplateFile,
+            createTemplateDto,
+        );
+
+        await entityManager.persistAndFlush(template);
 
         const allBpmnElements = (
-            await bpmnService.parseBpmnFile(
-                await scrumTemplate.getPublishedFileName(),
+            await this.bpmnService.parseBpmnFile(
+                await template.getPublishedFileName(),
                 false,
                 false,
             )
         ).flatMap((obj) =>
             obj.getElements(),
-        )
-
-        await templateNodeService.createFromBpmnData(
-            allBpmnElements,
-            await scrumTemplate.getVersionPublished()
         );
 
-        context.template = {
-            scrum: scrumTemplate,
-        };
+        await this.templateNodeService.createFromBpmnData(
+            allBpmnElements,
+            await template.getVersionPublished(),
+        );
+
+        await this.templateNodeService.createFromBpmnData(
+            allBpmnElements,
+            await template.getVersionDraft(),
+        );
+
+        return template;
     }
 }
