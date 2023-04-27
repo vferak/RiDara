@@ -84,10 +84,17 @@ export class TemplateController {
             ontologyFileUuid,
         );
 
+        const fileBuffer = await this.bpmnService.changeStructureOfImportedFile(
+            file.buffer,
+            await ontologyFile.getNodes(),
+            [],
+            true,
+        );
+
         return await this.templateService.create(
             currentUser,
             ontologyFile,
-            file.buffer,
+            fileBuffer,
             createTemplateDto
         );
     }
