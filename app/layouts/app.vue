@@ -8,49 +8,59 @@ const { data: user } = await getUser();
 setCurrentUser(user.value!);
 const currentWorkspace = await getCurrentWorkspace();
 
-const navs = useState(() => [
-    {
-        key: 'overview',
-        name: 'Overview',
-        visible: true,
-        links: [
-            {name: 'Dashboard', route: '/dashboard', icon: 'gg-collage'},
-            {name: 'Workspaces', route: '/workspaces', icon: 'gg-work-alt'},
-        ],
-    },
-    {
-        key: 'workspace',
-        name: currentWorkspace?.value?.name,
-        visible: !!currentWorkspace?.value,
-        links: [
-            {name: 'Projects', route: `/projects`, icon: 'gg-album'},
-            {name: 'Workspace settings', route: `/workspaces/${currentWorkspace.value?.uuid}/settings`, icon: 'gg-options'},
-        ],
-    },
-]);
+const navs = useState<{
+    key: string,
+    name: string,
+    visible: boolean,
+    links: {
+        name: string,
+        route: string,
+        icon: string,
+    }[]
+}[]>();
 
-if (user.value!.role === 'admin') {
-    navs.value.push({
-        key: 'admin',
-        name: 'Admin',
-        visible: true,
-        links: [
-            {name: 'Templates', route: '/templates', icon: 'gg-template'},
-            {name: 'Ontology files', route: '/ontology/files', icon: 'gg-file-document'},
-        ],
-    })
-}
+const renderNav = () => {
+    navs.value = [
+        {
+            key: 'overview',
+            name: 'Overview',
+            visible: true,
+            links: [
+                {name: 'Dashboard', route: '/dashboard', icon: 'gg-collage'},
+                {name: 'Workspaces', route: '/workspaces', icon: 'gg-work-alt'},
+            ],
+        },
+    ];
+
+    if (currentWorkspace.value) {
+        navs.value.push({
+            key: 'workspace',
+            name: currentWorkspace!.value!.name,
+            visible: !!currentWorkspace?.value,
+            links: [
+                {name: 'Projects', route: `/projects`, icon: 'gg-album'},
+                {name: 'Workspace settings', route: `/workspaces/${currentWorkspace.value?.uuid}/settings`, icon: 'gg-options'},
+            ],
+        });
+    }
+
+    if (user.value && user.value.role === 'admin') {
+        navs.value.push({
+            key: 'admin',
+            name: 'Admin',
+            visible: true,
+            links: [
+                {name: 'Templates', route: '/templates', icon: 'gg-template'},
+                {name: 'Ontology files', route: '/ontology/files', icon: 'gg-file-document'},
+            ],
+        })
+    }
+};
+
+renderNav();
 
 watch(currentWorkspace, () => {
-    const workspaceNav = navs.value.find((nav) => nav.key === 'workspace');
-    workspaceNav!.name = currentWorkspace?.value?.name;
-    workspaceNav!.visible = !!currentWorkspace?.value;
-
-    const settingsLink = workspaceNav!.links.find(
-        (link) => link.name === 'Workspace settings'
-    );
-
-    settingsLink!.route = `/workspaces/${currentWorkspace.value?.uuid}/settings`;
+    renderNav();
 })
 </script>
 <template>
