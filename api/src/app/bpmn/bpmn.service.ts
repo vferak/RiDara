@@ -600,20 +600,6 @@ export class BpmnService {
                 }
             }
         }
-        const first = allBpmnElementData.find(
-            (bpmnElement) => bpmnElement.getId() === 'Activity_0c4uib2',
-        );
-
-        const subprocess = allBpmnElementData.find(
-            (bpmnElement) => bpmnElement.getId() === 'Activity_0xla8a9',
-        );
-
-        const second = allBpmnElementData.find(
-            (bpmnElement) => bpmnElement.getId() === 'Activity_1veryrs',
-        );
-        console.log(first);
-        console.log(second);
-        console.log(subprocess);
 
         return allBpmnElementData;
     }

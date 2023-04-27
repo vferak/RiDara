@@ -29,7 +29,6 @@ const name = $veeValidate.useField<string>('name');
 const file = $veeValidate.useField<string>('file');
 
 if (props.ontologyFile !== undefined) {
-    console.log(props.ontologyFile);
     name.setValue(props.ontologyFile.name);
 }
 

@@ -48,15 +48,6 @@ duplicities.value = objectSize > 0 && props.errorTemplate[0].upmmUuid === '/12/1
                                 <b>{{ notPossibleItem }}</b> </p>
                         </div>
                     </div>
-
-                    <h1 class='text-2xl font-bold mt-3 text-center mb-2'>Extra relations:</h1>
-                    <div v-for='(items, indexTemplate) in props.errorTemplate' :key='indexTemplate'>
-                        <div v-for='(extraItem, extraIndex) in items.overExtends' :key='extraIndex'>
-
-                            <p class='text-lg text-center mt-2'><b>{{ items.upmmUuid }}</b> ({{items.id}})
-                                connected to <b>{{ extraItem }}</b></p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

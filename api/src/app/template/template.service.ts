@@ -155,38 +155,6 @@ export class TemplateService {
                         );
                     templateAnalyzeDatas.push(templateAnalyzeData);
                 }
-            } else {
-                const templateOutgoingMap =
-                    this.createMapWithOccurences(templateOutgoing);
-                const databaseOutgoingMap =
-                    this.createMapWithOccurences(databaseOutgoing);
-
-                for (const [key, firstValue] of templateOutgoingMap) {
-                    const secondValue = databaseOutgoingMap.get(key);
-                    if (firstValue !== secondValue) {
-                        const existingElement: TemplateAnalyzeData =
-                            templateAnalyzeDatas.find(
-                                (element: TemplateAnalyzeData) =>
-                                    element.getId() === templateNode.getId(),
-                            );
-                        if (existingElement === undefined) {
-                            const templateAnalyzeData: TemplateAnalyzeData =
-                                new TemplateAnalyzeData(
-                                    templateNode.getUpmmUuid(),
-                                    [],
-                                    [key],
-                                    templateNode.getId(),
-                                );
-                            templateAnalyzeDatas.push(templateAnalyzeData);
-                        } else {
-                            const existingOverExtends =
-                                existingElement.getOverExtends();
-                            existingOverExtends.push(key);
-
-                            existingElement.setOverExtends(existingOverExtends);
-                        }
-                    }
-                }
             }
         }
 
