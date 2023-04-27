@@ -32,6 +32,11 @@ export class WorkspaceSeeder extends Seeder {
             ferakUser,
         );
 
+        const analyzeExamplesWorkspace = await Workspace.create(
+            new CreateWorkspaceDto('Analyze examples workspace'),
+            adminUser,
+        );
+
         await sharedWorkspace.addUser(bestaUser);
 
         await entityManager.persistAndFlush([
@@ -39,12 +44,14 @@ export class WorkspaceSeeder extends Seeder {
             bestaWorkspace,
             ferakWorkspace,
             sharedWorkspace,
+            analyzeExamplesWorkspace,
         ]);
 
         context.workspace = {
             besta: bestaWorkspace,
             ferak: ferakWorkspace,
             shared: sharedWorkspace,
+            analyzeExamples: analyzeExamplesWorkspace,
         };
     }
 }
