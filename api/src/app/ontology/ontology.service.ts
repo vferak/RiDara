@@ -16,7 +16,7 @@ export class OntologyService {
     ) {}
 
     public async getOneFileByUuid(uuid: string): Promise<OntologyFile> {
-        return this.ontologyFileRepository.findOneOrFail({ uuid: uuid });
+        return this.ontologyFileRepository.findOneOrFail({ uuid: uuid, deleted: false });
     }
 
     public async getOneNodeByUuid(uuid: string): Promise<OntologyNode> {
@@ -24,7 +24,7 @@ export class OntologyService {
     }
 
     public async findAll(): Promise<OntologyFile[]> {
-        return this.ontologyFileRepository.findAll();
+        return this.ontologyFileRepository.find({ deleted: false });
     }
 
     public async getAllNodesByFile(
@@ -67,5 +67,10 @@ export class OntologyService {
         await this.ontologyFileRepository.flush();
 
         return ontologyFile;
+    }
+
+    public async deleteFile(ontologyFile: OntologyFile): Promise<void> {
+        ontologyFile.delete();
+        await this.ontologyFileRepository.flush();
     }
 }

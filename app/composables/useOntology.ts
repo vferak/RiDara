@@ -37,10 +37,18 @@ export const useOntology = () => {
         );
     }
 
+    const deleteOntologyFile = async (ontologyFileUuid: string): Promise<AsyncData<void, any>> => {
+        return useApiFetch<void>(
+            `${ontologyUrlPrefix}/${ontologyFileUuid}`,
+            { method: 'DELETE' }
+        );
+    }
+
     return {
         loadOntologyFile: loadOntologyFile,
         getOntologyFiles: getOntologyFiles,
         getOntologyNodes: getOntologyNodes,
         editOntologyFile: editOntologyFile,
+        deleteOntologyFile: deleteOntologyFile,
     };
 }

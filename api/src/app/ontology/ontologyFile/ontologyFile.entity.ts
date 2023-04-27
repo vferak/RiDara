@@ -35,10 +35,14 @@ export class OntologyFile {
     @OneToMany('Template', 'ontologyFile')
     private templates = new Collection<Template>(this);
 
+    @Property()
+    private deleted!: boolean;
+
     private constructor(uuid: UuidInterface, name: string, createDate: Date) {
         this.uuid = uuid.asString();
         this.name = name;
         this.createDate = createDate;
+        this.deleted = false;
     }
 
     public static create(
@@ -76,6 +80,10 @@ export class OntologyFile {
     public edit(editFileOntologyDto: EditFileOntologyDto): OntologyFile {
         this.name = editFileOntologyDto.name;
         return this;
+    }
+
+    public delete(): void {
+        this.deleted = true;
     }
 
     public async getNodes(): Promise<OntologyNode[]> {

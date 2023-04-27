@@ -1,6 +1,7 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
     Param,
     Patch,
@@ -52,6 +53,16 @@ export class OntologyController {
         const ontologyFile = await this.ontologyService.getOneFileByUuid(ontologyFileUuid)
 
         return await this.ontologyService.editFile(ontologyFile, editFileOntologyDto);
+    }
+
+    @Delete(':ontologyFileUuid')
+    @UserRoles(UserRole.ADMIN)
+    public async delete(
+        @Param('ontologyFileUuid') ontologyFileUuid: string,
+    ): Promise<void> {
+        const ontologyFile = await this.ontologyService.getOneFileByUuid(ontologyFileUuid)
+
+        return await this.ontologyService.deleteFile(ontologyFile);
     }
 
     @Get('files')
