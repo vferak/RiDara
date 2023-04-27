@@ -815,8 +815,8 @@
           "nullable": false,
           "mappedType": "string"
         },
-        "template_uuid": {
-          "name": "template_uuid",
+        "template_version_uuid": {
+          "name": "template_version_uuid",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -847,10 +847,10 @@
         },
         {
           "columnNames": [
-            "template_uuid"
+            "template_version_uuid"
           ],
           "composite": false,
-          "keyName": "project_template_uuid_index",
+          "keyName": "project_template_version_uuid_index",
           "primary": false,
           "unique": false
         },
@@ -890,16 +890,16 @@
           "referencedTableName": "workspace",
           "updateRule": "cascade"
         },
-        "project_template_uuid_foreign": {
-          "constraintName": "project_template_uuid_foreign",
+        "project_template_version_uuid_foreign": {
+          "constraintName": "project_template_version_uuid_foreign",
           "columnNames": [
-            "template_uuid"
+            "template_version_uuid"
           ],
           "localTableName": "project",
           "referencedColumnNames": [
             "uuid"
           ],
-          "referencedTableName": "template",
+          "referencedTableName": "template_version",
           "updateRule": "cascade"
         }
       }

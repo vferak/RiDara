@@ -27,7 +27,7 @@ const projectDelete = async (project: Project): Promise<void> => {
                 <div class='card-body'>
                     <h2 class='card-title'>{{ project.name }}</h2>
                     <p>Owner: <b>{{ project.owner.firstName }} {{ project.owner.lastName }}</b></p>
-                    <p>Template: <b>{{ project.template.name }}</b></p>
+                    <p>Template: <b>{{ project.templateVersion.template.name }}</b></p>
                     <div class='card-actions justify-end'>
                         <NuxtLink @click.prevent='editOpen(project)'>
                             <button class='btn btn-sm'>Edit</button>

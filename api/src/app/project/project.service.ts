@@ -7,6 +7,7 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { Template } from '../template/template.entity';
 import { Workspace } from '../workspace/workspace.entity';
 import { ProjectFileService } from './projectFile/projectFile.service';
+import { TemplateVersion } from '../template/templateVersion/templateVersion.entity';
 
 @Injectable()
 export class ProjectService {
@@ -29,7 +30,7 @@ export class ProjectService {
             this.projectFileService,
             createProjectDto,
             user,
-            template,
+            await template.getVersionPublished(),
             file,
         );
 
@@ -43,9 +44,9 @@ export class ProjectService {
         project: Project,
         updateProjectDto: UpdateProjectDto,
         workspace: Workspace,
-        template: Template,
+        templateVersion: TemplateVersion,
     ): Promise<Project> {
-        project.update(updateProjectDto, workspace, template);
+        project.update(updateProjectDto, workspace, templateVersion);
         await this.projectRepository.flush();
         return project;
     }

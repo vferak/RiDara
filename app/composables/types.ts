@@ -26,6 +26,11 @@ export type Template = {
     ontologyFile: OntologyFile
 }
 
+export type TemplateVersion = {
+    uuid: string,
+    template: Template,
+}
+
 export type Project = {
     uuid: string,
     name: string,
@@ -33,7 +38,7 @@ export type Project = {
     owner: User,
     workspace: Workspace,
     path: string,
-    template: Template,
+    templateVersion: TemplateVersion,
 }
 
 export type OntologyNode = {

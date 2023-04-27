@@ -5,7 +5,6 @@ import {
     PrimaryKey,
     Property,
 } from '@mikro-orm/core';
-import { v4 } from 'uuid';
 import { Workspace } from '../workspace/workspace.entity';
 import { ProjectRepository } from './project.repository';
 import { User } from '../shared/user/user.entity';
@@ -16,6 +15,7 @@ import { EntityManager } from '@mikro-orm/mariadb';
 import { Uuid } from '../common/uuid/uuid';
 import { ProjectFileService } from './projectFile/projectFile.service';
 import { UuidInterface } from '../common/uuid/uuid.interface';
+import { TemplateVersion } from '../template/templateVersion/templateVersion.entity';
 
 @Entity({ customRepository: () => ProjectRepository })
 export class Project {
@@ -39,8 +39,8 @@ export class Project {
     @ManyToOne({ entity: () => Workspace, eager: true })
     private workspace!: Workspace;
 
-    @ManyToOne({ entity: () => Template, eager: true })
-    private template!: Template;
+    @ManyToOne({ entity: () => TemplateVersion, eager: true })
+    private templateVersion!: TemplateVersion;
 
     private constructor(
         uuid: UuidInterface,
@@ -49,7 +49,7 @@ export class Project {
         owner: User,
         workspace: Workspace,
         createDate: Date,
-        template: Template,
+        templateVersion: TemplateVersion,
     ) {
         this.uuid = uuid.asString();
         this.name = name;
@@ -57,14 +57,14 @@ export class Project {
         this.owner = owner;
         this.workspace = workspace;
         this.createDate = createDate;
-        this.template = template;
+        this.templateVersion = templateVersion;
     }
 
     public static create(
         projectFileService: ProjectFileService,
         createProjectDto: CreateProjectDto,
         user: User,
-        template: Template,
+        templateVersion: TemplateVersion,
         file: Buffer,
     ): Project {
         const uuid = Uuid.createV4();
@@ -79,7 +79,7 @@ export class Project {
             user,
             createProjectDto.workspace,
             date,
-            template,
+            templateVersion,
         );
     }
 
@@ -90,10 +90,10 @@ export class Project {
     public update(
         updateProjectDto: UpdateProjectDto,
         workspace: Workspace,
-        template: Template,
+        templateVersion: TemplateVersion,
     ): void {
         this.name = updateProjectDto.name;
-        this.template = template;
+        this.templateVersion = templateVersion;
         this.workspace = workspace;
     }
 
@@ -102,14 +102,20 @@ export class Project {
     }
 
     public getTemplate(): Template {
-        return this.template;
+        return this.templateVersion.getTemplate();
+    }
+
+    public getTemplateVersion(): TemplateVersion {
+        return this.templateVersion;
+    }
+
+    public getTemplateFileName(): string {
+        return this.templateVersion.getFileName();
     }
 
     public async getNodesForBpmnDropdown(): Promise<object[]> {
-        const templateVersion = await this.getTemplate().getVersionPublished();
-
         const templateNodes = (
-            await templateVersion.getNodesSortedByName()
+            await this.templateVersion.getNodesSortedByName()
         ).map((templateNode) => {
             return {
                 uuid: templateNode.getUuid(),

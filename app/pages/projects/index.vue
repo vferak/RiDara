@@ -87,7 +87,7 @@ const emitValueDelete = async (project: Project): Promise<void> => {
 
         <Modal v-model='editState' v-if='editState'>
             <h3 class='text-lg font-bold'>Edit project</h3>
-            <FormEditProject @form-sent='editProject' :workspaces='workspaces' :workspace-uuid='projectToEdit.workspace.uuid' :templates='templates' :name='projectToEdit.name' :template-name='projectToEdit.template.name' :template-uuid='projectToEdit.template.uuid'/>
+            <FormEditProject @form-sent='editProject' :workspaces='workspaces' :workspace-uuid='projectToEdit.workspace.uuid' :templates='templates' :name='projectToEdit.name' :template-name='projectToEdit.templateVersion.template.name' :template-uuid='projectToEdit.templateVersion.template.uuid'/>
         </Modal>
 
     </div>

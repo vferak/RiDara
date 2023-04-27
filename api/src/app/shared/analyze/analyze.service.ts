@@ -3,7 +3,7 @@ import { BpmnElementData } from '../../bpmn/bpmnElement.data';
 import { AnalyzeData } from './analyze.data';
 import { RelationErrorData } from './relationError.data';
 import { TemplateNodeService } from '../../template/templateNode/templateNode.service';
-import { Template } from '../../template/template.entity';
+import { TemplateVersion } from '../../template/templateVersion/templateVersion.entity';
 
 @Injectable()
 export class AnalyzeService {
@@ -114,12 +114,11 @@ export class AnalyzeService {
         projectElements: BpmnElementData[],
         templateElements: BpmnElementData[],
         analyzedData: AnalyzeData,
-        template: Template,
+        templateVersion: TemplateVersion,
     ): Promise<any> {
         const relationErrorsData: RelationErrorData[] = [];
 
-        const allUniqueElementIdUsedInTemplate =
-            await this.templateNodeService.getAllByTemplateVersion(template);
+        const allUniqueElementIdUsedInTemplate = await templateVersion.getNodes();
 
         const allIdNamesFromTemplate = allUniqueElementIdUsedInTemplate.map(
             (obj) => obj.getElementId(),

@@ -17,6 +17,7 @@ import { Uuid } from '../../common/uuid/uuid';
 import { TemplateFileService } from '../templateFile/templateFile.service';
 import { TemplateVersionState } from './templateVersionState.enum';
 import { OntologyNode } from '../../ontology/ontologyNode/ontologyNode.entity';
+import { Project } from '../../project/project.entity';
 
 @Entity({ customRepository: () => TemplateVersionRepository })
 export class TemplateVersion {
@@ -25,11 +26,14 @@ export class TemplateVersion {
     @PrimaryKey()
     private readonly uuid: string;
 
-    @ManyToOne({ entity: () => Template })
+    @ManyToOne({ entity: () => Template, eager: true })
     private readonly template!: Template;
 
     @OneToMany('TemplateNode', 'templateVersion')
     private readonly templateNodes!: Collection<TemplateNode>;
+
+    @OneToMany('Project', 'templateVersion')
+    private readonly projects!: Collection<Project>;
 
     @Property()
     private readonly fileName!: string;
@@ -115,6 +119,10 @@ export class TemplateVersion {
 
     public getFileData(): FileData {
         return FileData.createFromFilePathWithName(this.fileName);
+    }
+
+    public getFileName(): string {
+        return this.fileName;
     }
 
     public getState(): TemplateVersionState {

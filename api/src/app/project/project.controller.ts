@@ -30,6 +30,7 @@ import { BPMN_BLANK_FILE_PATH } from '../common/file/file.constants';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { EntityManager } from '@mikro-orm/mariadb';
 import { BpmnElementData } from '../bpmn/bpmnElement.data';
+import { TemplateVersion } from '../template/templateVersion/templateVersion.entity';
 
 @Controller('project')
 export class ProjectController {
@@ -83,18 +84,25 @@ export class ProjectController {
         @Body() updateProjectDto: UpdateProjectDto,
         @Body('templateUuid') templateUuid: string,
     ): Promise<Project> {
-        const template = project.getTemplate().getUuid() === templateUuid ?
-            project.getTemplate() :
-            await this.templateService.getOneByUuid(templateUuid);
+        let templateVersion: TemplateVersion;
+
+        if (project.getTemplate().getUuid() === templateUuid) {
+            templateVersion = project.getTemplateVersion();
+        } else {
+            templateVersion = await (
+                await this.templateService.getOneByUuid(templateUuid)
+            ).getVersionPublished();
+        }
 
         const workspace = await this.workspaceService.getOneByUuid(
             updateProjectDto.workspace,
         );
+
         return this.projectService.update(
             project,
             updateProjectDto,
             workspace,
-            template,
+            templateVersion,
         );
     }
 
@@ -177,7 +185,6 @@ export class ProjectController {
         @Param('uuid', ProjectByUuidPipe) project: Project,
     ): Promise<AnalyzedJsonData> {
         let analyzedData: AnalyzeData;
-        const template = await project.getTemplate();
 
         const bpmnProjectData = await this.bpmnService.parseBpmnFile(
             project.getPath(),
@@ -188,7 +195,7 @@ export class ProjectController {
             bpmnProjectData.flatMap((obj) => obj.getElements());
 
         const templateBpmnData = await this.bpmnService.parseBpmnFile(
-            await project.getTemplate().getPublishedFileName(),
+            project.getTemplateFileName(),
             false,
             false,
         );
@@ -226,7 +233,7 @@ export class ProjectController {
                     secondLevelBpmnData,
                     allBpmnTemplateElementData,
                     analyzedData,
-                    template,
+                    project.getTemplateVersion(),
                 );
                 if (analyzedData.getRelationErrorData().length >= 1) {
                     const specialProjectBpmnData =
