@@ -4,6 +4,8 @@ import { BpmnData } from './bpmn.data';
 import { BpmnElementData } from './bpmnElement.data';
 import { TemplateVersion } from '../template/templateVersion/templateVersion.entity';
 import { TemplateNode } from '../template/templateNode/templateNode.entity';
+import { Template } from '../template/template.entity';
+import { OntologyNode } from '../ontology/ontologyNode/ontologyNode.entity';
 
 @Injectable()
 export class BpmnService {
@@ -362,6 +364,7 @@ export class BpmnService {
             references: references,
         } = await moddle.fromXML(bpmnFile);
         const allNodes = await templateVersion.getNodes();
+        //TODO dodelat asociace
         for (const object of rootElement.get('rootElements')) {
             if (object.hasOwnProperty('flowElements')) {
                 this.changeAttributesValues(
@@ -386,9 +389,12 @@ export class BpmnService {
             const searchedTemplateNode = allNodes.find((templateNode) => {
                 return templateNode.getElementId() === element.get('elementId');
             });
-            element.set('upmmId', searchedTemplateNode.getUuid());
-            element.set('upmmName', element.get('elementId'));
-            element.set('elementId', undefined);
+
+            if (searchedTemplateNode !== undefined) {
+                element.set('upmmId', searchedTemplateNode.getUuid());
+                element.set('upmmName', element.get('elementId'));
+                element.set('elementId', undefined);
+            }
 
             if (element.hasOwnProperty('flowElements')) {
                 this.changeAttributesValues(
@@ -445,13 +451,6 @@ export class BpmnService {
             let newOutgoingForUpperBpmnElement = bpmnElement.getOutgoing();
             let newIncomingForUpperBpmnElement = bpmnElement.getIncoming();
 
-            /*if (fourthLevel)
-            {
-                console.log(bpmnElement.getChildElements());
-            } else {
-                console.log(bpmnElement.getChildElements());
-
-            }*/
             for (const searchedOutgoingElement of searchedOutgoingElements) {
                 const bpmnElementDataToEdit = allBpmnElementData.find(
                     (bpmnElement) =>
@@ -548,9 +547,9 @@ export class BpmnService {
         analyzeTemplate?: boolean,
         fourthLevel?: boolean,
     ): BpmnElementData[] {
-        const a = allBpmnElementData.find(
+        /*const a = allBpmnElementData.find(
             (bpmnElement) => bpmnElement.getId() === 'Activity_0xla8a9',
-        );
+        );*/
         for (const messageFlow of messageFlows) {
             let fromElement: BpmnElementData;
             let toElement: BpmnElementData;
@@ -570,8 +569,7 @@ export class BpmnService {
                         );
                     }
 
-
-                   /* if (fromElement !== undefined && toElement !== undefined) {
+                    /* if (fromElement !== undefined && toElement !== undefined) {
                         console.log('before');
 
                         console.log(fromElement);
@@ -638,5 +636,105 @@ export class BpmnService {
             }
         }
         return result;
+    }
+
+    public async changeStructureOfImportedFile(
+        file: Buffer,
+        allNodesByTemplate: OntologyNode[],
+        allTemplateNodes: TemplateNode[],
+        importTemplate?: boolean,
+    ): Promise<Buffer> {
+        const moddle = this.createModdle();
+        const bpmnFile = file.toString();
+
+        const {
+            rootElement: rootElement,
+            elementsById: elementsById,
+            references: references,
+        } = await moddle.fromXML(bpmnFile);
+
+        const objects = [];
+        const messageFlows: any[] = [];
+        for (const object of rootElement.get('rootElements')) {
+            const type = object.$type.toString().split(':')[1];
+            if (type === 'Process' && object.flowElements !== undefined) {
+                objects.push(object);
+            } else {
+                if (object.hasOwnProperty('messageFlows')) {
+                    for (const flow of object.messageFlows) {
+                        const relationsOfObject = references.filter(
+                            (reference) => reference.element.id === flow.id,
+                        );
+                        messageFlows.push(relationsOfObject);
+                    }
+                }
+            }
+        }
+
+        for (const object of objects) {
+            if (importTemplate) {
+                // import template
+                this.changeImportedAttributesValues(
+                    object.get('flowElements'),
+                    allNodesByTemplate,
+                    true,
+                );
+            } else {
+                // import project
+                this.changeImportedAttributesValues(
+                    object.get('flowElements'),
+                    allTemplateNodes,
+                    false,
+                );
+            }
+        }
+        const { xml: xmlStrUpdated } = await moddle.toXML(rootElement);
+        return Buffer.from(xmlStrUpdated);
+    }
+
+    private changeImportedAttributesValues(
+        objects: any,
+        databaseNodes: any[],
+        importTemplate?: boolean,
+    ): void {
+        for (const element of objects) {
+            if (importTemplate) {
+                const searchedNode = databaseNodes.find((node) => {
+                    return node.getName() === element.get('upmmName');
+                });
+
+                if (searchedNode !== undefined) {
+                    element.set('upmmId', searchedNode.getUuid());
+                }
+
+                if (element.hasOwnProperty('flowElements')) {
+                    this.changeImportedAttributesValues(
+                        element.get('flowElements'),
+                        databaseNodes,
+                        importTemplate,
+                    );
+                }
+            } else {
+                const searchedTemplateNode = databaseNodes.find(
+                    (templateNode) => {
+                        return (
+                            templateNode.getElementId() ===
+                            element.get('upmmName')
+                        );
+                    },
+                );
+
+                if (searchedTemplateNode !== undefined) {
+                    element.set('upmmId', searchedTemplateNode.getUuid());
+                }
+                if (element.hasOwnProperty('flowElements')) {
+                    this.changeImportedAttributesValues(
+                        element.get('flowElements'),
+                        databaseNodes,
+                        importTemplate,
+                    );
+                }
+            }
+        }
     }
 }

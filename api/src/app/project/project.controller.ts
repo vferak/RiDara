@@ -151,12 +151,21 @@ export class ProjectController {
         @Body('templateUuid') templateUuid: string,
     ): Promise<Project> {
         const template = await this.templateService.getOneByUuid(templateUuid);
+        const allNodesByTemplate = await template.getOntologyFile().getNodes();
+        const templateVersion = await template.getVersionPublished();
+        const allTemplateNodes = await templateVersion.getNodes();
+        const newBuffer = await this.bpmnService.changeStructureOfImportedFile(
+            file.buffer,
+            allNodesByTemplate,
+            allTemplateNodes,
+            false,
+        );
 
         return await this.projectService.create(
             createProjectDto,
             user,
             template,
-            file.buffer,
+            newBuffer,
         );
     }
 

@@ -6,6 +6,7 @@ import { TemplateFileService } from '../app/template/templateFile/templateFile.s
 import { FileService } from '../app/common/file/file.service';
 import * as path from 'path';
 import { FileData } from '../app/common/file/file.data';
+import { BpmnService } from '../app/bpmn/bpmn.service';
 
 export class TemplateSeeder extends Seeder {
     private static SEEDER_RESOURCES_FOLDER = path.join(
@@ -24,18 +25,19 @@ export class TemplateSeeder extends Seeder {
         entityManager: EntityManager,
         context: Dictionary,
     ): Promise<void> {
+        const bpmnService = new BpmnService();
         const fileService = new FileService();
         const templateFileService = new TemplateFileService(fileService);
 
         const adminUser = context.user.admin;
         const upmmOntology = context.ontology.upmm;
 
-        const waterfallTemplateFile = fileService.readFile(
+        let waterfallTemplateFile = fileService.readFile(
             FileData.createFromFilePathWithName(
                 TemplateSeeder.WATERFALL_TEMPLATE_BPMN_FILE,
             ),
         );
-
+        waterfallTemplateFile = await bpmnService.changeStructureOfImportedFile(waterfallTemplateFile, await upmmOntology.getNodes(),[], true);
         const scrumTemplate = await Template.create(
             templateFileService,
             adminUser,
