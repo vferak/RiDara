@@ -52,8 +52,7 @@ export class WorkspaceController {
     public async getUsersByWorkspace(
         @Param('uuid', WorkspaceByUuidPipe) workspace: Workspace,
     ): Promise<UserWorkspace[]> {
-        const usersWorkspaces = await workspace.getUserWorkspaces();
-        return usersWorkspaces;
+        return workspace.getUserWorkspacesSortedByUserName();
     }
 
     @Get(':uuid/users_not_in_workspace')
@@ -79,7 +78,7 @@ export class WorkspaceController {
     public async getWorkspaces(
         @CurrentUser() user: User,
     ): Promise<Workspace[]> {
-        return await user.getWorkspaces();
+        return await user.getWorkspacesSorted();
     }
 
     @Patch(':uuid')

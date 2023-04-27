@@ -137,7 +137,7 @@ export class TemplateController {
 
     @Get()
     public async getAllForUser(): Promise<Template[]> {
-        return await this.templateService.getTemplates();
+        return await this.templateService.getTemplatesSorted();
     }
 
     @Patch(':templateUuid/publish')

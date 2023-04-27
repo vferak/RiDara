@@ -16,6 +16,7 @@ import { UserWorkspace } from './userWorkspace/userWorkspace.entity';
 import { Project } from '../project/project.entity';
 import { Uuid } from '../common/uuid/uuid';
 import { UuidInterface } from '../common/uuid/uuid.interface';
+import { OntologyNode } from '../ontology/ontologyNode/ontologyNode.entity';
 
 @Entity({ customRepository: () => WorkspaceRepository })
 export class Workspace {
@@ -85,13 +86,33 @@ export class Workspace {
     }
 
     public async getProjects(): Promise<Project[]> {
-        await this.projects.init();
-        return this.projects.getItems();
+        return this.projects.loadItems();
     }
 
+    public async getProjectsSorted(): Promise<Project[]> {
+        return (await this.getProjects()).sort(
+            (a: Project, b: Project): number => {
+            const aName = a.getName();
+            const bName = b.getName();
+
+            return aName > bName ? 1 : bName > aName ? -1 : 0;
+        });
+    }
+
+
     public async getUserWorkspaces(): Promise<UserWorkspace[]> {
-        await this.userWorkspaces.init();
-        return this.userWorkspaces.getItems();
+        return this.userWorkspaces.loadItems();
+    }
+
+    public async getUserWorkspacesSortedByUserName(): Promise<UserWorkspace[]> {
+        return (await this.getUserWorkspaces()).sort(
+            (a: UserWorkspace, b: UserWorkspace): number => {
+                const aName = a.getUser().getFullName();
+                const bName = b.getUser().getFullName();
+
+                return aName > bName ? 1 : bName > aName ? -1 : 0;
+            }
+        );
     }
 
     public async addUser(user: User): Promise<UserWorkspace> {

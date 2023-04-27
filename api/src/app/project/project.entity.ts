@@ -97,6 +97,10 @@ export class Project {
         this.workspace = workspace;
     }
 
+    public getName(): string {
+        return this.name;
+    }
+
     public getPath(): string {
         return this.path;
     }

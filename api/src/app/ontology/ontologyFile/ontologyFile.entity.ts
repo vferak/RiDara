@@ -99,4 +99,8 @@ export class OntologyFile {
                 return aName > bName ? 1 : bName > aName ? -1 : 0;
             });
     }
+
+    public getName(): string {
+        return this.name;
+    }
 }

@@ -34,12 +34,12 @@ export class UserController {
 
     @Get('dashboard')
     public async getDashboard(@CurrentUser() user: User): Promise<Workspace[]> {
-        return user.getWorkspaces();
+        return user.getWorkspacesSorted();
     }
 
     @Get('profile')
     public async getProfile(@CurrentUser() user: User): Promise<object> {
-        await user.getWorkspaces();
+        await user.getWorkspacesSorted();
         const userProjects = await user.getProjects();
         return {
             user: user,

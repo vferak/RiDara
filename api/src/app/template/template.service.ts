@@ -13,6 +13,7 @@ import { OntologyNode } from '../ontology/ontologyNode/ontologyNode.entity';
 import { OntologyNodeRepository } from '../ontology/ontologyNode/ontologyNode.repository';
 import { DatabaseRelationAnalyzeData } from '../ontology/ontologyNode/databaseRelationAnalyze.data';
 import { TemplateAnalyzeData } from '../ontology/ontologyNode/templateAnalyze.data';
+import { Workspace } from '../workspace/workspace.entity';
 
 @Injectable()
 export class TemplateService {
@@ -23,8 +24,15 @@ export class TemplateService {
         private readonly ontologyNodeRepository: OntologyNodeRepository,
     ) {}
 
-    public async getTemplates(): Promise<Template[]> {
-        return this.templateRepository.find({ deleted: false });
+    public async getTemplatesSorted(): Promise<Template[]> {
+        return (await this.templateRepository.find({ deleted: false }))
+            .sort(
+                (a: Template, b: Template): number => {
+                    const aName = a.getName();
+                    const bName = b.getName();
+                    return aName > bName ? 1 : bName > aName ? -1 : 0;
+                }
+            );
     }
 
     public async getOneByUuid(templateUuid: string): Promise<Template> {

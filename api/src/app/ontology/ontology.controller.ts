@@ -68,7 +68,7 @@ export class OntologyController {
     @Get('files')
     @UserRoles(UserRole.ADMIN)
     public async displayFiles(): Promise<OntologyFile[]> {
-        return this.ontologyService.findAll();
+        return this.ontologyService.findAllSorted();
     }
 
     @Get(':uuid/nodes')

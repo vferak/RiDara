@@ -17,6 +17,7 @@ import { Project } from '../../project/project.entity';
 import { Template } from '../../template/template.entity';
 import { UserRole } from './role/userRole.enum';
 import { BcryptService } from '../../common/providers/bcrypt.service';
+import { OntologyFile } from '../../ontology/ontologyFile/ontologyFile.entity';
 
 @Entity({ customRepository: () => UserRepository })
 export class User {
@@ -109,14 +110,29 @@ export class User {
         return this.lastName;
     }
 
+    public getFullName(): string {
+        return `${this.firstName} ${this.lastName}`;
+    }
+
     public async getWorkspaces(): Promise<Workspace[]> {
-        await this.userWorkspaces.init();
-        return this.userWorkspaces
-            .getItems()
+        return (await this.userWorkspaces.loadItems())
             .map((userWorkspace: UserWorkspace) =>
                 userWorkspace.getWorkspace(),
             );
     }
+
+    public async getWorkspacesSorted(): Promise<Workspace[]> {
+        return (await this.getWorkspaces())
+            .sort(
+                (a: Workspace, b: Workspace): number => {
+                    const aName = a.getName();
+                    const bName = b.getName();
+                    return aName > bName ? 1 : bName > aName ? -1 : 0;
+                }
+            );
+    }
+
+
 
     public getUuid(): string {
         return this.uuid;

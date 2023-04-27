@@ -97,6 +97,10 @@ export class Template {
         return this.uuid;
     }
 
+    public getName(): string {
+        return this.name;
+    }
+
     public async getDraftFileName(): Promise<string> {
         return (await this.getVersionDraft())
             .getFileData()

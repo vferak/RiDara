@@ -113,7 +113,8 @@ export class ProjectController {
         const workspace = await this.workspaceService.getOneByUuid(
             workspaceUuid,
         );
-        return workspace.getProjects();
+
+        return workspace.getProjectsSorted();
     }
 
     @Delete('/delete')

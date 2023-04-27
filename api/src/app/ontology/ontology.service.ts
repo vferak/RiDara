@@ -7,6 +7,7 @@ import { OntologyNode } from './ontologyNode/ontologyNode.entity';
 import { BpmnElementData } from '../bpmn/bpmnElement.data';
 import { TurtleData } from '../shared/turtle/turtle.data';
 import { EditFileOntologyDto } from './dto/edit-file-ontology.dto';
+import { Project } from '../project/project.entity';
 
 @Injectable()
 export class OntologyService {
@@ -23,8 +24,15 @@ export class OntologyService {
         return this.ontologyNodeRepository.findOneOrFail({ uuid: uuid });
     }
 
-    public async findAll(): Promise<OntologyFile[]> {
-        return this.ontologyFileRepository.find({ deleted: false });
+    public async findAllSorted(): Promise<OntologyFile[]> {
+        return (await this.ontologyFileRepository.find({ deleted: false }))
+            .sort(
+                (a: OntologyFile, b: OntologyFile): number => {
+                    const aName = a.getName();
+                    const bName = b.getName();
+                    return aName > bName ? 1 : bName > aName ? -1 : 0;
+                }
+            );
     }
 
     public async getAllNodesByFile(
