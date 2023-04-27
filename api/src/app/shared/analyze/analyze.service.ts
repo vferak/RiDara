@@ -206,9 +206,19 @@ export class AnalyzeService {
 
             const outgoingElements = fromElement.getOutgoing();
 
-            allOutgoingElements = [...allOutgoingElements, ...outgoingElements];
+            allOutgoingElements = [
+                ...allOutgoingElements,
+                ...outgoingElements,
+            ].sort();
+            const alreadyVisitedElements: string[] = [];
             while (allOutgoingElements.length !== 0) {
                 const outgoingValue = allOutgoingElements.shift();
+                if (alreadyVisitedElements.includes(outgoingValue)) {
+                    continue;
+                } else {
+                    alreadyVisitedElements.push(outgoingValue);
+                }
+
                 const outgoingElement = projectElements.find(
                     (projectElement) =>
                         projectElement.getId() === outgoingValue,
