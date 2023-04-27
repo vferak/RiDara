@@ -14,23 +14,23 @@ const lastName = user.value?.lastName;
 const exist = computed(() => workspaces.value !== null && workspaces.value?.length === 0);
 </script>
 <template>
-    <div class="container mx-auto my-6">
-        <p class="mb-4 mt-4 text-4xl font-bold tracking-tight leading-none md:text-5xl lg:text-6xl dark:text-white">
-            Dashboard
-        </p>
-        <Alert class='my-4'>
-            Welcome back {{ firstName }} {{ lastName }}, today is {{ date }} and it's {{ time }}.
-        </Alert>
-        <AlertInform v-if='exist'>
-            <div class="flex-1">
-                <span>Hi, it looks like you haven't created a workspace yet. You can create one by clicking the following button.</span>
-            </div>
-            <div class="flex-none">
-                <NuxtLink to='/workspaces' class="btn btn-sm btn-primary">Create workspace</NuxtLink>
-            </div>
-        </AlertInform>
-        <div class='grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-8 mt-8'>
+    <LayoutGridList title='Dashboard'>
+        <template v-slot:alerts>
+            <Alert>
+                Welcome back {{ firstName }} {{ lastName }}, today is {{ date }} and it's {{ time }}.
+            </Alert>
+            <AlertInform v-if='exist' class='mt-4'>
+                <div class="flex-1">
+                    <span>Hi, it looks like you haven't created a workspace yet. You can create one by clicking the following button.</span>
+                </div>
+                <div class="flex-none">
+                    <NuxtLink to='/workspaces' class="btn btn-sm btn-primary">Create workspace</NuxtLink>
+                </div>
+            </AlertInform>
+        </template>
+
+        <template v-slot:grid>
             <CardsWorkspaceCard v-for='workspace in workspaces' :key='workspace.id' :workspace='workspace' />
-        </div>
-    </div>
+        </template>
+    </LayoutGridList>
 </template>

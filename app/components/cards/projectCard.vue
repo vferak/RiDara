@@ -23,22 +23,20 @@ const projectDelete = async (project: Project): Promise<void> => {
 <template>
     <div>
         <NuxtLink :to="{ name: 'projects-uuid', params: { uuid: project.uuid }}">
-            <div class='card w-50 bg-base-200 shadow-xl'>
-                <div class='card-body'>
-                    <h2 class='card-title'>{{ project.name }}</h2>
-                    <p>Owner: <b>{{ project.owner.firstName }} {{ project.owner.lastName }}</b></p>
-                    <p>Template: <b>{{ project.templateVersion.template.name }}</b></p>
-                    <div class='card-actions justify-end'>
-                        <NuxtLink @click.prevent='editOpen(project)'>
-                            <button class='btn btn-sm'>Edit</button>
-                        </NuxtLink>
+            <CardPrimary :title='project.name'>
+                <p>Owner: <b>{{ project.owner.firstName }} {{ project.owner.lastName }}</b></p>
+                <p>Template: <b>{{ project.templateVersion.template.name }}</b></p>
 
-                        <NuxtLink @click.prevent='projectDelete(project)'>
-                            <button class='btn btn-sm'>Delete</button>
-                        </NuxtLink>
-                    </div>
-                </div>
-            </div>
+                <template v-slot:actions>
+                    <NuxtLink @click.prevent='editOpen(project)'>
+                        <button class='btn btn-secondary btn-sm'>Edit</button>
+                    </NuxtLink>
+
+                    <NuxtLink @click.prevent='projectDelete(project)'>
+                        <button class='btn btn-secondary btn-sm'>Delete</button>
+                    </NuxtLink>
+                </template>
+            </CardPrimary>
         </NuxtLink>
     </div>
 </template>

@@ -35,6 +35,6 @@ const onSubmit = handleSubmit(async (): Promise<void> => {
     <form @submit='onSubmit' class='flex flex-col mb-4'>
         <FormInputBase :name='"New password"' :type='"password"' :field='password'/>
         <FormInputBase :name='"New password again"' :type='"password"' :field='password_again'/>
-        <input type='submit' value='Submit' class='btn btn-sm mt-4' />
+        <input type='submit' value='Submit' class='btn btn-primary btn-sm mt-4' />
     </form>
 </template>

@@ -29,7 +29,7 @@ watchEffect(() => {
                 <div class='card-body w-full'>
                     <div class='flex item-center justify-between'>
                         <h2 class='card-title'>Login</h2>
-                        <NuxtLink to='/register' class='btn sm:btn-md text-end space-between'>Create account</NuxtLink>
+                        <NuxtLink to='/register' class='btn btn-secondary sm:btn-md text-end space-between'>Create account</NuxtLink>
                     </div>
                     <FormLogin />
                 </div>

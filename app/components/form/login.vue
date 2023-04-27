@@ -35,6 +35,6 @@ const onSubmit = handleSubmit(async (): Promise<void> => {
         <AlertError v-if='loginFailed' class='mb-6 mt-4'>Invalid credentials!</AlertError>
         <FormInputBase :name='"E-mail"' :type='"email"' :field='email'/>
         <FormInputBase :name='"Password"' :type='"password"' :field='password'/>
-        <input type='submit' value='Submit' class='btn btn-sm mt-4' />
+        <input type='submit' value='Submit' class='btn btn-primary btn-sm mt-4' />
     </form>
 </template>

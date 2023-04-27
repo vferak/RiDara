@@ -53,6 +53,6 @@ const onSubmit = handleSubmit(async (): Promise<void> => {
         <FormInputBase :name='"Name"' :type='"text"' :field='name'/>
         <FormInputBase :name='"File"' :type='"select"' :field='templateUuid' :options='templates'/>
         <FormInputBase :name='"Blank file"' :type='"radio"' :field='blankFile'/>
-        <input type='submit' value='Submit' class='btn btn-sm mt-4'/>
+        <input type='submit' value='Submit' class='btn btn-primary btn-sm mt-4'/>
     </form>
 </template>

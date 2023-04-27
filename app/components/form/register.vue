@@ -51,6 +51,6 @@ const onSubmit = handleSubmit(async (): Promise<void> => {
         <FormInputBase :name='"E-mail"' :type='"email"' :field='email' />
         <FormInputBase :name='"Password"' :type='"password"' :field='password' />
         <FormInputBase :name='"Password again"' :type='"password"' :field='password_again' />
-        <input type='submit' value='Submit' class='btn btn-sm mt-4' />
+        <input type='submit' value='Submit' class='btn btn-primary btn-sm mt-4' />
     </form>
 </template>

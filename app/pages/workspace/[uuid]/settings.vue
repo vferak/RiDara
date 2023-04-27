@@ -53,24 +53,23 @@ const deleteUser = async () => {
 
 <template>
     <div v-if="workspace" class="container mx-auto h-full mt-4">
-        <div class="card w-1/2 min-w-min bg-base-200 shadow-xl mx-auto">
+        <div class="card bg-primary text-primary-content w-1/2 min-w-min bg-base-200 shadow-xl mx-auto">
             <div class="card-body items-center text-center">
                 <h2 class="card-title text-2xl">{{ workspace.name }}</h2>
                 <span>owner: {{ workspace.owner.firstName }} {{ workspace.owner.lastName }}</span>
-                <button @click='openModal' class="btn mt-2 btn-xs">Edit</button>
-                <Modal v-model='modalState'>
-                    <h3 class='text-lg font-bold'>Update workspace name</h3>
-                    <FormWorkspace @form-sent='update' :name='workspace.name'/>
-                </Modal>
+                <button @click='openModal' class="btn btn-secondary mt-2 btn-sm">Edit</button>
             </div>
         </div>
         <div class="card w-1/2 min-w-min bg-base-200 shadow-xl mx-auto mt-8 px-10 pt-8">
             <div v-if="users" class="mx-auto h-full">
+                <div class='float-left'>
+                    <h2 class="card-title text-2xl mt-4">Workspace users</h2>
+                </div>
                 <div class='float-right'>
-                    <button @click='deleteUser' class='btn mt-4 mr-3 btn-md'>
+                    <button @click='deleteUser' class='btn btn-secondary mt-4 mr-3 btn-md'>
                         Delete workspace
                     </button>
-                    <button @click='openAddUser' class='btn mt-4 btn-md'>
+                    <button @click='openAddUser' class='btn btn-secondary mt-4 btn-md'>
                         Add user
                     </button>
                     <Modal v-model='addUserState'>
@@ -107,5 +106,9 @@ const deleteUser = async () => {
                 </div>
             </div>
         </div>
+        <Modal v-model='modalState'>
+            <h3 class='text-lg font-bold'>Update workspace name</h3>
+            <FormWorkspace @form-sent='update' :name='workspace.name'/>
+        </Modal>
     </div>
 </template>

@@ -15,22 +15,22 @@ const create = async (name: string): Promise<void> => {
 
 <template>
     <div>
-        <div class='container mx-auto'>
-            <div class='flex items-center justify-between'>
-                <p class='mb-4 mt-4 text-4xl font-bold tracking-tight leading-none md:text-5xl lg:text-6xl dark:text-white'>
-                    Workspaces</p>
-                <div>
-                    <button @click='openModal' class='btn mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
-                        New workspace
-                    </button>
+        <LayoutGridList title='Workspaces'>
+            <template v-slot:headerButtons>
+                <button @click='openModal' class='btn btn-secondary mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
+                    New workspace
+                </button>
+            </template>
 
-                </div>
-            </div>
-            <AlertInform v-if='exist' class='mb-6 mt-4'>Hi, it looks like you haven't created a workspace yet. You can create one here.</AlertInform>
-            <div class='grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5'>
+            <template v-slot:alerts>
+                <AlertInform v-if='exist' class='mb-6 mt-4'>Hi, it looks like you haven't created a workspace yet. You can create one here.</AlertInform>
+            </template>
+
+            <template v-slot:grid>
                 <CardsWorkspaceCard v-for='workspace in workspaces' :key='workspace.uuid' :workspace='workspace' />
-            </div>
-        </div>
+            </template>
+        </LayoutGridList>
+
         <Modal v-model='modalState'>
             <h3 class='text-lg font-bold'>Create new workspace</h3>
             <FormWorkspace @form-sent='create'/>

@@ -2,6 +2,7 @@
 const { getUser } = useUser();
 const { setCurrentUser } = useCurrentUser();
 const { getCurrentWorkspace } = useCurrentWorkspace();
+const route = useRoute();
 
 const { data: user } = await getUser();
 
@@ -39,7 +40,7 @@ const renderNav = () => {
             visible: !!currentWorkspace?.value,
             links: [
                 {name: 'Projects', route: `/projects`, icon: 'gg-album'},
-                {name: 'Workspace settings', route: `/workspaces/${currentWorkspace.value?.uuid}/settings`, icon: 'gg-options'},
+                {name: 'Workspace settings', route: `/workspace/${currentWorkspace.value?.uuid}/settings`, icon: 'gg-options'},
             ],
         });
     }
@@ -51,7 +52,7 @@ const renderNav = () => {
             visible: true,
             links: [
                 {name: 'Templates', route: '/templates', icon: 'gg-template'},
-                {name: 'Ontology files', route: '/ontology/files', icon: 'gg-file-document'},
+                {name: 'Ontology files', route: '/ontology', icon: 'gg-file-document'},
             ],
         })
     }
@@ -61,6 +62,10 @@ renderNav();
 
 watch(currentWorkspace, () => {
     renderNav();
+})
+
+watch(route, () => {
+    console.log(route.path);
 })
 </script>
 <template>
@@ -80,7 +85,7 @@ watch(currentWorkspace, () => {
                 <label for="site-drawer" class="drawer-overlay"></label>
                 <aside class='w-80 bg-base-300 h-full'>
                     <div class='hidden lg:flex px-4 py-2'>
-                        <NuxtLink class='btn btn-ghost justify-start normal-case text-3xl font-bold w-full' to="/dashboard">RiDara</NuxtLink>
+                        <NuxtLink class='btn btn-ghost text-primary justify-start normal-case text-3xl font-bold w-full' to="/dashboard">RiDara</NuxtLink>
                     </div>
                     <div class='flex flex-col'>
                         <div v-for='nav in navs' :key='nav.key'>
@@ -88,7 +93,7 @@ watch(currentWorkspace, () => {
                                 <div class="divider">{{ nav.name }}</div>
                                 <ul class="menu p-4 text-base-content">
                                     <li v-for='navLink in nav.links' :key='navLink.route'>
-                                        <NuxtLink :to="navLink.route" class='flex gap-4 items-stretch'>
+                                        <NuxtLink :to="navLink.route" class='flex gap-4 items-stretch' :class='{"active": route.path.includes(navLink.route)}'>
                                             <span class='flex-none w-6 flex justify-center items-center'>
                                                 <i :class="navLink.icon"></i>
                                             </span>

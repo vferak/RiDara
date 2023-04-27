@@ -56,39 +56,37 @@ const emitValueDelete = async (project: Project): Promise<void> => {
 
 <template>
     <div>
-        <div class='container mx-auto'>
-            <div class='flex items-center justify-between'>
-                <p class='mb-4 mt-4 text-4xl font-bold tracking-tight leading-none md:text-5xl lg:text-6xl dark:text-white'>
-                    Projects</p>
-                <div>
-                    <button @click='createOpen' class='btn mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
-                        New project
-                    </button>
+        <LayoutGridList title='Projects'>
+            <template v-slot:headerButtons>
+                <button @click='createOpen' class='btn btn-secondary mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
+                    New project
+                </button>
 
-                    <button @click='importOpen' class='btn ml-4 mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
-                        Import project
-                    </button>
-                </div>
-            </div>
-            <AlertInform v-if='exist' class='mb-6 mt-4'>You do not have any projects. Please create new project!</AlertInform>
-            <div class='grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5'>
+                <button @click='importOpen' class='btn btn-secondary ml-4 mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
+                    Import project
+                </button>
+            </template>
+
+            <template v-slot:alerts>
+                <AlertInform v-if='exist' class='mb-6 mt-4'>You do not have any projects. Please create new project!</AlertInform>
+            </template>
+
+            <template v-slot:grid>
                 <CardsProjectCard v-for='project in projects' :key='project.uuid' :project='project' @delete-project='emitValueDelete' @edit-project='emitValueEdit'/>
-            </div>
-        </div>
+            </template>
+        </LayoutGridList>
+
         <Modal v-model='createState'>
             <h3 class='text-lg font-bold'>Create new project</h3>
             <FormProject @form-sent='create' :templates='templates' />
         </Modal>
-
         <Modal v-model='importState'>
             <h3 class='text-lg font-bold'>Import project</h3>
             <FormImportProjectFile @form-sent='upload' :templates='templates' />
         </Modal>
-
         <Modal v-model='editState' v-if='editState'>
             <h3 class='text-lg font-bold'>Edit project</h3>
             <FormEditProject @form-sent='editProject' :workspaces='workspaces' :workspace-uuid='projectToEdit.workspace.uuid' :templates='templates' :name='projectToEdit.name' :template-name='projectToEdit.templateVersion.template.name' :template-uuid='projectToEdit.templateVersion.template.uuid'/>
         </Modal>
-
     </div>
 </template>

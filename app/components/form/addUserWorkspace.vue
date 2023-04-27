@@ -54,6 +54,6 @@ const onSubmit = handleSubmit(async (): Promise<void> => {
 <template>
     <form @submit='onSubmit' class='flex flex-col mb-4'>
         <FormInputBase :name='"User"' :type='"select"' :field='userUuid' :options='users' />
-        <input type='submit' value='Submit' class='btn btn-sm mt-4' />
+        <input type='submit' value='Submit' class='btn btn-primary btn-sm mt-4' />
     </form>
 </template>

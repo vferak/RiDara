@@ -69,40 +69,37 @@ const removeTemplate = async (template: Template): Promise<void> => {
 
 <template>
     <div>
-        <div class='container mx-auto my-6'>
-            <div class='flex items-center justify-between'>
-                <p class="mb-4 mt-4 text-4xl font-bold tracking-tight leading-none md:text-5xl lg:text-6xl dark:text-white">
-                    Templates
-                </p>
-                <div>
-                    <button @click='openCreateModal' class='btn btn-primary mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
-                        New template
-                    </button>
-                    <button @click='openImportModal' class='btn btn-secondary ml-4 mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
-                        Import template
-                    </button>
-                </div>
-            </div>
-            <AlertInform v-if='exist' class='mb-6 mt-4'>No templates found! Go ahead and create one.</AlertInform>
-            <div class='grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5'>
+        <LayoutGridList title='Templates'>
+            <template v-slot:headerButtons>
+                <button @click='openCreateModal' class='btn btn-secondary mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
+                    New template
+                </button>
+                <button @click='openImportModal' class='btn btn-secondary ml-4 mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
+                    Import template
+                </button>
+            </template>
+
+            <template v-slot:alerts>
+                <AlertInform v-if='exist' class='mb-6 mt-4'>No templates found! Go ahead and create one.</AlertInform>
+            </template>
+
+            <template v-slot:grid>
                 <NuxtLink v-for='template in templates' :key='template.uuid' :to="{ name: 'templates-uuid', params: { uuid: template.uuid }}">
-                    <div class='card w-50 bg-base-200 shadow-xl'>
-                        <div class='card-body'>
-                            <h2 class='card-title'>{{ template.name }}</h2>
-                            <p>{{ template.ontologyFile.name }}</p>
-                            <div class='card-actions justify-end'>
-                                <NuxtLink @click.prevent='editModal(template)'>
-                                    <button class='btn btn-secondary btn-sm'>Edit</button>
-                                </NuxtLink>
-                                <NuxtLink @click.prevent='removeTemplate(template)'>
-                                    <button class='btn btn-error btn-sm'>Delete</button>
-                                </NuxtLink>
-                            </div>
-                        </div>
-                    </div>
+                    <CardPrimary :title='template.name' :data-rows='[  ]' >
+                        <p>{{ template.ontologyFile.name }}</p>
+                        <template v-slot:actions>
+                            <NuxtLink @click.prevent='editModal(template)'>
+                                <button class='btn btn-secondary btn-sm'>Edit</button>
+                            </NuxtLink>
+                            <NuxtLink @click.prevent='removeTemplate(template)'>
+                                <button class='btn btn-secondary btn-sm'>Delete</button>
+                            </NuxtLink>
+                        </template>
+                    </CardPrimary>
                 </NuxtLink>
-            </div>
-        </div>
+            </template>
+        </LayoutGridList>
+
         <Modal v-model='createModalState'>
             <h3 class='text-lg font-bold'>Create new template</h3>
             <FormTemplate @form-sent='create' :ontology-files='ontologyFiles' />

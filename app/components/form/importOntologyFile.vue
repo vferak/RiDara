@@ -52,6 +52,6 @@ const onSubmit = handleSubmit(async (): Promise<void> => {
     <form @submit='onSubmit' class='flex flex-col mb-4' method="post" enctype="multipart/form-data">
         <FormInputBase :name='"Name"' :type='"text"' :field='name'/>
         <FormInputBase v-if='!props.ontologyFile' @change='onChangeFile($event)' :name='"Ontology file"' :type='"file"' :field='file'/>
-        <input type='submit' value='Submit' class='btn btn-sm mt-4'/>
+        <input type='submit' value='Submit' class='btn btn-primary btn-sm mt-4'/>
     </form>
 </template>
