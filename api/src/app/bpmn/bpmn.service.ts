@@ -104,21 +104,6 @@ export class BpmnService {
             const bpmnData = new BpmnData(bpmnElementsData);
             bpmnDatas.push(bpmnData);
         }
-        //temporary condition
-        /*if (fourthLevel) {
-            const allBpmnTemplateElementData: BpmnElementData[] =
-                bpmnDatas.flatMap((obj) => obj.getElements());
-            const res = this.assignMessagesFlows(
-                messageFlows,
-                references,
-                allObjects,
-                allBpmnTemplateElementData,
-                analyzeTemplate,
-                fourthLevel,
-            );
-        }*/
-
-        //const newBpmnData = new BpmnData(res);
 
         let result;
         const finalResult: BpmnData[] = [];
@@ -149,8 +134,6 @@ export class BpmnService {
             }
         }
         return finalResult;
-
-        //return bpmnDatas;
     }
 
     private createBpmnElementDataFromBaseObjects(
@@ -170,15 +153,6 @@ export class BpmnService {
             ) {
                 continue;
             }
-
-            /* if (
-                object.$type.toString().split(':')[1] === 'DataObjectReference'
-            ) {
-
-                const relationsOfObject = references.filter(
-                    (reference) => reference.element.id === object.id,
-                );
-            }*/
 
             const relationsOfObject = references.filter(
                 (reference) => reference.element.id === object.id,
@@ -204,27 +178,6 @@ export class BpmnService {
                         );
 
                         incoming.push(objectOfIncomingAssociation.id);
-
-                        /*if (analyzeTemplate) {
-                            incoming.push(objectOfIncomingAssociation.upmmId);
-                        } else {
-                            if (fourthLevel) {
-                                incoming.push(objectOfIncomingAssociation.id);
-                            } else {
-                                if (
-                                    objectOfIncomingAssociation.elementId ===
-                                    undefined
-                                ) {
-                                    incoming.push(
-                                        objectOfIncomingAssociation.upmmName,
-                                    );
-                                } else {
-                                    incoming.push(
-                                        objectOfIncomingAssociation.elementId,
-                                    );
-                                }
-                            }
-                        }*/
                     }
                     incoming = [...new Set(incoming)];
                 }
@@ -241,27 +194,6 @@ export class BpmnService {
                         const objectOfOutgoingAssociation = objects.find(
                             (object) => object.id === outgoingAssociation.id,
                         );
-
-                        /*if (analyzeTemplate) {
-                            outgoing.push(objectOfOutgoingAssociation.upmmId);
-                        } else {
-                            if (fourthLevel) {
-                                outgoing.push(objectOfOutgoingAssociation.id);
-                            } else {
-                                if (
-                                    objectOfOutgoingAssociation.elementId ===
-                                    undefined
-                                ) {
-                                    outgoing.push(
-                                        objectOfOutgoingAssociation.upmmName,
-                                    );
-                                } else {
-                                    outgoing.push(
-                                        objectOfOutgoingAssociation.elementId,
-                                    );
-                                }
-                            }
-                        }*/
                         outgoing.push(objectOfOutgoingAssociation.id);
                     }
                     outgoing = [...new Set(outgoing)];
@@ -334,6 +266,7 @@ export class BpmnService {
                     references,
                     object.id,
                     analyzeTemplate,
+                    fourthLevel,
                 );
                 bpmnElementData.setChildElements(childElements);
 
@@ -344,7 +277,7 @@ export class BpmnService {
                     bpmnElements.push(childElement);
                 }
             }
-
+            this.assignMessagesFlows(messageFlows, bpmnElements);
             bpmnElements.push(bpmnElementData);
         }
 
@@ -364,7 +297,6 @@ export class BpmnService {
             references: references,
         } = await moddle.fromXML(bpmnFile);
         const allNodes = await templateVersion.getNodes();
-        //TODO dodelat asociace
         for (const object of rootElement.get('rootElements')) {
             if (object.hasOwnProperty('flowElements')) {
                 this.changeAttributesValues(
@@ -443,11 +375,24 @@ export class BpmnService {
             const searchedOutgoingElements = objects.filter((object) =>
                 outgoingOfElement.includes(object.id),
             );
+            /*if (searchedOutgoingElements.length === 0) {
+                searchedOutgoingElements = objects.filter((object) =>
+                    outgoingOfElement.includes(object.upmmName),
+                );
+            }*/
+
+            //console.log(searchedOutgoingElements);
 
             const searchedIncomingElements = objects.filter((object) =>
                 incomingOfElement.includes(object.id),
             );
+            /*if (searchedIncomingElements.length === 0) {
+                searchedIncomingElements = objects.filter((object) =>
+                    incomingOfElement.includes(object.upmmName),
+                );
+            }*/
 
+            //console.log(searchedIncomingElements);
             let newOutgoingForUpperBpmnElement = bpmnElement.getOutgoing();
             let newIncomingForUpperBpmnElement = bpmnElement.getIncoming();
 
@@ -534,6 +479,15 @@ export class BpmnService {
                 bpmnElementDataToEdit.setOutgoing(outGoingToChange);
                 bpmnElement.setIncoming(newIncomingForUpperBpmnElement);
             }
+
+            /*if (bpmnElement.getChildElements().length === 0) {
+                this.changeRelationsValues(
+                    objects,
+                    bpmnElement.getChildElements(),
+                    analyzeTemplate,
+                    fourthLevel,
+                );
+            }*/
         }
 
         return allBpmnElementData;
@@ -541,62 +495,40 @@ export class BpmnService {
 
     private assignMessagesFlows(
         messageFlows: any[],
-        references: any[],
-        objects: any[],
         allBpmnElementData: BpmnElementData[],
-        analyzeTemplate?: boolean,
-        fourthLevel?: boolean,
     ): BpmnElementData[] {
-        /*const a = allBpmnElementData.find(
-            (bpmnElement) => bpmnElement.getId() === 'Activity_0xla8a9',
-        );*/
+        let fromElement: BpmnElementData;
+        let toElement: BpmnElementData;
         for (const messageFlow of messageFlows) {
-            let fromElement: BpmnElementData;
-            let toElement: BpmnElementData;
-            //temporary
-            if (fourthLevel) {
-                for (const flow of messageFlow) {
-                    const property = flow.property.toString().split(':')[1];
-                    if (property === 'sourceRef') {
-                        fromElement = allBpmnElementData.find(
-                            (bpmnElement) => bpmnElement.getId() === flow.id,
-                        );
-                    }
+            for (const flow of messageFlow) {
+                const property = flow.property.toString().split(':')[1];
+                if (property === 'sourceRef') {
+                    fromElement = allBpmnElementData.find(
+                        (bpmnElement) => bpmnElement.getId() === flow.id,
+                    );
+                }
 
-                    if (property === 'targetRef') {
-                        toElement = allBpmnElementData.find(
-                            (bpmnElement) => bpmnElement.getId() === flow.id,
-                        );
-                    }
+                if (property === 'targetRef') {
+                    toElement = allBpmnElementData.find(
+                        (bpmnElement) => bpmnElement.getId() === flow.id,
+                    );
+                }
 
-                    /* if (fromElement !== undefined && toElement !== undefined) {
-                        console.log('before');
+                if (fromElement !== undefined && toElement !== undefined) {
+                    let fromOutgoin = fromElement.getOutgoing();
 
-                        console.log(fromElement);
-                        console.log(toElement);
-                        let fromOutgoin = fromElement.getOutgoing();
-                        console.log(fromOutgoin);
+                    fromOutgoin.push(toElement.getId());
+                    fromElement.setOutgoing(fromOutgoin);
 
-                        fromOutgoin.push(toElement.getId());
-                        fromElement.setOutgoing(fromOutgoin);
+                    let toIncoming = toElement.getIncoming();
+                    toIncoming.push(fromElement.getId());
+                    fromElement.setIncoming(toIncoming);
 
-                        let toIncoming = toElement.getIncoming();
-                        console.log(toIncoming);
-                        toIncoming.push(fromElement.getId());
-                        fromElement.setIncoming(toIncoming);
+                    fromOutgoin = [];
+                    toIncoming = [];
 
-                        console.log('after');
-                        console.log(fromOutgoin);
-                        console.log(toIncoming);
-
-                        console.log(fromElement);
-                        console.log(toElement);
-                        fromOutgoin = [];
-                        toIncoming = [];
-
-                        fromElement = undefined;
-                        toElement = undefined;
-                    }*/
+                    fromElement = undefined;
+                    toElement = undefined;
                 }
             }
         }
