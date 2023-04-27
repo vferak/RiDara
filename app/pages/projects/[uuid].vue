@@ -5,10 +5,16 @@ import { RelationErrorDeserializedData } from '~/composables/types';
 const route = useRoute();
 const { modalState, openModal, closeModal } = useModal('project-analyze');
 
-const { getProjectFile, saveProjectBpmnFile, getNodesByProject, analyze } = useProject();
+const {
+    getProjectFile,
+    saveProjectBpmnFile,
+    getNodesByProject,
+    analyze,
+    checkForNewProjectTemplateVersion,
+    updateProjectToNewTemplateVersion,
+} = useProject();
 
 const projectUuid = route.params.uuid.toString();
-
 
 const { data: ontologyNodes } = await getNodesByProject(projectUuid);
 
@@ -125,12 +131,37 @@ const saveProjectFile = async (xml: string): Promise<void> => {
     await saveProjectBpmnFile(projectUuid, xml);
     successToast.value = true;
 };
+
+const { data: newTemplateVersionIsAvailable } = await checkForNewProjectTemplateVersion(projectUuid);
+
+const availableTemplateUpdateToast = useState<boolean>(() => false);
+const templateVersionSuccessfullyUpdated = useState<boolean>(() => false);
+
+if (newTemplateVersionIsAvailable.value === "true") {
+    availableTemplateUpdateToast.value = true;
+}
+
+const updateTemplateVersion = async (): Promise<void> => {
+    const confirmed = confirm('Do you really want to update the template version of this project? This action is irreversible.')
+
+    if (confirmed) {
+        await updateProjectToNewTemplateVersion(projectUuid);
+        templateVersionSuccessfullyUpdated.value = true;
+        newTemplateVersionIsAvailable.value = "false";
+    }
+}
 </script>
 
 <template>
     <div class='h-full'>
         <Toast v-model='successToast'>
             <AlertSuccess>Diagram saved!</AlertSuccess>
+        </Toast>
+        <Toast v-model='availableTemplateUpdateToast'>
+            <AlertInform>New template version for this project is available!</AlertInform>
+        </Toast>
+        <Toast v-model='templateVersionSuccessfullyUpdated'>
+            <AlertSuccess>Project template version was successfully updated!</AlertSuccess>
         </Toast>
         <BpmnModeler :xml='xml' :upmm-options='upmmOptions' @save-bpmn='saveProjectFile' :is-template='false'/>
     </div>
@@ -141,6 +172,9 @@ const saveProjectFile = async (xml: string): Promise<void> => {
                           :relation-error-data='relationErrorDeserializedData'/>
     </Modal>
     <div class='flex justify-between fixed bottom-32 items-center ml-2'>
+        <button v-if='newTemplateVersionIsAvailable === "true"' @click='updateTemplateVersion' class='btn btn-secondary mt-4 mr-2 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
+            Update template version
+        </button>
         <button @click='analyzeProject' class='btn btn-primary mt-4 btn-xs sm:btn-sm md:btn-md lg:btn-lg'>
             Analyze
         </button>

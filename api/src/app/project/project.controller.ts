@@ -117,6 +117,20 @@ export class ProjectController {
         return workspace.getProjectsSorted();
     }
 
+    @Get(':uuid/check-for-new-template-version')
+    public async getProjectHasNewTemplateVersionAvailable(
+        @Param('uuid', ProjectByUuidPipe) project: Project,
+    ): Promise<boolean> {
+        return project.isNewTemplateVersionAvailable();
+    }
+
+    @Patch(':uuid/update-template-version')
+    public async patchUpdateTemplateVersion(
+        @Param('uuid', ProjectByUuidPipe) project: Project,
+    ): Promise<void> {
+        return this.projectService.updateToPublishedTemplateVersion(project);
+    }
+
     @Delete('/delete')
     public async deleteProject(
         @Body('projectUuid') projectUuid: string,

@@ -43,8 +43,12 @@ const saveTemplateFile = async (xml: string): Promise<void> => {
 }
 
 const publish = async (): Promise<void> => {
-    await publishTemplate(templateUuid);
-    successPublishToast.value = true;
+    const confirmed = confirm("Are you sure you want to publish new template version?");
+
+    if (confirmed) {
+        await publishTemplate(templateUuid);
+        successPublishToast.value = true;
+    }
 }
 
 const analyzeTemplate = async (): Promise<void> => {

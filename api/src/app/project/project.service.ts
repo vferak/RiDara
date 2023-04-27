@@ -50,4 +50,9 @@ export class ProjectService {
         await this.projectRepository.flush();
         return project;
     }
+
+    public async updateToPublishedTemplateVersion(project: Project): Promise<void> {
+        await project.updateToPublishedTemplateVersion();
+        await this.projectRepository.flush();
+    }
 }

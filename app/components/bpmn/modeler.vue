@@ -79,7 +79,6 @@ const downloadBPMN = async () => {
             <div id="properties" class='border-l-4'></div>
         </div>
         <div class="flex justify-between fixed bottom-14 items-center ml-2 z-50">
-            <button @click='saveDiagram' class="btn btn-success">Save</button>
             <div class="dropdown dropdown-top m-0">
                 <label tabindex="0" class="btn m-1">Download</label>
                 <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-200 rounded-box w-52">
@@ -87,6 +86,7 @@ const downloadBPMN = async () => {
                     <li @click='downloadSVG'><a>SVG</a></li>
                 </ul>
             </div>
+            <button @click='saveDiagram' class="btn btn-success">Save</button>
         </div>
     </div>
 </template>

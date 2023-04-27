@@ -108,6 +108,23 @@ export const useProject = () => {
         );
     }
 
+    const checkForNewProjectTemplateVersion = async (
+        uuid: string,
+    ): Promise<AsyncData<string, any>> => {
+        return useApiFetch(
+            `${projectUrlPrefix}/${uuid}/check-for-new-template-version`,
+        );
+    }
+
+    const updateProjectToNewTemplateVersion = async (
+        uuid: string,
+    ): Promise<AsyncData<boolean, any>> => {
+        return useApiFetch(
+            `${projectUrlPrefix}/${uuid}/update-template-version`,
+            { method: 'PATCH' },
+        );
+    }
+
     return {
         getProjects: getProjects,
         createProject: createProject,
@@ -121,5 +138,7 @@ export const useProject = () => {
         analyzeThirdLevel: analyzeThirdLevel,
         analyze: analyze,
         deleteProject: deleteProject,
+        checkForNewProjectTemplateVersion: checkForNewProjectTemplateVersion,
+        updateProjectToNewTemplateVersion: updateProjectToNewTemplateVersion,
     };
 }

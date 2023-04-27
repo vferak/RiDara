@@ -97,6 +97,10 @@ export class Project {
         this.workspace = workspace;
     }
 
+    public async updateToPublishedTemplateVersion(): Promise<void> {
+        this.templateVersion = await this.getTemplate().getVersionPublished();
+    }
+
     public getName(): string {
         return this.name;
     }
@@ -137,5 +141,9 @@ export class Project {
         });
 
         return templateNodes.concat(ontologyNodes);
+    }
+
+    public async isNewTemplateVersionAvailable(): Promise<boolean> {
+        return this.templateVersion.getUuid() !== (await this.getTemplate().getVersionPublished()).getUuid();
     }
 }
