@@ -1,10 +1,10 @@
 <script setup lang='ts'>
-import { OntologyFile } from '~/composables/types';
+import { Template } from '~/composables/types';
 
 const { $z, $veeValidate } = useNuxtApp();
 
 const props = defineProps<{
-    templates: OntologyFile[]
+    templates: Template[]
 }>();
 
 const emit = defineEmits<{

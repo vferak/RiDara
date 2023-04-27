@@ -1,7 +1,14 @@
 <script setup lang='ts'>
 import { Template } from '~/composables/types';
 
-const { createTemplate, editTemplate, getTemplates, importTemplate } = useTemplate();
+const {
+    createTemplate,
+    editTemplate,
+    getTemplates,
+    importTemplate,
+    deleteTemplate,
+} = useTemplate();
+
 const { getOntologyFiles } = useOntology();
 const {
     modalState: createModalState,
@@ -49,6 +56,15 @@ const importTemplateSubmit = async (name: string, ontologyFileUuid: string, file
     await refreshTemplates();
     closeImportModal();
 };
+
+const removeTemplate = async (template: Template): Promise<void> => {
+    const confirmed = confirm('Are you sure you want to delete this ontology file?');
+
+    if (confirmed) {
+        await deleteTemplate(template.uuid);
+        await refreshTemplates();
+    }
+}
 </script>
 
 <template>
@@ -77,6 +93,9 @@ const importTemplateSubmit = async (name: string, ontologyFileUuid: string, file
                             <div class='card-actions justify-end'>
                                 <NuxtLink @click.prevent='editModal(template)'>
                                     <button class='btn btn-secondary btn-sm'>Edit</button>
+                                </NuxtLink>
+                                <NuxtLink @click.prevent='removeTemplate(template)'>
+                                    <button class='btn btn-error btn-sm'>Delete</button>
                                 </NuxtLink>
                             </div>
                         </div>

@@ -24,11 +24,11 @@ export class TemplateService {
     ) {}
 
     public async getTemplates(): Promise<Template[]> {
-        return this.templateRepository.findAll();
+        return this.templateRepository.find({ deleted: false });
     }
 
     public async getOneByUuid(templateUuid: string): Promise<Template> {
-        return this.templateRepository.findOneOrFail({ uuid: templateUuid });
+        return this.templateRepository.findOneOrFail({ uuid: templateUuid, deleted: false });
     }
 
     public async create(
@@ -67,6 +67,12 @@ export class TemplateService {
 
         await this.templateRepository.flush();
         return template;
+    }
+
+    public async delete(template: Template): Promise<void> {
+        template.delete();
+
+        await this.templateRepository.flush();
     }
 
     public async publishNewTemplateVersion(template: Template): Promise<void> {

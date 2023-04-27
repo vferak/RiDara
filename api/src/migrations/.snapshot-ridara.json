@@ -344,6 +344,16 @@
           "primary": false,
           "nullable": false,
           "mappedType": "string"
+        },
+        "deleted": {
+          "name": "deleted",
+          "type": "tinyint(1)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "false",
+          "mappedType": "boolean"
         }
       },
       "name": "template",

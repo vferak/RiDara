@@ -16,12 +16,6 @@ import { TemplateFileService } from './templateFile/templateFile.service';
 import { Uuid } from '../common/uuid/uuid';
 import { TemplateVersionState } from './templateVersion/templateVersionState.enum';
 import { EditTemplateDto } from './dto/edit-template.dto';
-import { Body, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { CreateProjectDto } from '../project/dto/create-project.dto';
-import { CurrentUser } from '../common/decorators/user.decorator';
-import { Express } from 'express';
-import { Project } from '../project/project.entity';
 
 @Entity({ customRepository: () => TemplateRepository })
 export class Template {
@@ -45,6 +39,9 @@ export class Template {
     @OneToMany('TemplateVersion', 'template')
     private templateVersions!: Collection<TemplateVersion>;
 
+    @Property()
+    private deleted!: boolean;
+
     private constructor(
         uuid: string,
         name: string,
@@ -59,6 +56,7 @@ export class Template {
         this.author = author;
         this.createDate = createDate;
         this.ontologyFile = ontologyFile;
+        this.deleted = false;
     }
 
     public static async create(
@@ -95,10 +93,18 @@ export class Template {
         return this;
     }
 
+    public getUuid(): string {
+        return this.uuid;
+    }
+
     public async getDraftFileName(): Promise<string> {
         return (await this.getVersionDraft())
             .getFileData()
             .getFilePathWithName();
+    }
+
+    public delete(): void {
+        this.deleted = true;
     }
 
     public async getPublishedFileName(): Promise<string> {

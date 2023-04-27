@@ -92,6 +92,13 @@ export const useTemplate = () => {
         );
     }
 
+    const deleteTemplate = async (templateUuid: string): Promise<AsyncData<void, any>> => {
+        return useApiFetch<void>(
+            `${templateUrlPrefix}/${templateUuid}`,
+            { method: 'DELETE' }
+        );
+    }
+
     return {
         createTemplate: createTemplate,
         getTemplates: getTemplates,
@@ -102,5 +109,6 @@ export const useTemplate = () => {
         editTemplate: editTemplate,
         analyze: analyze,
         importTemplate: importTemplate,
+        deleteTemplate: deleteTemplate,
     };
 }

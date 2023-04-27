@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { TemplateService } from './template.service';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { CurrentUser } from '../common/decorators/user.decorator';
@@ -101,6 +101,16 @@ export class TemplateController {
         const template = await this.templateService.getOneByUuid(templateUuid);
 
         return await this.templateService.edit(template, createTemplateDto);
+    }
+
+    @Delete(':templateUuid')
+    @UserRoles(UserRole.ADMIN)
+    public async delete(
+        @Param('templateUuid') templateUuid: string,
+    ): Promise<void> {
+        const template = await this.templateService.getOneByUuid(templateUuid)
+
+        return await this.templateService.delete(template);
     }
 
     @Get(':templateUuid/file')

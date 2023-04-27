@@ -1,10 +1,10 @@
 <script setup lang='ts'>
-import { OntologyFile, Workspace } from '~/composables/types';
+import { Template, Workspace } from '~/composables/types';
 
 const { $z, $veeValidate } = useNuxtApp();
 
 const props = defineProps<{
-    templates: OntologyFile[],
+    templates: Template[],
     workspaces: Workspace[],
     name: string,
     templateUuid: string,
@@ -31,6 +31,10 @@ const workspaces = props.workspaces.map((workspace) => {
         disabled: false
     }
 });
+
+if (!templates.find((template) => template.value === props.templateUuid)) {
+    templates.unshift({ value: props.templateUuid, name: props.templateName, disabled: false });
+}
 
 templates.unshift({ value: '', name: 'Select template', disabled: true });
 workspaces.unshift({ value: '', name: 'Select workspace', disabled: true });
