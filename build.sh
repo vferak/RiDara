@@ -7,6 +7,10 @@ cp ./app/.env.dist ./app/.env
 
 docker-compose build
 
+docker-compose up -d database
+
+docker-compose down
+
 docker-compose run api npm install
 
 docker-compose run app npm install
