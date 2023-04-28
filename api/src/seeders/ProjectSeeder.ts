@@ -6,6 +6,10 @@ import * as path from 'path';
 import { FileService } from '../app/common/file/file.service';
 import { FileData } from '../app/common/file/file.data';
 import { ProjectFileService } from '../app/project/projectFile/projectFile.service';
+import { BpmnService } from '../app/bpmn/bpmn.service';
+import { Template } from '../app/template/template.entity';
+import { Workspace } from '../app/workspace/workspace.entity';
+import { User } from 'src/app/shared/user/user.entity';
 
 export class ProjectSeeder extends Seeder {
     private static SEEDER_RESOURCES_FOLDER = path.join(
@@ -60,155 +64,96 @@ export class ProjectSeeder extends Seeder {
         'DevelopmentExtraNotValidElements.bpmn',
     );
 
+    private fileService: FileService = new FileService();
+    private projectFileService: ProjectFileService = new ProjectFileService(this.fileService);
+    private bpmnService: BpmnService = new BpmnService();
+
     async run(
         entityManager: EntityManager,
         context: Dictionary,
     ): Promise<void> {
-        const fileService = new FileService();
-        const projectFileService = new ProjectFileService(fileService);
-
-        const scrumTemplate = await context.template.waterfall.getVersionPublished();
-        const developmentTemplate = await context.template.developmentProcessTemplate.getVersionPublished();
+        const waterfallTemplate = await context.template.waterfall;
+        const developmentTemplate = await context.template.developmentProcessTemplate;
 
         const analyzeWorkspace = context.workspace.analyzeExamples;
-        const analyzeNoErrorFile = fileService.readFile(
-            FileData.createFromFilePathWithName(
-                ProjectSeeder.EXAMPLE_NO_ERRORS,
-            ),
-        );
-        const analyzeMissingElements = fileService.readFile(
-            FileData.createFromFilePathWithName(
-                ProjectSeeder.EXAMPLE_MISSING_ELEMENTS,
-            ),
-        );
-        const analyzeBadShapes = fileService.readFile(
-            FileData.createFromFilePathWithName(
-                ProjectSeeder.EXAMPLE_BAD_SHAPES,
-            ),
-        );
-
-        const analyzeBadRelations = fileService.readFile(
-            FileData.createFromFilePathWithName(
-                ProjectSeeder.EXAMPLE_BAD_RELATIONS,
-            ),
-        );
-
-        const analyzeExtraValidElements = fileService.readFile(
-            FileData.createFromFilePathWithName(
-                ProjectSeeder.EXAMPLE_EXTRA_VALID_ELEMENTS,
-            ),
-        );
-        const analyzeExtraNotValidElements = fileService.readFile(
-            FileData.createFromFilePathWithName(
-                ProjectSeeder.EXAMPLE_EXTRA_NOTVALID_ELEMENTS,
-            ),
-        );
-
         const sharedWorkspace = context.workspace.shared;
-        const sharedProjectFile = fileService.readFile(
-            FileData.createFromFilePathWithName(
-                ProjectSeeder.SHARED_PROJECT_BPMN_FILE,
-            ),
-        );
+        const ferakWorkspace = context.workspace.ferak;
+        const bestaWorkspace = context.workspace.besta;
 
         const ferakUser = context.user.ferak;
-        const ferakWorkspace = context.workspace.ferak;
-        const ferakProjectFile = fileService.readFile(
-            FileData.createFromFilePathWithName(
-                ProjectSeeder.FERAK_PROJECT_BPMN_FILE,
-            ),
-        );
-
         const bestaUser = context.user.besta;
-        const bestaWorkspace = context.workspace.besta;
-        const bestaProjectFile = fileService.readFile(
-            FileData.createFromFilePathWithName(
-                ProjectSeeder.BESTA_PROJECT_BPMN_FILE,
-            ),
-        );
         const adminUser = context.user.admin;
-        const exampleProjectNoErrors = Project.create(
-            projectFileService,
-            new CreateProjectDto('Example no errors', analyzeWorkspace),
-            adminUser,
+
+        const exampleProjectNoErrors = await this.createProject(
+            ProjectSeeder.EXAMPLE_NO_ERRORS,
             developmentTemplate,
-            analyzeNoErrorFile,
+            analyzeWorkspace,
+            adminUser,
+            'Example no errors',
         );
 
-        const exampleProjectMissingElements = Project.create(
-            projectFileService,
-            new CreateProjectDto('Example missing elements', analyzeWorkspace),
-            adminUser,
+        const exampleProjectMissingElements = await this.createProject(
+            ProjectSeeder.EXAMPLE_MISSING_ELEMENTS,
             developmentTemplate,
-            analyzeMissingElements,
+            analyzeWorkspace,
+            adminUser,
+            'Example missing elements',
         );
 
-        const exampleProjectBadShapes = Project.create(
-            projectFileService,
-            new CreateProjectDto(
-                'Example bad shapes of elements',
-                analyzeWorkspace,
-            ),
-            adminUser,
+        const exampleProjectBadShapes = await this.createProject(
+            ProjectSeeder.EXAMPLE_BAD_SHAPES,
             developmentTemplate,
-            analyzeBadShapes,
+            analyzeWorkspace,
+            adminUser,
+            'Example bad shapes of elements',
         );
 
-        const exampleProjectBadRelations = Project.create(
-            projectFileService,
-            new CreateProjectDto(
-                'Example bad relations of elements',
-                analyzeWorkspace,
-            ),
-            adminUser,
+        const exampleProjectBadRelations = await this.createProject(
+            ProjectSeeder.EXAMPLE_BAD_RELATIONS,
             developmentTemplate,
-            analyzeBadRelations,
+            analyzeWorkspace,
+            adminUser,
+            'Example bad relations of elements',
         );
 
-        const exampleProjectExtraValidElements = Project.create(
-            projectFileService,
-            new CreateProjectDto(
-                'Example valid extra elements',
-                analyzeWorkspace,
-            ),
-            adminUser,
+        const exampleProjectExtraValidElements = await this.createProject(
+            ProjectSeeder.EXAMPLE_EXTRA_VALID_ELEMENTS,
             developmentTemplate,
-            analyzeExtraValidElements,
+            analyzeWorkspace,
+            adminUser,
+            'Example valid extra elements',
         );
 
-        const exampleProjectExtraNotValidElements = Project.create(
-            projectFileService,
-            new CreateProjectDto(
-                'Example not valid extra elements',
-                analyzeWorkspace,
-            ),
-            adminUser,
+        const exampleProjectExtraNotValidElements = await this.createProject(
+            ProjectSeeder.EXAMPLE_EXTRA_NOTVALID_ELEMENTS,
             developmentTemplate,
-            analyzeExtraNotValidElements,
+            analyzeWorkspace,
+            adminUser,
+            'Example not valid extra elements',
         );
 
-        const ferakProject = Project.create(
-            projectFileService,
-            new CreateProjectDto('Ferak project', ferakWorkspace),
+        const ferakProject = await this.createProject(
+            ProjectSeeder.FERAK_PROJECT_BPMN_FILE,
+            waterfallTemplate,
+            ferakWorkspace,
             ferakUser,
-            scrumTemplate,
-            ferakProjectFile,
+            'Ferak project',
         );
 
-        const bestaProject = Project.create(
-            projectFileService,
-            new CreateProjectDto('Besta project', bestaWorkspace),
+        const bestaProject = await this.createProject(
+            ProjectSeeder.BESTA_PROJECT_BPMN_FILE,
+            waterfallTemplate,
+            bestaWorkspace,
             bestaUser,
-            scrumTemplate,
-            bestaProjectFile,
+            'Besta project',
         );
 
-        const sharedProject = Project.create(
-            projectFileService,
-            new CreateProjectDto('Shared project', sharedWorkspace),
+        const sharedProject= await this.createProject(
+            ProjectSeeder.SHARED_PROJECT_BPMN_FILE,
+            waterfallTemplate,
+            sharedWorkspace,
             ferakUser,
-            scrumTemplate,
-            sharedProjectFile,
+            'Shared project',
         );
 
         await entityManager.persistAndFlush([
@@ -235,5 +180,34 @@ export class ProjectSeeder extends Seeder {
             exampleProjectExtraNotValidElements:
                 exampleProjectExtraNotValidElements,
         };
+    }
+
+    private async createProject(
+        projectFileName: string,
+        template: Template,
+        workspace: Workspace,
+        user: User,
+        projectName: string,
+    ): Promise<Project> {
+        const publishedTemplateVersion = await template.getVersionPublished();
+
+        const fileBuffer = await this.bpmnService.changeStructureOfImportedFile(
+            this.fileService.readFile(
+                FileData.createFromFilePathWithName(
+                    projectFileName,
+                ),
+            ),
+            await template.getOntologyFile().getNodes(),
+            await publishedTemplateVersion.getNodes(),
+            false,
+        );
+
+        return Project.create(
+            this.projectFileService,
+            new CreateProjectDto(projectName, workspace),
+            user,
+            publishedTemplateVersion,
+            fileBuffer,
+        );
     }
 }
