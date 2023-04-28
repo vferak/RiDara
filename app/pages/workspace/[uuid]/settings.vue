@@ -43,10 +43,15 @@ const removeUser = async (userUuid: string) => {
     await refreshUsersNotInWorkspace();
 };
 
-const deleteUser = async () => {
-    await deleteWorkspace(workspace.value!.uuid);
-    await clearCurrentWorkspace();
-    router.push('/workspaces');
+const deleteWorkspaceAction = async () => {
+
+    const confirmed = confirm('Do you really want to delete the workspace? This action is irreversible.')
+
+    if (confirmed) {
+        await deleteWorkspace(workspace.value!.uuid);
+        await clearCurrentWorkspace();
+        router.push('/workspaces');
+    }
 };
 
 </script>
@@ -66,7 +71,7 @@ const deleteUser = async () => {
                     <h2 class="card-title text-2xl mt-4">Workspace users</h2>
                 </div>
                 <div class='float-right'>
-                    <button @click='deleteUser' class='btn btn-secondary mt-4 mr-3 btn-md'>
+                    <button @click='deleteWorkspaceAction' class='btn btn-secondary mt-4 mr-3 btn-md'>
                         Delete workspace
                     </button>
                     <button @click='openAddUser' class='btn btn-secondary mt-4 btn-md'>
