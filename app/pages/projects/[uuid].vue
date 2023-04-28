@@ -52,6 +52,13 @@ let percentValueThirdLevel = useState();
 const analyzeProject = async (): Promise<void> => {
     const xml = await $bpmnModeler.get().saveXML();
     await saveProjectFile(xml.xml);
+    missingMapFirstLevel.value = new Map<string, number>();
+    overExtendsMapFirstLevel.value = new Map<string, number>();
+    errorsShapeMapSecondLevel.value = new Map<string, string>();
+    relationErrorDeserializedData.value = [];
+    percentValueFirstLevel.value = 0;
+    percentValueSecondLevel.value = 0;
+    percentValueThirdLevel.value = 0;
 
     const result = await analyze(projectUuid);
     const analyzedJsonData = result.data.value;

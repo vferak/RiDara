@@ -189,10 +189,17 @@ export class AnalyzeService {
         allNodesByTemplate: OntologyNode[],
     ): Promise<any> {
         let missingRelations: Map<string, string> = new Map<string, string>();
+        let extraRelations: Map<string, string> = new Map<string, string>();
+
         for (const relationData of analyzedData.getRelationErrorData()) {
             missingRelations = new Map([
                 ...Array.from(missingRelations.entries()),
                 ...Array.from(relationData.getMissingRelations().entries()),
+            ]);
+
+            extraRelations = new Map([
+                ...Array.from(extraRelations.entries()),
+                ...Array.from(relationData.getOverExtendsRelations().entries()),
             ]);
         }
         let newAnalyzedData = analyzedData;
@@ -207,7 +214,6 @@ export class AnalyzeService {
             );
 
             const outgoingElements = fromElement.getOutgoing();
-            const incomingElements = [...new Set(fromElement.getIncoming())];
 
             allOutgoingElements = [
                 ...allOutgoingElements,
@@ -216,6 +222,7 @@ export class AnalyzeService {
             const alreadyVisitedElements: string[] = [];
             while (allOutgoingElements.length !== 0) {
                 const outgoingValue = allOutgoingElements.shift();
+
                 if (alreadyVisitedElements.includes(outgoingValue)) {
                     continue;
                 } else {
@@ -241,47 +248,75 @@ export class AnalyzeService {
                     ];
                 }
             }
+        }
+
+        for (const [key, value] of extraRelations) {
             const allNamesOfNodes: string[] = allNodesByTemplate.map((obj) =>
                 obj.getName(),
             );
-            for (const incoming of incomingElements) {
-                const incomingElement = projectElements.find(
-                    (projectElement) => projectElement.getId() === incoming,
-                );
-                if (allNamesOfNodes.includes(incomingElement.getUpmmName())) {
-                    if (incomingElement.getIncoming().length === 0) {
-                        const fromElement = projectElements.find(
-                            (projectElement) =>
-                                projectElement.getId() === incoming,
-                        );
 
-                        const toElement = projectElements.find(
-                            (projectElement) =>
-                                projectElement.getId() ===
-                                fromElement.getOutgoing()[0],
-                        );
+            const fromElement = projectElements.find(
+                (projectElement) => projectElement.getUpmmName() === key,
+            );
 
-                        const relationErrorData = newAnalyzedData
-                            .getRelationErrorData()
-                            .find(
-                                (errorData) =>
-                                    errorData.getElementId() ===
-                                    toElement.getId(),
-                            );
-                        relationErrorData
-                            .getOverExtendsRelations()
-                            .forEach((value, key) => {
-                                if (value === toElement.getUpmmName()) {
-                                    relationErrorData
-                                        .getOverExtendsRelations()
-                                        .delete(key);
-                                }
-                            });
-                    }
+            const toElement = projectElements.find(
+                (projectElement) => projectElement.getUpmmName() === value,
+            );
+
+            if (fromElement === undefined) {
+                continue;
+            }
+
+            if (toElement === undefined) {
+                continue;
+            }
+
+            if (allNamesOfNodes.includes(fromElement.getUpmmName())) {
+                if (
+                    fromElement.getOutgoing().length === 1 &&
+                    fromElement.getIncoming().length === 0
+                ) {
+                    const relationErrorData = newAnalyzedData
+                        .getRelationErrorData()
+                        .find(
+                            (errorData) =>
+                                errorData.getElementId() === toElement.getId(),
+                        );
+                    relationErrorData
+                        .getOverExtendsRelations()
+                        .forEach((value, key) => {
+                            if (value === toElement.getUpmmName()) {
+                                relationErrorData
+                                    .getOverExtendsRelations()
+                                    .delete(key);
+                            }
+                        });
+                }
+            }
+            if (allNamesOfNodes.includes(toElement.getUpmmName())) {
+                if (
+                    toElement.getIncoming().length === 1 &&
+                    toElement.getOutgoing().length === 0
+                ) {
+                    const relationErrorData = newAnalyzedData
+                        .getRelationErrorData()
+                        .find(
+                            (errorData) =>
+                                errorData.getElementId() ===
+                                fromElement.getId(),
+                        );
+                    relationErrorData
+                        .getOverExtendsRelations()
+                        .forEach((value, key) => {
+                            if (key === fromElement.getUpmmName()) {
+                                relationErrorData
+                                    .getOverExtendsRelations()
+                                    .delete(key);
+                            }
+                        });
                 }
             }
         }
-
         return newAnalyzedData;
     }
 

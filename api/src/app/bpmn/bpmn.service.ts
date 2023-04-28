@@ -4,7 +4,6 @@ import { BpmnData } from './bpmn.data';
 import { BpmnElementData } from './bpmnElement.data';
 import { TemplateVersion } from '../template/templateVersion/templateVersion.entity';
 import { TemplateNode } from '../template/templateNode/templateNode.entity';
-import { Template } from '../template/template.entity';
 import { OntologyNode } from '../ontology/ontologyNode/ontologyNode.entity';
 
 @Injectable()
@@ -177,6 +176,10 @@ export class BpmnService {
                             (object) => object.id === incominAssociation.id,
                         );
 
+                        if (objectOfIncomingAssociation == undefined) {
+                            continue;
+                        }
+
                         incoming.push(objectOfIncomingAssociation.id);
                     }
                     incoming = [...new Set(incoming)];
@@ -194,6 +197,11 @@ export class BpmnService {
                         const objectOfOutgoingAssociation = objects.find(
                             (object) => object.id === outgoingAssociation.id,
                         );
+
+                        if (objectOfOutgoingAssociation == undefined) {
+                            continue;
+                        }
+
                         outgoing.push(objectOfOutgoingAssociation.id);
                     }
                     outgoing = [...new Set(outgoing)];
@@ -375,24 +383,11 @@ export class BpmnService {
             const searchedOutgoingElements = objects.filter((object) =>
                 outgoingOfElement.includes(object.id),
             );
-            /*if (searchedOutgoingElements.length === 0) {
-                searchedOutgoingElements = objects.filter((object) =>
-                    outgoingOfElement.includes(object.upmmName),
-                );
-            }*/
-
-            //console.log(searchedOutgoingElements);
 
             const searchedIncomingElements = objects.filter((object) =>
                 incomingOfElement.includes(object.id),
             );
-            /*if (searchedIncomingElements.length === 0) {
-                searchedIncomingElements = objects.filter((object) =>
-                    incomingOfElement.includes(object.upmmName),
-                );
-            }*/
 
-            //console.log(searchedIncomingElements);
             let newOutgoingForUpperBpmnElement = bpmnElement.getOutgoing();
             let newIncomingForUpperBpmnElement = bpmnElement.getIncoming();
 
@@ -406,6 +401,10 @@ export class BpmnService {
                     newOutgoingForUpperBpmnElement.filter(
                         (value) => value !== searchedOutgoingElement.id,
                     );
+
+                if (bpmnElementDataToEdit === undefined) {
+                    continue;
+                }
 
                 const incomingToChange = bpmnElementDataToEdit.getIncoming();
 
@@ -437,7 +436,7 @@ export class BpmnService {
                 bpmnElementDataToEdit.setIncoming(incomingToChange);
                 bpmnElement.setOutgoing(newOutgoingForUpperBpmnElement);
             }
-            /////////////SECOND PART
+
             for (const searchedIngoingElement of searchedIncomingElements) {
                 const bpmnElementDataToEdit = allBpmnElementData.find(
                     (bpmnElement) =>
@@ -448,6 +447,9 @@ export class BpmnService {
                         (value) => value !== searchedIngoingElement.id,
                     );
 
+                if (bpmnElementDataToEdit === undefined) {
+                    continue;
+                }
                 const outGoingToChange = bpmnElementDataToEdit.getOutgoing();
 
                 if (analyzeTemplate) {
@@ -479,15 +481,6 @@ export class BpmnService {
                 bpmnElementDataToEdit.setOutgoing(outGoingToChange);
                 bpmnElement.setIncoming(newIncomingForUpperBpmnElement);
             }
-
-            /*if (bpmnElement.getChildElements().length === 0) {
-                this.changeRelationsValues(
-                    objects,
-                    bpmnElement.getChildElements(),
-                    analyzeTemplate,
-                    fourthLevel,
-                );
-            }*/
         }
 
         return allBpmnElementData;

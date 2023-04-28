@@ -13,7 +13,6 @@ import { OntologyNode } from '../ontology/ontologyNode/ontologyNode.entity';
 import { OntologyNodeRepository } from '../ontology/ontologyNode/ontologyNode.repository';
 import { DatabaseRelationAnalyzeData } from '../ontology/ontologyNode/databaseRelationAnalyze.data';
 import { TemplateAnalyzeData } from '../ontology/ontologyNode/templateAnalyze.data';
-import { Workspace } from '../workspace/workspace.entity';
 
 @Injectable()
 export class TemplateService {
@@ -112,8 +111,6 @@ export class TemplateService {
     ): Promise<TemplateAnalyzeData[]> {
         const relationsFromDatabase: DatabaseRelationAnalyzeData[] = [];
         const namesOfNodesInTemplate: string[] = [];
-
-        //array of names from bpmntemplate
         for (const ontologyNode of ontologyNodes) {
             namesOfNodesInTemplate.push(ontologyNode.getUuid());
         }
@@ -195,6 +192,9 @@ export class TemplateService {
             const nameOfUuidsMissing: string[] = [];
             const nameOfUuidsOverExtends: string[] = [];
             for (const badRelation of analyzedObject.getNotPossible()) {
+                if (badRelation === undefined) {
+                    continue;
+                }
                 const nodeObject =
                     await this.ontologyNodeRepository.findOneOrFail(
                         badRelation,
@@ -204,6 +204,9 @@ export class TemplateService {
             }
 
             for (const badRelation of analyzedObject.getOverExtends()) {
+                if (badRelation === undefined) {
+                    continue;
+                }
                 const nodeObject =
                     await this.ontologyNodeRepository.findOneOrFail(
                         badRelation,
@@ -222,19 +225,5 @@ export class TemplateService {
         }
 
         return filteredTemplateAnalyzeDatas;
-    }
-
-    private createMapWithOccurences(values: string[]): Map<string, number> {
-        const map = new Map<string, number>();
-
-        values.forEach((str: string) => {
-            if (map.has(str)) {
-                const count = map.get(str) as number;
-                map.set(str, count + 1);
-            } else {
-                map.set(str, 1);
-            }
-        });
-        return map;
     }
 }
