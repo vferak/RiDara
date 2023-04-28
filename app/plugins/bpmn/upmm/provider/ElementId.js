@@ -1,4 +1,4 @@
-import { TextFieldEntry, isSelectEntryEdited } from "@bpmn-io/properties-panel";
+import { TextFieldEntry, isTextFieldEntryEdited } from "@bpmn-io/properties-panel";
 import { useService } from "bpmn-js-properties-panel";
 
 export default function (element) {
@@ -6,7 +6,7 @@ export default function (element) {
         id: "elementId",
         element,
         component: ElementId,
-        isEdited: isSelectEntryEdited,
+        isEdited: isTextFieldEntryEdited
     };
 }
 

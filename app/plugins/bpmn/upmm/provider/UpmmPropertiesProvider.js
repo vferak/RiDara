@@ -4,34 +4,6 @@ import elementId from "./ElementId";
 
 const HIGH_PRIORITY = 1500;
 
-export default function UpmmPropertiesProvider(propertiesPanel, translate) {
-    this.getGroups = function (element) {
-        return function (groups) {
-            if (
-                !isAny(
-                element,
-                [
-                    'bpmn:Process',
-                    'bpmn:Participant',
-                    'bpmn:Lane',
-                    'bpmn:MessageFlow',
-                    'bpmn:DataOutputAssociation',
-                    'bpmn:DataInputAssociation',
-                    'bpmn:SequenceFlow',
-                ])
-            ) {
-                groups.push(createUpmmGroup(element, translate));
-            }
-
-            return groups;
-        };
-    };
-
-    propertiesPanel.registerProvider(HIGH_PRIORITY, this);
-}
-
-UpmmPropertiesProvider.$inject = ["propertiesPanel", "translate"];
-
 function createUpmmGroup(element, translate) {
     const isTemplateModeler = window['isTemplateModeler'];
 
@@ -47,3 +19,35 @@ function createUpmmGroup(element, translate) {
         entries: entries,
     };
 }
+
+export default function UpmmPropertiesProvider(propertiesPanel, translate) {
+    this.getGroups = function (element) {
+        return function (groups) {
+            if (
+                !isAny(
+                element,
+                [
+                    'bpmn:Process',
+                    'bpmn:Participant',
+                    'bpmn:Lane',
+                    'bpmn:MessageFlow',
+                    'bpmn:DataOutputAssociation',
+                    'bpmn:DataInputAssociation',
+                    'bpmn:SequenceFlow',
+                    'bpmn:Collaboration',
+                    'bpmn:Association',
+                    'bpmn:TextAnnotation',
+                    'bpmn:Group'
+                ])
+            ) {
+                groups.push(createUpmmGroup(element, translate));
+            }
+
+            return groups;
+        };
+    };
+
+    propertiesPanel.registerProvider(HIGH_PRIORITY, this);
+}
+
+UpmmPropertiesProvider.$inject = ["propertiesPanel", "translate"];
