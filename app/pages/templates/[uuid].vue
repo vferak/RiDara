@@ -8,6 +8,7 @@ const {
     analyze
 } = useTemplate();
 const { getOntologyNodes } = useOntology();
+const { $bpmnModeler } = useNuxtApp();
 
 const templateUuid = route.params.uuid.toString();
 
@@ -52,6 +53,9 @@ const publish = async (): Promise<void> => {
 }
 
 const analyzeTemplate = async (): Promise<void> => {
+    const xml = await $bpmnModeler.get().saveXML();
+    await saveTemplateFile(xml.xml);
+
     const result = await analyze(templateUuid);
     errorTemplateData.value = result.data.value;
     openModal();

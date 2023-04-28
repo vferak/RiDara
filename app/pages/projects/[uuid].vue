@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 
 import { RelationErrorDeserializedData } from '~/composables/types';
+const { $bpmnModeler } = useNuxtApp();
 
 const route = useRoute();
 const { modalState, openModal, closeModal } = useModal('project-analyze');
@@ -49,6 +50,9 @@ let percentValueSecondLevel = useState();
 let percentValueThirdLevel = useState();
 
 const analyzeProject = async (): Promise<void> => {
+    const xml = await $bpmnModeler.get().saveXML();
+    await saveProjectFile(xml.xml);
+
     const result = await analyze(projectUuid);
     const analyzedJsonData = result.data.value;
     relationErrorDeserializedData.value = [];
