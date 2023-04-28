@@ -25,18 +25,20 @@ export class TemplateService {
     ) {}
 
     public async getTemplatesSorted(): Promise<Template[]> {
-        return (await this.templateRepository.find({ deleted: false }))
-            .sort(
-                (a: Template, b: Template): number => {
-                    const aName = a.getName();
-                    const bName = b.getName();
-                    return aName > bName ? 1 : bName > aName ? -1 : 0;
-                }
-            );
+        return (await this.templateRepository.find({ deleted: false })).sort(
+            (a: Template, b: Template): number => {
+                const aName = a.getName();
+                const bName = b.getName();
+                return aName > bName ? 1 : bName > aName ? -1 : 0;
+            },
+        );
     }
 
     public async getOneByUuid(templateUuid: string): Promise<Template> {
-        return this.templateRepository.findOneOrFail({ uuid: templateUuid, deleted: false });
+        return this.templateRepository.findOneOrFail({
+            uuid: templateUuid,
+            deleted: false,
+        });
     }
 
     public async create(

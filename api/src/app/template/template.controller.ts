@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Patch,
+    Post,
+    UploadedFile,
+    UseInterceptors,
+} from '@nestjs/common';
 import { TemplateService } from './template.service';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { CurrentUser } from '../common/decorators/user.decorator';
@@ -95,7 +105,7 @@ export class TemplateController {
             currentUser,
             ontologyFile,
             fileBuffer,
-            createTemplateDto
+            createTemplateDto,
         );
     }
 
@@ -115,7 +125,7 @@ export class TemplateController {
     public async delete(
         @Param('templateUuid') templateUuid: string,
     ): Promise<void> {
-        const template = await this.templateService.getOneByUuid(templateUuid)
+        const template = await this.templateService.getOneByUuid(templateUuid);
 
         return await this.templateService.delete(template);
     }

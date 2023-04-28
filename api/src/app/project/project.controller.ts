@@ -200,6 +200,7 @@ export class ProjectController {
         @Param('uuid', ProjectByUuidPipe) project: Project,
     ): Promise<AnalyzedJsonData> {
         let analyzedData: AnalyzeData;
+        const ontologyFile = project.getTemplate().getOntologyFile();
 
         const bpmnProjectData = await this.bpmnService.parseBpmnFile(
             project.getPath(),
@@ -262,9 +263,14 @@ export class ProjectController {
                         specialProjectBpmnData.flatMap((obj) =>
                             obj.getElements(),
                         );
+                    const allNodesByTemplate =
+                        await this.ontologyService.getAllNodesByFile(
+                            ontologyFile,
+                        );
                     analyzedData = await this.analyzeService.fourthLevelAnalyze(
                         fourthLevelBpmnProjectData,
                         analyzedData,
+                        allNodesByTemplate,
                     );
 
                     analyzedData =

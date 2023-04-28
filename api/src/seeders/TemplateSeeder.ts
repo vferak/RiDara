@@ -71,29 +71,32 @@ export class TemplateSeeder extends Seeder {
             new CreateTemplateDto('Waterfall'),
         );
 
-        const requirementPrioritizationTemplate = await this.createTemplateWithAllRelations(
-            entityManager,
-            TemplateSeeder.REQUIREMENT_PRIORITIZATION_TEMPLATE_BPMN_FILE,
-            adminUser,
-            upmmOntology,
-            new CreateTemplateDto('Requirement prioritization'),
-        );
+        const requirementPrioritizationTemplate =
+            await this.createTemplateWithAllRelations(
+                entityManager,
+                TemplateSeeder.REQUIREMENT_PRIORITIZATION_TEMPLATE_BPMN_FILE,
+                adminUser,
+                upmmOntology,
+                new CreateTemplateDto('Requirement prioritization'),
+            );
 
-        const developmentProcessTemplate = await this.createTemplateWithAllRelations(
-            entityManager,
-            TemplateSeeder.DEVELOPMENT_PROCESS_TEMPLATE_BPMN_FILE,
-            adminUser,
-            upmmOntology,
-            new CreateTemplateDto('Development process no errors'),
-        );
+        const developmentProcessTemplate =
+            await this.createTemplateWithAllRelations(
+                entityManager,
+                TemplateSeeder.DEVELOPMENT_PROCESS_TEMPLATE_BPMN_FILE,
+                adminUser,
+                upmmOntology,
+                new CreateTemplateDto('Development process'),
+            );
 
-        const developmentProcessBadTemplate = await this.createTemplateWithAllRelations(
-            entityManager,
-            TemplateSeeder.DEVELOPMENT_PROCESS_BAD_TEMPLATE_BPMN_FILE,
-            adminUser,
-            upmmOntology,
-            new CreateTemplateDto('Development process bad template '),
-        );
+        const developmentProcessBadTemplate =
+            await this.createTemplateWithAllRelations(
+                entityManager,
+                TemplateSeeder.DEVELOPMENT_PROCESS_BAD_TEMPLATE_BPMN_FILE,
+                adminUser,
+                upmmOntology,
+                new CreateTemplateDto('Development process bad template '),
+            );
 
         context.template = {
             waterfall: waterFallTemplate,
@@ -110,14 +113,15 @@ export class TemplateSeeder extends Seeder {
         ontologyFile: OntologyFile,
         createTemplateDto: CreateTemplateDto,
     ): Promise<Template> {
-        const waterfallTemplateFile = await this.bpmnService.changeStructureOfImportedFile(
-            this.fileService.readFile(
-                FileData.createFromFilePathWithName(templateFileName),
-            ),
-            await ontologyFile.getNodes(),
-            [],
-            true,
-        );
+        const waterfallTemplateFile =
+            await this.bpmnService.changeStructureOfImportedFile(
+                this.fileService.readFile(
+                    FileData.createFromFilePathWithName(templateFileName),
+                ),
+                await ontologyFile.getNodes(),
+                [],
+                true,
+            );
 
         const template = await Template.create(
             this.templateFileService,
@@ -135,9 +139,7 @@ export class TemplateSeeder extends Seeder {
                 false,
                 false,
             )
-        ).flatMap((obj) =>
-            obj.getElements(),
-        );
+        ).flatMap((obj) => obj.getElements());
 
         await this.templateNodeService.createFromBpmnData(
             allBpmnElements,
