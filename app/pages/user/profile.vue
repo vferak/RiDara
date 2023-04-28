@@ -5,7 +5,7 @@ const { data: userData } = await getUserProfile();
 </script>
 <template>
     <div v-if="userData" class="container mx-auto h-full mt-4">
-        <div class="card w-1/2 min-w-min bg-base-200 shadow-xl mx-auto">
+        <div class="card bg-primary text-primary-content w-1/2 min-w-min bg-base-200 shadow-xl mx-auto">
             <figure class="px-10 pt-10">
                 <div class="avatar">
                     <div class="w-24 mask mask-squircle">

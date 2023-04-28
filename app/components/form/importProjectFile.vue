@@ -62,7 +62,7 @@ const onSubmit = handleSubmit(async (): Promise<void> => {
     <form @submit='onSubmit' class='flex flex-col mb-4' method="post" enctype="multipart/form-data">
         <FormInputBase :name='"Name"' :type='"text"' :field='name'/>
         <FormInputBase @change='onChangeFile($event)' :name='"Project file"' :type='"file"' :field='file'/>
-        <FormInputBase :name='"File"' :type='"select"' :field='templateUuid' :options='templates'/>
+        <FormInputBase :name='"Template"' :type='"select"' :field='templateUuid' :options='templates'/>
         <input type='submit' value='Submit' class='btn btn-primary btn-sm mt-4'/>
     </form>
 </template>

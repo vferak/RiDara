@@ -51,7 +51,7 @@ const onSubmit = handleSubmit(async (): Promise<void> => {
 <template>
     <form @submit='onSubmit' class='flex flex-col mb-4'>
         <FormInputBase :name='"Name"' :type='"text"' :field='name'/>
-        <FormInputBase :name='"File"' :type='"select"' :field='templateUuid' :options='templates'/>
+        <FormInputBase :name='"Template"' :type='"select"' :field='templateUuid' :options='templates'/>
         <FormInputBase :name='"Blank file"' :type='"radio"' :field='blankFile'/>
         <input type='submit' value='Submit' class='btn btn-primary btn-sm mt-4'/>
     </form>

@@ -14,7 +14,7 @@ const lastName = user.value?.lastName;
 const exist = computed(() => workspaces.value !== null && workspaces.value?.length === 0);
 </script>
 <template>
-    <div class="hero py-16 bg-primary text-primary-content">
+    <div class="hero py-12 bg-primary text-primary-content">
         <div class="hero-content text-center">
             <div class="max-w-2xl">
                 <h1 class="text-6xl font-bold">Welcome to RiDara</h1>
@@ -36,7 +36,7 @@ const exist = computed(() => workspaces.value !== null && workspaces.value?.leng
                 <NuxtLink to='/workspaces' class="btn btn-sm btn-primary">Create workspace</NuxtLink>
             </div>
         </AlertInform>
-        <div class='grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-8 mt-8'>
+        <div class='grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-8 mt-8'>
             <CardsWorkspaceCard v-for='workspace in workspaces' :key='workspace.id' :workspace='workspace' />
         </div>
     </div>
