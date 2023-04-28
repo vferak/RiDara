@@ -1,4 +1,8 @@
 <script setup lang='ts'>
+useHead({
+    title: useTitle().createTitle('Projects'),
+});
+
 import { Project } from '~/composables/types';
 
 const { getWorkspace, getWorkspaces } = useWorkspace();

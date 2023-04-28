@@ -1,4 +1,8 @@
 <script setup lang='ts'>
+useHead({
+    title: useTitle().createTitle('Dashboard'),
+});
+
 const { getWorkspaces } = useWorkspace();
 const { getUser } = useUser();
 

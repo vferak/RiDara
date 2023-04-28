@@ -1,4 +1,8 @@
 <script setup lang='ts'>
+useHead({
+    title: useTitle().createTitle('User profile'),
+});
+
 const { getUserProfile } = useUser();
 
 const { data: userData } = await getUserProfile();

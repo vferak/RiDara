@@ -1,3 +1,8 @@
+<script setup lang='ts'>
+useHead({
+    title: useTitle().createTitle('Registration'),
+});
+</script>
 <template>
     <div class='container mx-auto h-full'>
         <div class='flex h-full justify-center items-center'>

@@ -1,4 +1,8 @@
 <script setup lang='ts'>
+useHead({
+    title: useTitle().createTitle('Templates'),
+});
+
 import { Template } from '~/composables/types';
 
 const {

@@ -1,4 +1,8 @@
 <script setup lang='ts'>
+useHead({
+    title: useTitle().createTitle('Workspace settings'),
+});
+
 const router = useRouter();
 const route = useRoute();
 const { clearCurrentWorkspace } = useCurrentWorkspace();
