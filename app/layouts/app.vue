@@ -63,10 +63,6 @@ renderNav();
 watch(currentWorkspace, () => {
     renderNav();
 })
-
-watch(route, () => {
-    console.log(route.path);
-})
 </script>
 <template>
     <div class="flex flex-col h-screen">

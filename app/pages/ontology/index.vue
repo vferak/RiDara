@@ -1,4 +1,8 @@
 <script setup lang='ts'>
+useHead({
+    title: useTitle().createTitle('Ontology files'),
+});
+
 import { OntologyFile } from '~/composables/types';
 
 const {

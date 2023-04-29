@@ -1,4 +1,7 @@
 <script setup lang='ts'>
+useHead({
+    title: useTitle().createTitle('Project'),
+});
 
 import { RelationErrorDeserializedData } from '~/composables/types';
 const { $bpmnModeler } = useNuxtApp();

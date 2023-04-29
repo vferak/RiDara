@@ -1,4 +1,8 @@
 <script setup lang='ts'>
+useHead({
+    title: useTitle().createTitle('Templates'),
+});
+
 import { Template } from '~/composables/types';
 
 const {
@@ -58,7 +62,7 @@ const importTemplateSubmit = async (name: string, ontologyFileUuid: string, file
 };
 
 const removeTemplate = async (template: Template): Promise<void> => {
-    const confirmed = confirm('Are you sure you want to delete this ontology file?');
+    const confirmed = confirm('Are you sure you want to delete this template?');
 
     if (confirmed) {
         await deleteTemplate(template.uuid);

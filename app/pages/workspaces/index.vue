@@ -1,4 +1,8 @@
 <script setup lang='ts'>
+useHead({
+    title: useTitle().createTitle('Workspaces'),
+});
+
 const { getWorkspaces, createWorkspace } = useWorkspace();
 const { modalState, openModal, closeModal } = useModal('workspace-create');
 

@@ -9,7 +9,7 @@ const emit = defineEmits<{
     (event: 'formSent', name: string): void
 }>();
 
-const { handleSubmit } = $veeValidate.useForm({
+const { handleSubmit, resetForm } = $veeValidate.useForm({
     validationSchema: $veeValidate.toFormValidator(
         $z.object({
             name: $z.string().min(4, { message: 'Too short' }),
@@ -26,6 +26,7 @@ const onSubmit = handleSubmit(async (): Promise<void> => {
     emit('formSent', name.value.value);
     name.setValue(name.value.value);
     name.meta.touched = false;
+    resetForm();
 });
 
 </script>

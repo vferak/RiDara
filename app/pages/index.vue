@@ -1,4 +1,8 @@
 <script setup lang='ts'>
+useHead({
+    title: useTitle().createTitle('Login'),
+});
+
 const route = useRoute();
 const success = useState<boolean>(() => false);
 const fail = useState<boolean>(() => false);
