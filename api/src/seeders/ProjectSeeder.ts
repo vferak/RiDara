@@ -19,21 +19,6 @@ export class ProjectSeeder extends Seeder {
         'resources',
     );
 
-    private static FERAK_PROJECT_BPMN_FILE = path.join(
-        ProjectSeeder.SEEDER_RESOURCES_FOLDER,
-        'FerakProject.bpmn',
-    );
-
-    private static BESTA_PROJECT_BPMN_FILE = path.join(
-        ProjectSeeder.SEEDER_RESOURCES_FOLDER,
-        'BestaProject.bpmn',
-    );
-
-    private static SHARED_PROJECT_BPMN_FILE = path.join(
-        ProjectSeeder.SEEDER_RESOURCES_FOLDER,
-        'SharedProject.bpmn',
-    );
-
     private static EXAMPLE_NO_ERRORS = path.join(
         ProjectSeeder.SEEDER_RESOURCES_FOLDER,
         'DevelopmentNoErrorsProject.bpmn',
@@ -72,7 +57,6 @@ export class ProjectSeeder extends Seeder {
         entityManager: EntityManager,
         context: Dictionary,
     ): Promise<void> {
-        const waterfallTemplate = await context.template.waterfall;
         const developmentTemplate = await context.template.developmentProcessTemplate;
 
         const analyzeWorkspace = context.workspace.analyzeExamples;
@@ -133,24 +117,24 @@ export class ProjectSeeder extends Seeder {
         );
 
         const ferakProject = await this.createProject(
-            ProjectSeeder.FERAK_PROJECT_BPMN_FILE,
-            waterfallTemplate,
+            ProjectSeeder.EXAMPLE_NO_ERRORS,
+            developmentTemplate,
             ferakWorkspace,
             ferakUser,
             'Ferak project',
         );
 
         const bestaProject = await this.createProject(
-            ProjectSeeder.BESTA_PROJECT_BPMN_FILE,
-            waterfallTemplate,
+            ProjectSeeder.EXAMPLE_NO_ERRORS,
+            developmentTemplate,
             bestaWorkspace,
             bestaUser,
             'Besta project',
         );
 
         const sharedProject= await this.createProject(
-            ProjectSeeder.SHARED_PROJECT_BPMN_FILE,
-            waterfallTemplate,
+            ProjectSeeder.EXAMPLE_NO_ERRORS,
+            developmentTemplate,
             sharedWorkspace,
             ferakUser,
             'Shared project',
